@@ -1,4 +1,4 @@
-package badbitchesonly
+package main
 
 import (
 	_ "fmt"
@@ -153,8 +153,6 @@ func makeKeyStream() {
 	r2 = makeR2()
 	r3 = makeR3()
 	r4 = makeR4()
-
-	/* Initialiser Registers*/
 
 	/* Initialize internal state with K_c and frame number */
 
