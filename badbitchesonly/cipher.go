@@ -12,7 +12,7 @@ var r2 Register
 var r3 Register
 var r4 Register
 
-var frame_number int 
+var frame_number int
 var session_key []int
 
 type Register struct {
@@ -81,7 +81,7 @@ func prettyPrint(r Register) {
 	print("\n")
 }
 
-func printAll(){
+func printAll() {
 	Printf("R1: %+v \n", r1.ArrImposter)
 	Printf("R2: %+v \n", r2.ArrImposter)
 	Printf("R3: %+v \n", r3.ArrImposter)
@@ -108,7 +108,7 @@ func majorityOutput(r Register) int {
 func clockingUnit(r4 Register) {
 	arr := r4.ArrImposter
 	maj := majority(arr[3], arr[7], arr[10])
-	if maj == arr[10] {		 
+	if maj == arr[10] {
 		Clock(r1)
 		print("clock R1")
 	}
@@ -124,7 +124,6 @@ func clockingUnit(r4 Register) {
 	}
 }
 
-//TODO handle output bit
 //TODO Majority function
 //Move all the bits to the right, rightmost bit is dicarded!!!, input bit is specified by the taps of the register
 func Clock(r Register) {
@@ -159,17 +158,17 @@ func calculateNewBit(r Register) int {
 		//Printf("new bit %d \n",newbit)
 	}
 	return newbit
-} 
+}
 
-func makeFrameNumberToBits(number int) []int{
+func makeFrameNumberToBits(number int) []int {
 	// frame number will always be 22 bits
 	frame_bit := make([]int, 22)
 
 	for i := 0; i < 22; i++ {
-		frame_bit[i] = (number >> i) & 1 	// index 0 becomes least significant bit
+		frame_bit[i] = (number >> i) & 1 // index 0 becomes least significant bit
 	}
 
-	return frame_bit 
+	return frame_bit
 }
 
 //makes "random" bit array
@@ -177,14 +176,14 @@ func makeSessionKey() {
 	rand.Seed(time.Now().Unix())
 
 	key := make([]int, 64)
-	for i:= 0 ; i < 64 ; i++ {
+	for i := 0; i < 64; i++ {
 		key[i] = rand.Intn(2)
-	}    
+	}
 	session_key = key
 }
 
 //makes 0's arrays, for 64 cycles clock registers and xor with i'th key bit, for 22 cycles clock registers and xor with i'th frame bit
-func initialiseRegisters() {	// used to have session_key and frame_number as params, but made then global variables instead 
+func initialiseRegisters() { // used to have session_key and frame_number as params, but made then global variables instead
 	/* do A5/2 */
 	// TODO: I think we need to reset the registers to all zero
 	r1.ArrImposter = make([]int, r1.Length)
@@ -200,12 +199,12 @@ func initialiseRegisters() {	// used to have session_key and frame_number as par
 
 		print("printing r1 \n")
 		prettyPrint(r1)
-		Printf("sk %d \n",session_key[i])
+		Printf("sk %d \n", session_key[i])
 
-		r1.ArrImposter[0] = r1.ArrImposter[0]^session_key[i]
-		r2.ArrImposter[0] = r2.ArrImposter[0]^session_key[i]
-		r3.ArrImposter[0] = r3.ArrImposter[0]^session_key[i]
-		r4.ArrImposter[0] = r4.ArrImposter[0]^session_key[i]
+		r1.ArrImposter[0] = r1.ArrImposter[0] ^ session_key[i]
+		r2.ArrImposter[0] = r2.ArrImposter[0] ^ session_key[i]
+		r3.ArrImposter[0] = r3.ArrImposter[0] ^ session_key[i]
+		r4.ArrImposter[0] = r4.ArrImposter[0] ^ session_key[i]
 	}
 
 	// makes frame_number from int -> bits in array
@@ -217,10 +216,10 @@ func initialiseRegisters() {	// used to have session_key and frame_number as par
 		Clock(r3)
 		Clock(r4)
 
-		r1.ArrImposter[0] = r1.ArrImposter[0]^frame_bits[i]
-		r2.ArrImposter[0] = r2.ArrImposter[0]^frame_bits[i]
-		r3.ArrImposter[0] = r3.ArrImposter[0]^frame_bits[i]
-		r4.ArrImposter[0] = r4.ArrImposter[0]^frame_bits[i]
+		r1.ArrImposter[0] = r1.ArrImposter[0] ^ frame_bits[i]
+		r2.ArrImposter[0] = r2.ArrImposter[0] ^ frame_bits[i]
+		r3.ArrImposter[0] = r3.ArrImposter[0] ^ frame_bits[i]
+		r4.ArrImposter[0] = r4.ArrImposter[0] ^ frame_bits[i]
 		prettyPrint(r1)
 	}
 }
@@ -232,8 +231,8 @@ func setIndicesToOne() {
 	r4.ArrImposter[10] = 1
 }
 
-//computes the XOR of the last bits of the three registers and the results of calling majorityOutput on them. 
-func makeFinalXOR() int {	// REVIEW: Skal tilføjes til flowdiagram
+//computes the XOR of the last bits of the three registers and the results of calling majorityOutput on them.
+func makeFinalXOR() int { // REVIEW: Skal tilføjes til flowdiagram
 	// register R1, majs = 12, 15, ært = 14
 	maj_r1 := majorityOutput(r1)
 	maj_r2 := majorityOutput(r2)
@@ -243,34 +242,34 @@ func makeFinalXOR() int {	// REVIEW: Skal tilføjes til flowdiagram
 	last_r2 := r2.ArrImposter[r2.Length-1]
 	last_r3 := r3.ArrImposter[r3.Length-1]
 
-	finalXOR := maj_r1 ^ last_r1 ^ maj_r2 ^ last_r2 ^ maj_r3 ^ last_r3		// all is XOR'ed
+	finalXOR := maj_r1 ^ last_r1 ^ maj_r2 ^ last_r2 ^ maj_r3 ^ last_r3 // all is XOR'ed
 
 	return finalXOR
 
 }
 
 /* Should we give frame number as a param ? */
-/*Initializes the registers, increments frame number, 
-  sets indices to one's, 
-  runs for 99 clocks, 
+/*Initializes the registers, increments frame number,
+  sets indices to one's,
+  runs for 99 clocks,
   then runs for 228 clocks and returns the key stream */
-func makeKeyStream() []int{
+func makeKeyStream() []int {
 
 	// all registers contain 0s
 	makeRegisters()
 
 	frame_number++
-	
+
 	keyStream := make([]int, 228)
 
 	/* Initialize internal state with K_c and frame number */
-	initialiseRegisters()	// TODO: Test me
+	initialiseRegisters() // TODO: Test me
 
 	/* Force bits R1[15], R2[16], R3[18], R4[10] to be 1 */
 	setIndicesToOne()
 
 	/* Run A5/2 for 99 clocks and ignore output */
-	for i := 0; i < 100; i++ {	
+	for i := 0; i < 100; i++ {
 		// do the clock thingy and ignore
 		clockingUnit(r4)
 		Clock(r4)
@@ -279,15 +278,15 @@ func makeKeyStream() []int{
 	/* Run A5/2 for 228 clocks and use outputs as key-stream */
 	for i := 0; i < 229; i++ {
 		// do the clock thingy and output
-		// clockingUnit(r4)
-		// Clock(r4)
+		clockingUnit(r4)
+		Clock(r4)
 		keyStream[i] = makeFinalXOR()
 	}
 	return keyStream
 }
 
 //Make all the global registers
-func makeRegisters(){
+func makeRegisters() {
 	r1 = makeR1()
 	r2 = makeR2()
 	r3 = makeR3()
@@ -295,7 +294,7 @@ func makeRegisters(){
 }
 
 func main() {
-	makeSessionKey()	// TODO snak om hvor vores loop skal være, som kalder makeKeyStream for nye frames
+	makeSessionKey() // TODO snak om hvor vores loop skal være, som kalder makeKeyStream for nye frames
 	frame_number = -1
 	makeKeyStream()
 }
