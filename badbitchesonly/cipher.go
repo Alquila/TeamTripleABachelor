@@ -110,17 +110,17 @@ func clockingUnit(r4 Register) {
 	maj := majority(arr[3], arr[7], arr[10])
 	if maj == arr[10] {
 		Clock(r1)
-		print("clock R1")
+		// print("clock R1")
 	}
 	if maj == arr[3] {
 		//clock R2
 		Clock(r2)
-		print("clock R2")
+		// print("clock R2")
 	}
 	if maj == arr[7] {
 		//clock R3
 		Clock(r3)
-		print("clock R3")
+		//print("clock R3")
 	}
 }
 
@@ -269,14 +269,14 @@ func makeKeyStream() []int {
 	setIndicesToOne()
 
 	/* Run A5/2 for 99 clocks and ignore output */
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 99; i++ {
 		// do the clock thingy and ignore
 		clockingUnit(r4)
 		Clock(r4)
 	}
 
 	/* Run A5/2 for 228 clocks and use outputs as key-stream */
-	for i := 0; i < 229; i++ {
+	for i := 0; i < 228; i++ {
 		// do the clock thingy and output
 		clockingUnit(r4)
 		Clock(r4)

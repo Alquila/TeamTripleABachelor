@@ -3,9 +3,9 @@ package main
 import (
 	. "fmt"
 	"math/rand"
+	"reflect"
 	"testing"
 	"time"
-	"reflect"
 	//"golang.org/x/tools/go/analysis/passes/nilfunc"
 )
 
@@ -109,14 +109,14 @@ func TestSetIndiciesToOne(t *testing.T) {
 	printAll()
 }
 
-func TestInitialiseRegisters(t *testing.T) {	// TODO: test at initreg er forskellig når framenumber er forskellig :-)
+func TestInitialiseRegisters(t *testing.T) { // TODO: test at initreg er forskellig når framenumber er forskellig :-)
 	makeRegisters()
 	frame_number = 22
 	makeSessionKey()
 	initialiseRegisters()
 	reg1 := r1
 	reg2 := r2
-	reg3 := r3 
+	reg3 := r3
 	reg4 := r4
 
 	r1.ArrImposter[6] = 42
@@ -127,7 +127,7 @@ func TestInitialiseRegisters(t *testing.T) {	// TODO: test at initreg er forskel
 	Printf("Initialise registers again: \n")
 	initialiseRegisters()
 	printAll()
-	
+
 	if reflect.DeepEqual(reg1.ArrImposter, r1.ArrImposter) {
 		t.Log("reg1 and r1 are different")
 		t.Fail()
@@ -147,24 +147,47 @@ func TestInitialiseRegisters(t *testing.T) {	// TODO: test at initreg er forskel
 
 }
 
-func TestCalculateNewBit(t *testing.T){
-	makeRegisters()	
+func TestCalculateNewBit(t *testing.T) {
+	makeRegisters()
 
 	a1 := r1.ArrImposter
-	a1[13] = 1; a1[16] = 0; a1[17] = 1; a1[18] = 0; //set the tap indexes to concrete values 1 ⨁ 0 ⨁ 1 ⨁ 0 = 0
+	a1[13] = 1
+	a1[16] = 0
+	a1[17] = 1
+	a1[18] = 0 //set the tap indexes to concrete values 1 ⨁ 0 ⨁ 1 ⨁ 0 = 0
 	res := calculateNewBit(r1)
-	if( res != 0){t.Fail()}
-	
-	
-	a1[13] = 1; a1[16] = 0; a1[17] = 1; a1[18] = 1; //set the tap indexes to concrete values 1 ⨁ 0 ⨁ 1 ⨁ 1 = 1
+	if res != 0 {
+		t.Fail()
+	}
+
+	a1[13] = 1
+	a1[16] = 0
+	a1[17] = 1
+	a1[18] = 1 //set the tap indexes to concrete values 1 ⨁ 0 ⨁ 1 ⨁ 1 = 1
 	res = calculateNewBit(r1)
-	if( res != 1){t.Fail()}
+	if res != 1 {
+		t.Fail()
+	}
 }
 
-func TestMajorityOutput(t *testing.T){}
+func TestMajorityOutput(t *testing.T) {}
 
-func TestClockingUnit(t *testing.T){}
+func TestClockingUnit(t *testing.T) {}
 
-func TestFinalXor(t *testing.T){}
+func TestFinalXor(t *testing.T) {}
 
-func TestKeyStream(t *testing.T){}
+func TestKeyStreamSimple(t *testing.T) {
+	makeSessionKey() // TODO snak om hvor vores loop skal være, som kalder makeKeyStream for nye frames
+	frame_number = -1
+	x := makeKeyStream()
+	Printf("%+v \n", x)
+	Printf("mean %f \n", mean(x))
+}
+
+func mean(a []int) float64 {
+	sum := 0.0
+	for _, v := range a {
+		sum += (float64(v))
+	}
+	return (sum / float64(len(a)))
+}
