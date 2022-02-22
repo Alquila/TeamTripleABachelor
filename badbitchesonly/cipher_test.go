@@ -118,6 +118,8 @@ func TestInitialiseRegisters(t *testing.T) { // TODO: test at initreg er forskel
 	reg2 := r2
 	reg3 := r3
 	reg4 := r4
+	// copy(reg1,r1.ArrImposter)
+	//TODO få amalie til at forklare den her test
 
 	r1.ArrImposter[6] = 42
 	r2.ArrImposter[6] = 42
@@ -168,11 +170,115 @@ func TestCalculateNewBit(t *testing.T) {
 	if res != 1 {
 		t.Fail()
 	}
+
+	a2 := r2.ArrImposter
+	a2[20] = 0
+	a2[21] = 0 //set the tap indexes to concrete values  0 ⨁ 0 = 0
+	res = calculateNewBit(r2)
+	if res != 0 {
+		t.Fail()
+	}
+
+	a2[20] = 1
+	a2[21] = 0 //set the tap indexes to concrete values 1 ⨁ 0 = 1
+	res = calculateNewBit(r2)
+	if res != 1 {
+		t.Fail()
+	}
+
+	a3 := r3.ArrImposter
+	a3[22] = 0
+	a3[21] = 1
+	a3[20] = 0
+	a3[7] = 1 //set the tap indexes to concrete values 0 ⨁ 1 ⨁ 0 ⨁ 1 = 0
+	res = calculateNewBit(r3)
+	if res != 0 {
+		t.Fail()
+	}
+
+	a3[22] = 1
+	a3[21] = 1
+	a3[20] = 0
+	a3[7] = 1 //set the tap indexes to concrete values 1 ⨁ 1 ⨁ 0 ⨁ 1 = 1
+	res = calculateNewBit(r3)
+	if res != 1 {
+		t.Fail()
+	}
+
 }
 
-func TestMajorityOutput(t *testing.T) {}
+func TestMajorityOutput(t *testing.T) {
+	makeRegisters()
 
-func TestClockingUnit(t *testing.T) {}
+	a := r1.ArrImposter
+	a[12] = 1
+	a[14] = 1
+	a[15] = 0
+	//set the tap indexes to concrete values maj(1,(1 ⨁ 1), 0)
+	res := majorityOutput(r1)
+	if res != 0 {
+		t.Errorf(" x is not 0 but %d", res)
+	}
+	a[12] = 1
+	a[14] = 0
+	a[15] = 0
+	//set the tap indexes to concrete values maj(1,(0 ⨁ 1), 0)
+	res = majorityOutput(r1)
+	if res != 1 {
+		t.Errorf(" x is not 1 but %d", res)
+	}
+
+	a = r2.ArrImposter
+	a[9] = 1
+	a[13] = 1
+	a[16] = 0
+	//set the tap indexes to concrete values maj(1, 1, (0 ⨁ 1))
+	res = majorityOutput(r2)
+	if res != 1 {
+		t.Errorf(" x is not 1 but %d", res)
+	}
+	a[9] = 1
+	a[13] = 0
+	a[16] = 1
+	//set the tap indexes to concrete values maj(1, 0, (1 ⨁ 1))
+	res = majorityOutput(r2)
+	if res != 0 {
+		t.Errorf(" x is not 0 but %d", res)
+	}
+
+	a = r3.ArrImposter
+	a[13] = 1
+	a[16] = 0
+	a[18] = 0
+	//set the tap indexes to concrete values maj((1 ⨁ 1), 0, 0)
+	res = majorityOutput(r3)
+	if res != 0 {
+		t.Errorf(" x is not 0 but %d", res)
+	}
+	a[13] = 1
+	a[16] = 1
+	a[18] = 1
+	//set the tap indexes to concrete values maj((1 ⨁ 1), 1, 1)
+	res = majorityOutput(r3)
+	if res != 1 {
+		t.Errorf(" x is not 0 but %d", res)
+	}
+}
+
+func TestClockingUnit(t *testing.T) {
+	makeRegisters()
+
+	a := r4.ArrImposter
+	//clock R2 og R3
+	a[3] = 1
+	a[7] = 1
+	a[10] = 0
+	clockingUnit(r4) //will print those it clocks
+
+	//clock all
+	Clock(r4) //will have 0's in the indexes
+	clockingUnit(r4)
+}
 
 func TestFinalXor(t *testing.T) {}
 

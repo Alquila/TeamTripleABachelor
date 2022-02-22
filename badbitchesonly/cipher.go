@@ -110,17 +110,17 @@ func clockingUnit(r4 Register) {
 	maj := majority(arr[3], arr[7], arr[10])
 	if maj == arr[10] {
 		Clock(r1)
-		// print("clock R1")
+		print("clock R1\n")
 	}
 	if maj == arr[3] {
 		//clock R2
 		Clock(r2)
-		// print("clock R2")
+		print("clock R2\n")
 	}
 	if maj == arr[7] {
 		//clock R3
 		Clock(r3)
-		//print("clock R3")
+		print("clock R3\n")
 	}
 }
 
@@ -185,7 +185,6 @@ func makeSessionKey() {
 //makes 0's arrays, for 64 cycles clock registers and xor with i'th key bit, for 22 cycles clock registers and xor with i'th frame bit
 func initialiseRegisters() { // used to have session_key and frame_number as params, but made then global variables instead
 	/* do A5/2 */
-	// TODO: I think we need to reset the registers to all zero
 	r1.ArrImposter = make([]int, r1.Length)
 	r2.ArrImposter = make([]int, r2.Length)
 	r3.ArrImposter = make([]int, r3.Length)
@@ -220,8 +219,14 @@ func initialiseRegisters() { // used to have session_key and frame_number as par
 		r2.ArrImposter[0] = r2.ArrImposter[0] ^ frame_bits[i]
 		r3.ArrImposter[0] = r3.ArrImposter[0] ^ frame_bits[i]
 		r4.ArrImposter[0] = r4.ArrImposter[0] ^ frame_bits[i]
-		prettyPrint(r1)
 	}
+
+	Printf("Initialised registers 1-4:")
+	Println()
+	prettyPrint(r1)
+	prettyPrint(r2)
+	prettyPrint(r3)
+	prettyPrint(r4)
 }
 
 func setIndicesToOne() {

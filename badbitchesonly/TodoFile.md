@@ -1,4 +1,9 @@
 ## BAD BITCHES ONLY D-:<= 
+
+# GO kommandoer
+go test -run TestName (kør specific test)
+go test -v (kør alle tests)
+
 # Done
 Register definition
 Make Session Key
