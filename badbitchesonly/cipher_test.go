@@ -42,7 +42,7 @@ func TestMajority(t *testing.T) {
 }
 
 func makeSmallReg() Register { //[0 0 0 0 0 0 0 0 0 0]
-	r1 = Register{Number: 0,
+	r1 = Register{
 		Length:      10,
 		ArrImposter: make([]int, 10),
 		Tabs:        []int{3, 5, 9}, // [0] = [3] ^ [5] ^ [9]
@@ -84,7 +84,7 @@ func TestMakeSessionKey(t *testing.T) {
 //Generate a random array of length n
 //Println(rand.Perm(64))
 
-func TestMakeFrameNumber(t *testing.T) {	// REVIEW: denne test, tester ikke metoden i vores kode, det bør den måske istedet
+func TestMakeFrameNumber(t *testing.T) { // REVIEW: denne test, tester ikke metoden i vores kode, det bør den måske istedet
 	f := 55
 
 	frameBit := make([]int, 22)
@@ -147,7 +147,7 @@ func TestRegistersAreSameAfterInitWithSameFrameNumber(t *testing.T) { // TODO: t
 	r2.ArrImposter[6] = 42
 	r3.ArrImposter[6] = 42
 	r4.ArrImposter[6] = 42
-	
+
 	//printAll()
 	initialiseRegisters()
 	Printf("Initialise registers again: \n")

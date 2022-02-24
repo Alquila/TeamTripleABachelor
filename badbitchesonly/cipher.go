@@ -16,7 +16,6 @@ var frame_number int
 var session_key []int
 
 type Register struct {
-	Number      int
 	Length      int
 	ArrImposter []int
 	Tabs        []int
@@ -24,8 +23,18 @@ type Register struct {
 	Ært         int
 }
 
+func makeRegister(length int, tabs []int, major_idx []int, compliment_idx int) Register {
+	reg := Register{
+		Length:      length,
+		ArrImposter: make([]int, length),
+		Tabs:        tabs,
+		Majs:        major_idx,
+		Ært:         compliment_idx}
+	return reg
+}
+
 func makeR1() Register {
-	r1 = makeRegister(1, 19, []int{18, 17, 16, 13}, []int{12, 15}, 14)
+	r1 = makeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14)
 	// r1 = Register{Number: 1,
 	// 	Length:      19,
 	// 	ArrImposter: make([]int, 19),
@@ -36,7 +45,7 @@ func makeR1() Register {
 }
 
 func makeR2() Register {
-	r2 = makeRegister(2, 22, []int{21, 20}, []int{9, 13}, 16)
+	r2 = makeRegister(22, []int{21, 20}, []int{9, 13}, 16)
 	// r2 = Register{Number: 2,
 	// 	Length:      22,
 	// 	ArrImposter: make([]int, 22),
@@ -47,7 +56,7 @@ func makeR2() Register {
 }
 
 func makeR3() Register {
-	r3 = makeRegister(3, 23, []int{22, 21, 20, 7}, []int{16, 18}, 13)
+	r3 = makeRegister(23, []int{22, 21, 20, 7}, []int{16, 18}, 13)
 	// r3 = Register{Number: 3,
 	// 	Length:      23,
 	// 	ArrImposter: make([]int, 23),
@@ -58,7 +67,7 @@ func makeR3() Register {
 }
 
 func makeR4() Register {
-	r4 = makeRegister(4, 17, []int{16, 11}, nil, -1)
+	r4 = makeRegister(17, []int{16, 11}, nil, -1)
 	// r4 = Register{Number: 4,
 	// 	Length:      17,
 	// 	ArrImposter: make([]int, 17),
@@ -66,14 +75,12 @@ func makeR4() Register {
 	return r4
 }
 
-func makeRegister(name int, length int, tabs []int, major_idx []int, compliment_idx int) Register {
-	reg := Register{Number: name,
-		Length:      length,
-		ArrImposter: make([]int, length),
-		Tabs:        tabs,
-		Majs:        major_idx,
-		Ært:         compliment_idx}
-	return reg
+//Make all the global registers
+func makeRegisters() {
+	r1 = makeR1()
+	r2 = makeR2()
+	r3 = makeR3()
+	r4 = makeR4()
 }
 
 func prettyPrint(r Register) {
@@ -288,14 +295,6 @@ func makeKeyStream() []int {
 		keyStream[i] = makeFinalXOR()
 	}
 	return keyStream
-}
-
-//Make all the global registers
-func makeRegisters() {
-	r1 = makeR1()
-	r2 = makeR2()
-	r3 = makeR3()
-	r4 = makeR4()
 }
 
 func main() {
