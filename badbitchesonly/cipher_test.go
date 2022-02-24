@@ -84,7 +84,7 @@ func TestMakeSessionKey(t *testing.T) {
 //Generate a random array of length n
 //Println(rand.Perm(64))
 
-func TestMakeFrameNumber(t *testing.T) {
+func TestMakeFrameNumber(t *testing.T) {	// REVIEW: denne test, tester ikke metoden i vores kode, det bør den måske istedet
 	f := 55
 
 	frameBit := make([]int, 22)
@@ -107,43 +107,66 @@ func TestSetIndiciesToOne(t *testing.T) {
 	makeRegisters()
 	setIndicesToOne()
 	printAll()
+	if r1.ArrImposter[15] != 1 {
+		t.Log("r1[15] should be 1 but was ", r1.ArrImposter[15])
+		t.Fail()
+	}
+	if r2.ArrImposter[16] != 1 {
+		t.Log("r2[16] should be 1 but was ", r2.ArrImposter[16])
+		t.Fail()
+	}
+	if r3.ArrImposter[18] != 1 {
+		t.Log("r3[18] should be 1 but was ", r3.ArrImposter[18])
+		t.Fail()
+	}
+	if r4.ArrImposter[10] != 1 {
+		t.Log("r4[10] should be 1 but was ", r4.ArrImposter[10])
+		t.Fail()
+	}
 }
 
-func TestInitialiseRegisters(t *testing.T) { // TODO: test at initreg er forskellig når framenumber er forskellig :-)
+func TestRegistersAreSameAfterInitWithSameFrameNumber(t *testing.T) { // TODO: test at initreg er forskellig når framenumber er forskellig :-)
 	makeRegisters()
 	frame_number = 22
 	makeSessionKey()
 	initialiseRegisters()
-	reg1 := r1
-	reg2 := r2
-	reg3 := r3
-	reg4 := r4
-	// copy(reg1,r1.ArrImposter)
+	reg1 := make([]int, 19)
+	reg2 := make([]int, 22)
+	reg3 := make([]int, 23)
+	reg4 := make([]int, 17)
+	copy(reg1, r1.ArrImposter)
+	copy(reg2, r2.ArrImposter)
+	copy(reg3, r3.ArrImposter)
+	copy(reg4, r4.ArrImposter)
 	//TODO få amalie til at forklare den her test
+
+	Printf("First initialisation: \n")
+	printAll()
 
 	r1.ArrImposter[6] = 42
 	r2.ArrImposter[6] = 42
 	r3.ArrImposter[6] = 42
 	r4.ArrImposter[6] = 42
-	printAll()
-	Printf("Initialise registers again: \n")
+	
+	//printAll()
 	initialiseRegisters()
+	Printf("Initialise registers again: \n")
 	printAll()
 
-	if reflect.DeepEqual(reg1.ArrImposter, r1.ArrImposter) {
-		t.Log("reg1 and r1 are different")
+	if !reflect.DeepEqual(reg1, r1.ArrImposter) {
+		t.Log("reg1 and r1 are different, but should be equal")
 		t.Fail()
 	}
-	if reflect.DeepEqual(reg2.ArrImposter, r2.ArrImposter) {
-		t.Log("reg2 and r2 are different")
+	if !reflect.DeepEqual(reg2, r2.ArrImposter) {
+		t.Log("reg2 and r2 are different but should be equal")
 		t.Fail()
 	}
-	if reflect.DeepEqual(reg3.ArrImposter, r3.ArrImposter) {
-		t.Log("reg3 and r3 are different")
+	if !reflect.DeepEqual(reg3, r3.ArrImposter) {
+		t.Log("reg3 and r3 are different but should be equal")
 		t.Fail()
 	}
-	if reflect.DeepEqual(reg4.ArrImposter, r4.ArrImposter) {
-		t.Log("reg4 and r4 are different")
+	if !reflect.DeepEqual(reg4, r4.ArrImposter) {
+		t.Log("reg4 and r4 are different but should be equal")
 		t.Fail()
 	}
 

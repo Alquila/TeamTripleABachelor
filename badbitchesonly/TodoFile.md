@@ -34,4 +34,6 @@ Clock R1-R3
 
 
 # Spørgsmål
-Skal de bits der skal bruges til den sidste XOR, skal de fetches før eller efter der clockes? 
+- Skal de bits der skal bruges til den sidste XOR, skal de fetches før eller efter der clockes? 
+- Framenumber: når framenumber skal repræsenteres som et binært array, skal vi så have least significance bit i index 0? Eller er det bare et valg vi tager, og egentlig ligemeget?
+- :'( 
