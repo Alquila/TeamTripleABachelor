@@ -161,7 +161,22 @@ func SymInitialiseRegisters() {
 // }
 
 func SymMajorityOutput() {
+	//TODO
+}
 
+//multiplies two decision vectors with result being c[i]d[j] ^ c[j]d[i] for i /= j and result = c[i]d[j] for i=j. res slice has lenght len(c)*(len(c)-1)/2.  c and d are assumed to be same lenght.
+func SymMajorityMultiply(c []int, d []int) []int {
+	leng := len(c)
+	leng = leng * (leng - 1) / 2
+	res := make([]int, leng)
+	for i := 0; i < len(c); i++ {
+		res[i] = c[i] * d[i]
+		for j := i; j < len(c); j++ {
+			res[leng+i] = c[i]*d[j] ^ c[j]*d[i]
+		}
+	}
+
+	return res
 }
 
 /*
@@ -182,6 +197,27 @@ func majorityOutput(r Register) int {
 #### THIS IS WHERE THE SIMPLE CIPHER SYM STREAM EXISTS ####
 ###########################################################
 */
+
+func MakeSymPlaintext() [][]int {
+	plaintext := make([][]int, 19)
+	for i := 0; i < 19; i++ {
+		plaintext[i] = make([]int, 19)
+		plaintext[i][i] = 1
+	}
+	return plaintext
+}
+
+// func EncryptSimpleSymPlaintext(plaintext []int) [][]int {
+// 	key := MakeSymPlaintext()
+// 	Printf("This is the key-stream: %d \n", key)
+// 	res := make([][]int, len(plaintext))
+// 	for i := range res {
+// 		res[i] = make([]int, 19)
+// 		for j := i; i < 19; i++ {
+// 			res[i][j] = key[i]
+// 		}
+// 	}
+// }
 
 func SimpleKeyStream(r SymRegister) [][]int {
 

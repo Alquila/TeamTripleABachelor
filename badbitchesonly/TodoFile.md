@@ -4,6 +4,12 @@
 go test -run TestName (kør specific test)
 go test -v (kør alle tests)
 
+## When running the first time run: 
+Run this inside the project:
+ * go mod init module_name
+ * go mod tidy
+
+
 # Done
 Register definition
 Make Session Key

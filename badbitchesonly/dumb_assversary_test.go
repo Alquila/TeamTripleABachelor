@@ -23,6 +23,22 @@ func TestEncryptPlaintext(t *testing.T) {
 	fmt.Printf("%d \n", cipher)
 }
 
+func TestSymPlaintext(t *testing.T) {
+	plaintext := MakeSymPlaintext()
+	fmt.Printf("This is the plaintext: %d \n", plaintext)
+}
+
+// func TestSymEncryptPlaintext(t *testing.T) {
+// 	plaintext := MakeSymPlaintext()
+// 	fmt.Printf("This is the plaintext: %d \n", plaintext)
+// 	cipher := EncryptSimpleSymPlaintext()
+// }
+
+func NotAllowedBigBangTest(t *testing.T) {
+	//plaintext := MakePlaintext()
+
+}
+
 func TestPrint2(t *testing.T) {
 	print("hello worlds")
 }
