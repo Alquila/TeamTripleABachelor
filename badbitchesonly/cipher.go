@@ -297,8 +297,45 @@ func makeKeyStream() []int {
 	return keyStream
 }
 
-func main() {
-	makeSessionKey() // TODO snak om hvor vores loop skal være, som kalder makeKeyStream for nye frames
-	frame_number = -1
-	makeKeyStream()
+/*
+#######################################################
+#### THIS IS WHERE THE SIMPLE CIPHER STREAM EXISTS ####
+#######################################################
+*/
+
+// vi bruger kun register R1 som er 19 langt
+func MakePlaintext() []int {
+	plaintext := []int{1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0}
+	return plaintext
+}
+
+// run stream-cipher, the one with actual numbers, such that the plaintext is encrypted
+func EncryptSimplePlaintext(plaintext []int) []int {
+	key := MakeSimpleKeyStream()
+	Printf("This is the key-stream: %d \n", key)
+	res := make([]int, len(plaintext))
+	for i := range res {
+		res[i] = key[i] ^ plaintext[i]
+	}
+
+	return res
+}
+
+func MakeSimpleKeyStream() []int {
+	// init R1
+	r1 = makeR1()
+	r1.ArrImposter[15] = 1
+
+	keyStream := make([]int, 50)
+
+	for i := 0; i < 101; i++ {
+		// clock R1
+		Clock(r1)
+		if i > 50 {
+			keyStream[i-51] = r1.ArrImposter[18]
+		}
+	}
+
+	return keyStream
+
 }

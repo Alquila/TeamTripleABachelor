@@ -4,6 +4,8 @@ import (
 	. "fmt"
 	"math/rand"
 	"reflect"
+	"strconv"
+	"strings"
 	"testing"
 	"time"
 	//"golang.org/x/tools/go/analysis/passes/nilfunc"
@@ -53,6 +55,45 @@ func makeSmallReg() Register { //[0 0 0 0 0 0 0 0 0 0]
 	return r1
 }
 
+func TestSimpleKeyStream(t *testing.T) {
+	r0 := SymRegister{Length: 10,
+		ArrImposter: make([][]int, 10),
+		Tabs:        []int{3, 5, 9}, // [0] = [3] ^ [5] ^ [9]
+		Majs:        []int{4, 7},
+		Ært:         6}
+
+	print("rip1")
+	for i := 0; i < r0.Length; i++ {
+		r0.ArrImposter[i] = make([]int, r0.Length)
+		r0.ArrImposter[i][i] = 1
+	}
+	print("rip")
+	key := SimpleKeyStream(r0)
+	Println("rip3")
+	for i := 0; i < 228; i++ {
+		// PrettyPrint()
+		for i := 0; i < r0.Length; i++ {
+			accString := "["
+			for j := 0; j < r0.Length; j++ {
+				if key[i][j] == 1 {
+					str := strconv.Itoa(j)
+					accString += "x" + (str) + " ⨁ "
+					// accString += " x" + (str) + " xor "
+				}
+			}
+			// accString = strings.TrimRight(accString, " xor ")
+			accString = strings.TrimRight(accString, "⨁ ")
+			//Printf("xor)
+			//Printf("")
+			accString += " ]"
+			print(accString)
+		}
+		Println()
+
+	}
+
+}
+
 func TestClock(t *testing.T) {
 
 	r0 := makeSmallReg()
@@ -72,55 +113,53 @@ func TestClock(t *testing.T) {
 
 }
 
-func TestSmallPrint(t *testing.T){
-	r0 := SymRegister{Length:      10,
+func TestSmallPrint(t *testing.T) {
+	r0 := SymRegister{Length: 10,
 		ArrImposter: make([][]int, 10),
 		Tabs:        []int{3, 5, 9}, // [0] = [3] ^ [5] ^ [9]
 		Majs:        []int{4, 7},
 		Ært:         6}
 
-		for i:=0; i< r0.Length; i++ {
-			r0.ArrImposter[i] = make([]int, r0.Length)
-		}
+	for i := 0; i < r0.Length; i++ {
+		r0.ArrImposter[i] = make([]int, r0.Length)
+	}
 
-		r0.ArrImposter[8][8] = 1
-		r0.ArrImposter[1][1] = 1
-		r0.ArrImposter[5][5] = 1
-		r0.ArrImposter[3][3] = 1
-		PrettyPrint(r0)
-		
-		symClock(r0)
-		//Printf("%+v \n", r0.ArrImposter)
-		//println(" 1st clock")
-		//PrettyPrint(r0)
-		symClock(r0)
-		//println(" 2nd clock")
-		//PrettyPrint(r0)
-		//Printf("%+v \n", r0.ArrImposter)
-		symClock(r0)
-		//Printf("%+v \n", r0.ArrImposter)
-		symClock(r0)
-		//Printf("%+v \n", r0.ArrImposter)
-		symClock(r0)
-		//Printf("%+v \n", r0.ArrImposter)
-		symClock(r0)
-		symClock(r0)
-		symClock(r0)
-		symClock(r0)
-		symClock(r0)
-		PrettyPrint(r0)
-		symClock(r0)
-		symClock(r0)
-		symClock(r0)
-		symClock(r0)
-		symClock(r0)
-		Printf("%+v \n", r0.ArrImposter)
-		PrettyPrint(r0)
-		//Printf("%+v \n", r0.ArrImposter)
-	
+	r0.ArrImposter[8][8] = 1
+	r0.ArrImposter[1][1] = 1
+	r0.ArrImposter[5][5] = 1
+	r0.ArrImposter[3][3] = 1
+	PrettyPrint(r0)
+
+	SymClock(r0)
+	//Printf("%+v \n", r0.ArrImposter)
+	//println(" 1st clock")
+	//PrettyPrint(r0)
+	SymClock(r0)
+	//println(" 2nd clock")
+	//PrettyPrint(r0)
+	//Printf("%+v \n", r0.ArrImposter)
+	SymClock(r0)
+	//Printf("%+v \n", r0.ArrImposter)
+	SymClock(r0)
+	//Printf("%+v \n", r0.ArrImposter)
+	SymClock(r0)
+	//Printf("%+v \n", r0.ArrImposter)
+	SymClock(r0)
+	SymClock(r0)
+	SymClock(r0)
+	SymClock(r0)
+	SymClock(r0)
+	PrettyPrint(r0)
+	SymClock(r0)
+	SymClock(r0)
+	SymClock(r0)
+	SymClock(r0)
+	SymClock(r0)
+	Printf("%+v \n", r0.ArrImposter)
+	PrettyPrint(r0)
+	//Printf("%+v \n", r0.ArrImposter)
 
 }
-
 
 func TestMakeSessionKey(t *testing.T) {
 	rand.Seed(time.Now().Unix())

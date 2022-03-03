@@ -31,11 +31,11 @@ func SymMakeRegister(length int, tabs []int, major_idx []int, compliment_idx int
 		Tabs:        tabs,
 		Majs:        major_idx,
 		Ært:         compliment_idx}
-	
-	for i:=0; i< reg.Length; i++ {
+
+	for i := 0; i < reg.Length; i++ {
 		reg.ArrImposter[i] = make([]int, reg.Length)
 	}
-	
+
 	return reg
 }
 
@@ -54,22 +54,22 @@ func SymClockingUnit(r4 SymRegister) {
 	//if maj == arr[10] {
 
 	// HARDCODING all registers is clocked every fucking time
-	symClock(sr1)
+	SymClock(sr1)
 	print("clock R1\n")
 	//}
 	//if maj == arr[3] {
 	//clock R2
-	symClock(sr2)
+	SymClock(sr2)
 	print("clock R2\n")
 	//}
 	//if maj == arr[7] {
 	//clock R3
-	symClock(sr3)
+	SymClock(sr3)
 	print("clock R3\n")
 	//}
 }
 
-func symClock(r SymRegister) {
+func SymClock(r SymRegister) {
 	arr := r.ArrImposter
 
 	//calculate the new bit before shifting all the numbers, using the feedback function
@@ -103,7 +103,7 @@ func SymCalculateNewBit(r SymRegister) []int {
 	return newbit
 }
 
-func symMakeSessionKey() {
+func SymMakeSessionKey() {
 	rand.Seed(time.Now().Unix())
 
 	key := make([]int, 64)
@@ -118,10 +118,10 @@ func SymInitialiseRegisters() {
 	SymSetRegisters()
 
 	for i := 0; i < 64; i++ {
-		symClock(sr1)
-		symClock(sr2)
-		symClock(sr3)
-		symClock(sr4)
+		SymClock(sr1)
+		SymClock(sr2)
+		SymClock(sr3)
+		SymClock(sr4)
 
 		// REVIEW: nomalt xor med sessions key - skal dette stadig gøres?
 		// REVIEW: we pretend that the session key is 0 #verySafe sorry Ivan
@@ -132,20 +132,20 @@ func SymInitialiseRegisters() {
 	//frame_bits := makeFrameNumberToBits(frame_number)
 
 	for i := 0; i < 22; i++ {
-		symClock(sr1)
-		symClock(sr2)
-		symClock(sr3)
-		symClock(sr4)
+		SymClock(sr1)
+		SymClock(sr2)
+		SymClock(sr3)
+		SymClock(sr4)
 
 		// REVIEW: xor med framenumber
-		// REVIEW: we pretend that the framenumber is 0 
+		// REVIEW: we pretend that the framenumber is 0
 		// frame_bits[i] skal XORs her
 	}
 }
 
 // func symMakeFinalXOR() []int { // REVIEW: Skal tilføjes til flowdiagram
 // 	// register R1, majs = 12, 15, ært = 14
-	
+
 // 	//maj_r1 := majorityOutput(r1)
 // 	//maj_r2 := majorityOutput(r2)
 // 	//maj_r3 := majorityOutput(r3)
@@ -160,9 +160,57 @@ func SymInitialiseRegisters() {
 
 // }
 
+func SymMajorityOutput() {
+
+}
+
+/*
+//Calls majority function for R1, R2, R3 with one inversed. Don't call on R4, it will crash
+func majorityOutput(r Register) int {
+	arr := r.ArrImposter
+
+	x := arr[r.Majs[0]]
+	y := arr[r.Majs[1]]
+	z := arr[r.Ært] ^ 1
+
+	return majority(x, y, z)
+}
+*/
+
+/*
+###########################################################
+#### THIS IS WHERE THE SIMPLE CIPHER SYM STREAM EXISTS ####
+###########################################################
+*/
+
+func SimpleKeyStream(r SymRegister) [][]int {
+
+	// last_r1 := r1.ArrImposter[r1.Length-1]
+	keyStream := make([][]int, 228)
+	Println("ripk")
+	for i := 0; i < 228; i++ {
+		keyStream[i] = make([]int, r.Length)
+	}
+	Println("ripk1")
+
+	for i := 0; i < 99; i++ {
+		SymClock(r)
+	}
+	Println("ripk2")
+	for i := 0; i < 228; i++ {
+		// do the clock thingy and output
+		// clockingUnit(r4)
+		SymClock(r)
+		keyStream[i] = r.ArrImposter[r.Length-1]
+	}
+
+	return keyStream
+
+}
+
 /*
 func symMakeKeyStream() [][]int {
-	
+
 	symSetRegisters()
 
 	frame_number++
@@ -171,7 +219,7 @@ func symMakeKeyStream() [][]int {
 
 	initialiseRgisters()
 
-	// Run A5/2 for 99 clocks and ignore output 
+	// Run A5/2 for 99 clocks and ignore output
 	for i := 0; i < 99; i++ {
 		// do the clock thingy and ignore
 		clockingUnit(r4)
