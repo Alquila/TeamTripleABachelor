@@ -110,7 +110,7 @@ func SymMakeSessionKey() {
 	for i := 0; i < 64; i++ {
 		key[i] = rand.Intn(2)
 	}
-	sym_session_key = make([][]int, 4)
+	sym_session_key = make([][]int, 4)	// REVIEW: der mangler noget her
 }
 
 func SymInitialiseRegisters() {
@@ -160,19 +160,51 @@ func SymInitialiseRegisters() {
 
 // }
 
-func SymMajorityOutput() {
+func SymMajorityOutput(r SymRegister) []int {
 	//TODO
+	arr := r.ArrImposter
+	x := arr[r.Majs[0]]
+	y := arr[r.Majs[1]]
+	z := arr[r.Ært] //FIXME how do we invert - var det noget med en ekstra indgang der markerede at det skulle være modsat? 
+	xy := SymMajorityMultiply(x,y)
+	xz := SymMajorityMultiply(x,z)
+	yz := SymMajorityMultiply(y,z)
+	ee := xorSlice(xy,xz)
+	return xorSlice(ee,yz)
+	
 }
 
-//multiplies two decision vectors with result being c[i]d[j] ^ c[j]d[i] for i /= j and result = c[i]d[j] for i=j. res slice has lenght len(c)*(len(c)-1)/2.  c and d are assumed to be same lenght.
+//Takes two slices and xors them indexwise together. Assumed to be of same lenght. Returns slice of size len(a)
+func xorSlice(a []int, b []int) []int{
+	res := make([]int, len(a))
+	for i:= 0; i < len(a); i++ {
+		res[i] = a[i] ^ b[i]
+	}
+	return res
+}
+
+//probably dont use this
+// func invert(z []int) []int{
+// 	res := make([]int, len(z))
+// 	for i:= 0; i < len(z); i++ {
+// 		res[i] =z[i] ^ 1
+// 	}
+// 	return res
+// }
+
+
+//multiplies two decision vectors with result being c[i]d[j] ^ c[j]d[i] for i /= j and result = c[i]d[j] for i=j. res slice has lenght len(c)*(len(c)-1)/2 + len(c).  c and d are assumed to be same lenght. The original len(c) variables will be in the first len(c) indexes of result
 func SymMajorityMultiply(c []int, d []int) []int {
-	leng := len(c)
-	leng = leng * (leng - 1) / 2
-	res := make([]int, leng)
-	for i := 0; i < len(c); i++ {
+	lenc := len(c)
+	leng := lenc * (lenc - 1) / 2
+	res := make([]int, leng+lenc)
+	acc := 0
+	for i := 0; i < lenc; i++ {
 		res[i] = c[i] * d[i]
-		for j := i; j < len(c); j++ {
-			res[leng+i] = c[i]*d[j] ^ c[j]*d[i]
+		for j := i+1; j < lenc; j++ {
+			res[lenc+acc] = c[i]*d[j] ^ c[j]*d[i]
+			Printf("res[%d] = %d*%d ^ %d*%d = %d \n",lenc+acc,c[i],d[j],c[j],d[i], res[lenc+acc] )
+			acc ++
 		}
 	}
 

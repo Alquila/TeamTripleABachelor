@@ -91,6 +91,7 @@ func TestSimpleKeyStream(t *testing.T) {
 		Println()
 
 	}
+	
 
 }
 
@@ -409,4 +410,42 @@ func mean(a []int) float64 {
 		sum += (float64(v))
 	}
 	return (sum / float64(len(a)))
+}
+
+func Symaaa(c []string, d []string) []string {
+	lenc := len(c)
+	leng := lenc * (lenc - 1) / 2
+	res := make([]string, leng+lenc)
+	acc := 0
+	for i := 0; i < lenc; i++ {
+		res[i] = c[i] + d[i]
+		for j := i + 1; j < lenc; j++ {
+			res[lenc+acc] = c[i] + d[j]
+			acc++
+		}
+	}
+	Println(acc)
+	return res
+}
+
+func TestSymaa(t *testing.T) {
+	c := []string{"0", "1", "2", "3", "4", "5"}
+	d := []string{"0", "1", "2", "3", "4", "5"}
+
+	res := Symaaa(c, d)
+	// print(res)
+	Printf("%+v \n", res)
+	Printf("lenght: %d \n", len(res))
+}
+
+func TestSymMajorityMultiply(t *testing.T) {
+
+	c := []int{0, 1, 0, 1, 1}
+	d := []int{0, 1, 1, 0, 1}
+
+	res := SymMajorityMultiply(c,d)
+
+	Printf("%+v \n", res)
+	Printf("lenght: %d \n", len(res))
+
 }

@@ -97,3 +97,80 @@ func GaussPartial(a0 [][]int, b0 []int) ([]int, error) {
 	}
 	return x, nil
 }
+
+func makeAugmentedMatrix(A [][]int, b []int) [][]int {
+	amountOfUnknownVar := len(A)		// this is row
+	amountOfColumns := len(A[0])		// this is column
+	augMa := make([][]int, amountOfUnknownVar)
+
+	for i := 0; i < amountOfUnknownVar; i++ {
+		augMa[i] = make([]int, amountOfColumns +1) //@Amalie hvor lange skal de være 
+	}
+
+	for i := 0; i < amountOfUnknownVar; i++ {
+		for j := 0; j < amountOfColumns; j++ {
+			augMa[i][j] = A[i][j]
+		}
+		augMa[i][amountOfColumns] = b[i]
+	}
+
+	return augMa 
+}
+
+
+
+func gaussElimination(augMa [][]int) [][]int {
+	n := len(augMa)			// n is number of unknowns
+	// temp := make([][]float64, len(augMa))
+
+	for i := 0; i < n; i++ {
+		if float64(augMa[i][i]) == 0.0 {		// should 0 be eps ?
+			// throw an error
+			fmt.Print("Divison by zero encountered")
+			continue
+		}
+		for j := i+1; j < n; j++ {
+			ratio := float64(augMa[j][i]) / float64(augMa[i][i])
+			fmt.Printf("augMa[j][i]: %d \n", augMa[j][i])
+			fmt.Printf("augMa[i][i]: %d \n", augMa[i][i])
+			fmt.Printf("ratio is: %v \n", ratio)
+
+			for k := 0; k < n+1; k++ {
+				augMa[j][k] = int(float64(augMa[j][k]) - ratio * float64(augMa[i][k]))
+
+				fmt.Printf("augMa[j][k]: %d \n", augMa[j][k])
+				fmt.Printf("augMa[i][k]: %d \n", augMa[i][k])
+			}
+		}
+	}
+
+
+	// temp[0] = []float64(augMa[0])
+
+
+	return augMa
+}
+
+// https://www.codegrepper.com/code-examples/python/gauss+elimination+python+numpy
+func backSubstitution(augMatrix [][]int) []int {
+	numberOfRows := len(augMatrix) 	// trying to get the length of rows
+	res := make([]int, numberOfRows)
+
+	res[numberOfRows - 1] = (augMatrix[numberOfRows - 1][numberOfRows]) / (augMatrix[numberOfRows - 1][numberOfRows - 1]) // x[n-1] = a[n-1][n] / a[n-1][n-1]
+	fmt.Printf("This is res1: %d \n", res)
+
+	for i := numberOfRows-2; i > -1; i-- {
+		res[i] = augMatrix[i][numberOfRows]
+		fmt.Printf("This is res2: %d \n", res)
+
+		for j := i+1; j < numberOfRows; j++ {
+			res[i] = res[i] - augMatrix[i][j] * res[j] 
+			fmt.Printf("This is res3: %d \n", res)
+		}
+
+		res[i] = res[i] / augMatrix[i][i]
+		fmt.Printf("This is res4: %d \n", res)
+	}
+
+	return res 
+}
