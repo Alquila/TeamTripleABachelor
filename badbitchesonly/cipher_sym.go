@@ -110,7 +110,7 @@ func SymMakeSessionKey() {
 	for i := 0; i < 64; i++ {
 		key[i] = rand.Intn(2)
 	}
-	sym_session_key = make([][]int, 4)	// REVIEW: der mangler noget her
+	sym_session_key = make([][]int, 4) // REVIEW: der mangler noget her
 }
 
 func SymInitialiseRegisters() {
@@ -160,40 +160,44 @@ func SymInitialiseRegisters() {
 
 // }
 
+/*
+Symbolic majority function. Calls SymMajorityMultiply and XorSlice.
+Performs xy ⨁ xz ⨁ yz ⨁ x ⨁ y on the majority tabs of the register.
+Returns slice of lengt len(r)+ (len(r)*(len(r)-1))/2 with the original variables in the first len(r) entries and products in the rest
+*/
 func SymMajorityOutput(r SymRegister) []int {
-	//TODO
 	arr := r.ArrImposter
 	x := arr[r.Majs[0]]
 	y := arr[r.Majs[1]]
-	z := arr[r.Ært] //FIXME how do we invert - var det noget med en ekstra indgang der markerede at det skulle være modsat? 
-	xy := SymMajorityMultiply(x,y)
-	xz := SymMajorityMultiply(x,z)
-	yz := SymMajorityMultiply(y,z)
-	ee := xorSlice(xy,xz)
-	return xorSlice(ee,yz)
-	
+	z := arr[r.Ært]
+	// xy ⨁ xz ⨁ yz ⨁ x ⨁ y
+	xy := SymMajorityMultiply(x, y) // [vars | products ] [x1, x2, x3, ..., x12, x23]
+	xz := SymMajorityMultiply(x, z)
+	yz := SymMajorityMultiply(y, z)
+	ee := XorSlice(xy, xz)
+	long_slice := XorSlice(ee, yz) //This is a xor of normal and product variables
+	short_slice := XorSlice(x, y)  //This is only a xor of the normal variables
+	// xor the "normal" variables in the start of the long slice [ vars | products ] ⨁ [ vars ]
+	for i := 0; i < len(short_slice); i++ {
+		long_slice[i] = long_slice[i] ^ short_slice[i]
+	}
+	return long_slice
 }
 
 //Takes two slices and xors them indexwise together. Assumed to be of same lenght. Returns slice of size len(a)
-func xorSlice(a []int, b []int) []int{
+func XorSlice(a []int, b []int) []int {
 	res := make([]int, len(a))
-	for i:= 0; i < len(a); i++ {
+	for i := 0; i < len(a); i++ {
 		res[i] = a[i] ^ b[i]
 	}
 	return res
 }
 
-//probably dont use this
-// func invert(z []int) []int{
-// 	res := make([]int, len(z))
-// 	for i:= 0; i < len(z); i++ {
-// 		res[i] =z[i] ^ 1
-// 	}
-// 	return res
-// }
-
-
-//multiplies two decision vectors with result being c[i]d[j] ^ c[j]d[i] for i /= j and result = c[i]d[j] for i=j. res slice has lenght len(c)*(len(c)-1)/2 + len(c).  c and d are assumed to be same lenght. The original len(c) variables will be in the first len(c) indexes of result
+/*
+multiplies two decision vectors with result being c[i]d[j] ^ c[j]d[i] for i /= j and result = c[i]d[j] for i=j.
+res slice has lenght len(c)*(len(c)-1)/2 + len(c).  c and d are assumed to be same lenght.
+The original len(c) variables will be in the first len(c) indexes of result
+*/
 func SymMajorityMultiply(c []int, d []int) []int {
 	lenc := len(c)
 	leng := lenc * (lenc - 1) / 2
@@ -201,10 +205,10 @@ func SymMajorityMultiply(c []int, d []int) []int {
 	acc := 0
 	for i := 0; i < lenc; i++ {
 		res[i] = c[i] * d[i]
-		for j := i+1; j < lenc; j++ {
+		for j := i + 1; j < lenc; j++ {
 			res[lenc+acc] = c[i]*d[j] ^ c[j]*d[i]
-			Printf("res[%d] = %d*%d ^ %d*%d = %d \n",lenc+acc,c[i],d[j],c[j],d[i], res[lenc+acc] )
-			acc ++
+			//Printf("res[%d] = %d*%d ^ %d*%d = %d \n", lenc+acc, c[i], d[j], c[j], d[i], res[lenc+acc])
+			acc++
 		}
 	}
 
@@ -230,15 +234,17 @@ func majorityOutput(r Register) int {
 ###########################################################
 */
 
-func MakeSymPlaintext() [][]int {
-	plaintext := make([][]int, 19)
+func InitOneSymRegister() SymRegister {
+	reg := SymMakeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14) // equvalent to reg1
+	// plaintext := make([][]int, 19)
 	for i := 0; i < 19; i++ {
-		plaintext[i] = make([]int, 19)
-		plaintext[i][i] = 1
+		// reg.ArrImposter[i] = make([]int, 19)
+		reg.ArrImposter[i][i] = 1 // each entry in the diagonal set to 1 as x_i is only dependent on x_i when initialized
 	}
-	return plaintext
+	return reg
 }
 
+// NOT USED AS WE DO NOT CARE ABOUT THE PLAINTEXT
 // func EncryptSimpleSymPlaintext(plaintext []int) [][]int {
 // 	key := MakeSymPlaintext()
 // 	Printf("This is the key-stream: %d \n", key)
@@ -246,34 +252,31 @@ func MakeSymPlaintext() [][]int {
 // 	for i := range res {
 // 		res[i] = make([]int, 19)
 // 		for j := i; i < 19; i++ {
-// 			res[i][j] = key[i]
+// 			res[i][j] = key[i][i]
 // 		}
 // 	}
+// 	return res
 // }
 
-func SimpleKeyStream(r SymRegister) [][]int {
+func SimpleKeyStreamSym(r SymRegister) [][]int {
 
-	// last_r1 := r1.ArrImposter[r1.Length-1]
+	// Init key stream array
 	keyStream := make([][]int, 228)
-	Println("ripk")
 	for i := 0; i < 228; i++ {
 		keyStream[i] = make([]int, r.Length)
 	}
-	Println("ripk1")
 
+	// Clock the register 99 times
 	for i := 0; i < 99; i++ {
 		SymClock(r)
 	}
-	Println("ripk2")
+
+	// clock 228 times and save keystream
 	for i := 0; i < 228; i++ {
-		// do the clock thingy and output
-		// clockingUnit(r4)
 		SymClock(r)
 		keyStream[i] = r.ArrImposter[r.Length-1]
 	}
-
 	return keyStream
-
 }
 
 /*

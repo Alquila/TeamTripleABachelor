@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	// "math/rand"
 	// "reflect"
 	// "strconv"
@@ -11,22 +10,22 @@ import (
 	// //"golang.org/x/tools/go/analysis/passes/nilfunc"
 )
 
-func TestPlaintext(t *testing.T) {
-	plaintext := MakePlaintext()
-	fmt.Printf("%d", plaintext)
-}
+// func TestPlaintext(t *testing.T) {
+// 	plaintext := MakePlaintext()
+// 	fmt.Printf("%d", plaintext)
+// }
 
-func TestEncryptPlaintext(t *testing.T) {
-	plaintext := MakePlaintext()
-	fmt.Printf("This is the plaintext: %d \n", plaintext)
-	cipher := EncryptSimplePlaintext(plaintext)
-	fmt.Printf("%d \n", cipher)
-}
+// func TestEncryptPlaintext(t *testing.T) {
+// 	plaintext := MakePlaintext()
+// 	fmt.Printf("This is the plaintext: %d \n", plaintext)
+// 	cipher := EncryptSimplePlaintext(plaintext)
+// 	fmt.Printf("%d \n", cipher)
+// }
 
-func TestSymPlaintext(t *testing.T) {
-	plaintext := MakeSymPlaintext()
-	fmt.Printf("This is the plaintext: %d \n", plaintext)
-}
+// func TestSymPlaintext(t *testing.T) {
+// 	plaintext := MakeSymPlaintext()
+// 	fmt.Printf("This is the plaintext: %d \n", plaintext)
+// }
 
 // func TestSymEncryptPlaintext(t *testing.T) {
 // 	plaintext := MakeSymPlaintext()

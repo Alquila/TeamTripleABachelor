@@ -68,7 +68,7 @@ func TestSimpleKeyStream(t *testing.T) {
 		r0.ArrImposter[i][i] = 1
 	}
 	print("rip")
-	key := SimpleKeyStream(r0)
+	key := SimpleKeyStreamSym(r0)
 	Println("rip3")
 	for i := 0; i < 228; i++ {
 		// PrettyPrint()
@@ -91,7 +91,6 @@ func TestSimpleKeyStream(t *testing.T) {
 		Println()
 
 	}
-	
 
 }
 
@@ -443,9 +442,94 @@ func TestSymMajorityMultiply(t *testing.T) {
 	c := []int{0, 1, 0, 1, 1}
 	d := []int{0, 1, 1, 0, 1}
 
-	res := SymMajorityMultiply(c,d)
+	res := SymMajorityMultiply(c, d)
 
 	Printf("%+v \n", res)
 	Printf("lenght: %d \n", len(res))
 
+}
+
+func TestSymMajorityOutput(t *testing.T) {
+	c := []int{0, 1, 0, 1}
+	d := []int{0, 1, 1, 0}
+	e := []int{1, 0, 1, 0}
+
+	r0 := SymRegister{Length: 4,
+		ArrImposter: make([][]int, 4),
+		Tabs:        []int{0, 0, 0},
+		Majs:        []int{0, 1},
+		Ært:         2}
+
+	r0.ArrImposter[0] = c
+	r0.ArrImposter[1] = d
+	r0.ArrImposter[2] = e
+
+	Printf("cd %+v \n", SymMajorityMultiply(c, d))
+	Printf("de %+v \n", SymMajorityMultiply(d, e))
+	Printf("ce %+v \n", SymMajorityMultiply(c, e))
+
+	res := SymMajorityOutput(r0)
+	Printf("res %+v \n", res)
+	Printf("lenght: %d \n", len(res))
+}
+
+func PrettySymPrint(symReg SymRegister) {
+	// key := SimpleKeyStreamSym(symReg)
+
+	// PrettyPrint()
+	for i := 0; i < symReg.Length; i++ {
+		accString := "["
+		for j := 0; j < symReg.Length; j++ {
+			if symReg.ArrImposter[i][j] == 1 {
+				str := strconv.Itoa(j)
+				accString += "x" + (str) + " ⨁ "
+				// accString += " x" + (str) + " xor "
+			}
+		}
+		// accString = strings.TrimRight(accString, " xor ")
+		accString = strings.TrimRight(accString, "⨁ ")
+		//Printf("xor)
+		//Printf("")
+		accString += "]"
+		print(accString)
+	}
+	Println()
+
+}
+
+func PrettySymPrintSlice(slice [][]int) {
+	// key := SimpleKeyStreamSym(symReg)
+
+	// PrettyPrint()
+	for i := 0; i < len(slice[0]); i++ {
+		accString := "["
+		for j := 0; j < len(slice[0]); j++ {
+			if slice[i][j] == 1 {
+				str := strconv.Itoa(j)
+				accString += "x" + (str) + " ⨁ "
+				// accString += " x" + (str) + " xor "
+			}
+		}
+		// accString = strings.TrimRight(accString, " xor ")
+		accString = strings.TrimRight(accString, "⨁ ")
+		//Printf("xor)
+		//Printf("")
+		accString += "]  \n"
+		print(accString)
+	}
+	Println()
+
+}
+
+func TestInitOneSymRegister(t *testing.T) {
+	reg := InitOneSymRegister()
+	PrettySymPrint(reg)
+}
+
+func TestSimpleKeyStreamSym(t *testing.T) {
+	reg := InitOneSymRegister()
+
+	keyStream := SimpleKeyStreamSym(reg)
+
+	PrettySymPrintSlice(keyStream)
 }
