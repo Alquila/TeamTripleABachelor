@@ -38,6 +38,10 @@ func NotAllowedBigBangTest(t *testing.T) {
 
 }
 
+func TestDoTheHack(t *testing.T) {
+	doTheHack()
+}
+
 func TestPrint2(t *testing.T) {
 	print("hello worlds")
 }

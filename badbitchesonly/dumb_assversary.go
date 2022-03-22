@@ -1,5 +1,10 @@
 package main
 
+import (
+	"fmt"
+	"reflect"
+)
+
 //"fmt"
 
 func idk() int {
@@ -8,15 +13,27 @@ func idk() int {
 
 func doTheHack() {
 	// init one register, in both OG and sym version
+	symReg := InitOneSymRegister()
+	reg := InitOneRegister()
+
 
 	// make output keystream in both
+	symKeyStream := SimpleKeyStreamSym(symReg) 
+	keyStream := SimpleKeyStream(reg)
 
 	// make sym version into [][]int if not allready
 
 	// use gauss to solve equations
-	// res := solveByGaussElimination()
+	//res := solveByGaussElimination(symKeyStream, keyStream)
+	res := solveByGaussEliminationTryTwo(symKeyStream, keyStream)
 
 	// compare if found res is equal to init registers
+	if !reflect.DeepEqual(res, reg.ArrImposter) {
+		fmt.Printf("This is fucking wrong\n")
+		fmt.Printf("Res er: %d\n", res)
+		fmt.Printf("reg er: %d\n", reg.ArrImposter)
+	}
+
 
 }
 

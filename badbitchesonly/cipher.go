@@ -303,6 +303,29 @@ func makeKeyStream() []int {
 #######################################################
 */
 
+func InitOneRegister() Register {
+	reg := makeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14)
+	reg.ArrImposter = []int{1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0}
+
+	return reg
+}
+
+func SimpleKeyStream(r Register) []int {
+	keyStream := make([]int, 228)
+
+	// Clock the register 99 times
+	for i := 0; i < 99; i++ {
+		Clock(r)
+	}
+
+	for i := 0; i < 228; i++ {
+		Clock(r)
+		keyStream[i] = r.ArrImposter[r.Length-1]
+	}
+
+	return keyStream
+}
+
 // vi bruger kun register R1 som er 19 langt
 func MakePlaintext() []int {
 	plaintext := []int{1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0}
