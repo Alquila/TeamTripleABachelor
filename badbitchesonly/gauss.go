@@ -210,7 +210,7 @@ func gaussEliminationpart2(augMa [][]int) [][]int {
 	for K := 0; K < n; K++ {
 		// Ensure we have non-zero entry in augma[k,k]
 		if augMa[K][K] == 0 {
-			for i := 0; i < n; i++ {
+			for i := K+1; i <= n; i++ {
 				if augMa[i][K] != 0 {
 					augCopyTo := make([]int, len(augMa[K]))
 					augCopyFrom := make([]int, len(augMa[i]))
@@ -218,7 +218,7 @@ func gaussEliminationpart2(augMa [][]int) [][]int {
 					copy(augCopyFrom, augMa[i])
 					augMa[K] = augCopyFrom
 					augMa[i] = augCopyTo
-
+					break
 				}
 			}
 
@@ -230,9 +230,9 @@ func gaussEliminationpart2(augMa [][]int) [][]int {
 			}
 		}
 
-		for I := 0; I < n; I++ {
+		for I := K + 1; I <= n; I++ {
 			if augMa[I][K] == 1 {
-				for J := K; I < n; I++ {
+				for J := 0; I <= n; I++ {
 					augMa[I][J] = augMa[I][J] ^ augMa[K][J]
 				}
 			}
