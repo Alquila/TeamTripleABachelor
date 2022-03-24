@@ -35,43 +35,21 @@ func makeRegister(length int, tabs []int, major_idx []int, compliment_idx int) R
 
 func makeR1() Register {
 	r1 = makeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14)
-	// r1 = Register{Number: 1,
-	// 	Length:      19,
-	// 	ArrImposter: make([]int, 19),
-	// 	Tabs:        []int{18, 17, 16, 13},
-	// 	Majs:        []int{12, 15},
-	// 	Ært:         14}
 	return r1
 }
 
 func makeR2() Register {
 	r2 = makeRegister(22, []int{21, 20}, []int{9, 13}, 16)
-	// r2 = Register{Number: 2,
-	// 	Length:      22,
-	// 	ArrImposter: make([]int, 22),
-	// 	Tabs:        []int{21, 20},
-	// 	Majs:        []int{9, 13},
-	// 	Ært:         16}
 	return r2
 }
 
 func makeR3() Register {
 	r3 = makeRegister(23, []int{22, 21, 20, 7}, []int{16, 18}, 13)
-	// r3 = Register{Number: 3,
-	// 	Length:      23,
-	// 	ArrImposter: make([]int, 23),
-	// 	Tabs:        []int{22, 21, 20, 7},
-	// 	Majs:        []int{16, 18},
-	// 	Ært:         13}
 	return r3
 }
 
 func makeR4() Register {
 	r4 = makeRegister(17, []int{16, 11}, nil, -1)
-	// r4 = Register{Number: 4,
-	// 	Length:      17,
-	// 	ArrImposter: make([]int, 17),
-	// 	Tabs:        []int{16, 11}}
 	return r4
 }
 
@@ -317,11 +295,31 @@ func SimpleKeyStream(r Register) []int {
 	for i := 0; i < 99; i++ {
 		Clock(r)
 	}
+	//fmt.Printf("Print register efter 99 clocks: \n %d \n", r.ArrImposter)
 
 	for i := 0; i < 228; i++ {
 		Clock(r)
 		keyStream[i] = r.ArrImposter[r.Length-1]
 	}
+	//fmt.Printf("Print register efter endnu 228 clocks: \n %d \n", r.ArrImposter)
+
+	return keyStream
+}
+
+func SimpleKeyStreamSecondVersion(r Register) []int {
+	keyStream := make([]int, 228)
+
+	// Clock the register 99 times
+	for i := 0; i < 99; i++ {
+		Clock(r)
+	}
+	//fmt.Printf("Print register efter 99 clocks: \n %d \n", r.ArrImposter)
+
+	for i := 0; i < 228; i++ {
+		Clock(r)
+		keyStream[i] = majorityOutput(r)
+	}
+	//fmt.Printf("Print register efter endnu 228 clocks: \n %d \n", r.ArrImposter)
 
 	return keyStream
 }

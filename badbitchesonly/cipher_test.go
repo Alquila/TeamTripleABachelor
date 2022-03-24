@@ -393,7 +393,56 @@ func TestClockingUnit(t *testing.T) {
 	clockingUnit(r4)
 }
 
-func TestFinalXor(t *testing.T) {}
+func TestFinalXor(t *testing.T) {
+	//hooow to teeeeest
+	//right now we just show that it takes the three registers and calculates the majority and takes the last slice in each and xors it all together. returns a long array with all the stuff
+	r1 := SymMakeRegister(4, []int{1, 3}, []int{0, 2}, 3)
+	for i := 0; i < 4; i++ {
+		r1.ArrImposter[i][i] = 1 // each entry in the diagonal set to 1 as x_i is only dependent on x_i when initialized
+	}
+	r2 := SymMakeRegister(5, []int{1, 3}, []int{2, 4}, 0)
+	for i := 0; i < 5; i++ {
+		r2.ArrImposter[i][i] = 1 // each entry in the diagonal set to 1 as x_i is only dependent on x_i when initialized
+	}
+	r3 := SymMakeRegister(8, []int{3, 4, 6, 5}, []int{1, 2}, 0)
+	for i := 0; i < 8; i++ {
+		r3.ArrImposter[i][i] = 1 // each entry in the diagonal set to 1 as x_i is only dependent on x_i when initialized
+	}
+
+	res := SymMakeFinalXOR(r1, r2, r3)
+	prints(res, "result")
+	Printf("lenght %d \n", len(res))
+	// 4+5+8 = 17
+	// 4*3/2 + 5*4/2+ 8*7/2 = 44
+
+	// maj_r1 := SymMajorityOutput(r1)
+	// maj_r2 := SymMajorityOutput(r2)
+	// maj_r3 := SymMajorityOutput(r3)
+
+	// prints(maj_r1, "r1 majority")
+	// prints(maj_r2, "r2 majority")
+	// prints(maj_r3, "r3 majority")
+	// r1 majority[1 0 1 0 0 1 1 0 0 1]
+	// r2 majority[0 0 1 0 1 0 1 0 1 0 0 0 0 1 0]
+	// r3 majority[0 1 1 0 0 0 0 0 1 1 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+
+	// last_r1 := r1.ArrImposter[r1.Length-1]
+	// last_r2 := r2.ArrImposter[r2.Length-1]
+	// last_r3 := r3.ArrImposter[r3.Length-1]
+	// prints(last_r1, "last r1")
+	// prints(last_r2, "last r2")
+	// prints(last_r3, "last r3")
+	/*
+			last r1[0 0 0 1]
+			last r2[0 0 0 0 1]
+			last r3[0 0 0 0 0 0 0 1]
+
+		result[1 0 1 1 0 1 1 0 0 1 0 0 1 0 0 0 1 0 1 0 0 0 0 1 0 0 1 1 0 0 0 0 1 1 1 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+		lenght 61
+
+	*/
+
+}
 
 func TestKeyStreamSimple(t *testing.T) {
 	makeSessionKey() // TODO snak om hvor vores loop skal være, som kalder makeKeyStream for nye frames
@@ -425,6 +474,10 @@ func Symaaa(c []string, d []string) []string {
 	}
 	Println(acc)
 	return res
+}
+
+func prints(res []int, text string) {
+	Printf(text+"%+v \n", res)
 }
 
 func TestSymaa(t *testing.T) {
@@ -464,32 +517,28 @@ func TestSymMajorityOutput(t *testing.T) {
 	r0.ArrImposter[1] = d
 	r0.ArrImposter[2] = e
 
-	Printf("cd %+v \n", SymMajorityMultiply(c, d))
-	Printf("de %+v \n", SymMajorityMultiply(d, e))
-	Printf("ce %+v \n", SymMajorityMultiply(c, e))
+	Printf("cd  %+v \n", SymMajorityMultiply(c, d))
+	Printf("de  %+v \n", SymMajorityMultiply(d, e))
+	Printf("ce  %+v \n", SymMajorityMultiply(c, e))
 
+	shouldBe := []int{0, 1, 0, 1, 0, 1, 1, 1, 1, 0} //see notes
 	res := SymMajorityOutput(r0)
-	Printf("res %+v \n", res)
-	Printf("lenght: %d \n", len(res))
+	if !reflect.DeepEqual(res, shouldBe) {
+		t.Logf("res is wrong %+v \n", res)
+		t.Fail()
+	}
 }
 
 func PrettySymPrint(symReg SymRegister) {
-	// key := SimpleKeyStreamSym(symReg)
-
-	// PrettyPrint()
 	for i := 0; i < symReg.Length; i++ {
 		accString := "["
 		for j := 0; j < symReg.Length; j++ {
 			if symReg.ArrImposter[i][j] == 1 {
 				str := strconv.Itoa(j)
 				accString += "x" + (str) + " ⨁ "
-				// accString += " x" + (str) + " xor "
 			}
 		}
-		// accString = strings.TrimRight(accString, " xor ")
 		accString = strings.TrimRight(accString, "⨁ ")
-		//Printf("xor)
-		//Printf("")
 		accString += "]"
 		print(accString)
 	}
@@ -497,23 +546,17 @@ func PrettySymPrint(symReg SymRegister) {
 
 }
 
+//works on slice_slice
 func PrettySymPrintSlice(slice [][]int) {
-	// key := SimpleKeyStreamSym(symReg)
-
-	// PrettyPrint()
 	for i := 0; i < len(slice[0]); i++ {
 		accString := "["
 		for j := 0; j < len(slice[0]); j++ {
 			if slice[i][j] == 1 {
 				str := strconv.Itoa(j)
 				accString += "x" + (str) + " ⨁ "
-				// accString += " x" + (str) + " xor "
 			}
 		}
-		// accString = strings.TrimRight(accString, " xor ")
 		accString = strings.TrimRight(accString, "⨁ ")
-		//Printf("xor)
-		//Printf("")
 		accString += "]  \n"
 		print(accString)
 	}
@@ -532,4 +575,28 @@ func TestSimpleKeyStreamSym(t *testing.T) {
 	keyStream := SimpleKeyStreamSym(reg)
 
 	PrettySymPrintSlice(keyStream)
+}
+
+func TestOverwriteXorSlice(t *testing.T) {
+	short := []int{1, 1, 0, 1, 1}
+	long := []int{0, 1, 0, 1, 1, 1, 1, 0}
+	OverwriteXorSlice(short, long)
+	Printf("%+v \n", long)
+}
+func TestAppend(t *testing.T) {
+
+	a := []int{1, 2, 3, 4}
+	b := []int{1, 2, 3, 4, 5}
+	c := []int{7, 8, 9, 10, 11, 12, 13}
+
+	start := make([]int, len(a))
+	copy(start, a)              //start by res = [vars1 | prod1]
+	start = append(start, b...) //now [vars1 | prod1 | vars2 | prod2 ]
+	start = append(start, c...) //now [vars1 | prod1 | vars2 | prod2 | vars3 | prod3]
+
+	Printf("a %+v \n", a)
+	Printf("b %+v \n", b)
+	Printf("c %+v \n", c)
+	Printf("start %+v \n", start)
+
 }

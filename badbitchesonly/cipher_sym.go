@@ -161,6 +161,33 @@ func SymInitialiseRegisters() {
 // }
 
 /*
+Makes the final xor of r1[-1] ⨁ maj(r1) ⨁ r2[-1] ⨁ maj(r2) ⨁ r3[-1] ⨁ maj(r3)
+returns [vars1 | prod1 | vars2 | prod2 | vars3 | prod3]
+Calls SymMajorityOutput and OverwriteXorSlice
+*/
+func SymMakeFinalXOR(r1 SymRegister, r2 SymRegister, r3 SymRegister) []int {
+	last_r1 := r1.ArrImposter[r1.Length-1]
+	last_r2 := r2.ArrImposter[r2.Length-1]
+	last_r3 := r3.ArrImposter[r3.Length-1]
+
+	maj_r1 := SymMajorityOutput(r1)
+	maj_r2 := SymMajorityOutput(r2)
+	maj_r3 := SymMajorityOutput(r3)
+
+	//Xor them "locally" together first
+	OverwriteXorSlice(last_r1, maj_r1) //[vars1 | prods1] = [vars1] ⨁ [vars1 | prods1]
+	OverwriteXorSlice(last_r2, maj_r2)
+	OverwriteXorSlice(last_r3, maj_r3)
+
+	start := make([]int, len(maj_r1))
+	copy(start, maj_r1)              //start by res = [vars1 | prod1]
+	start = append(start, maj_r2...) //now [vars1 | prod1 | vars2 | prod2 ]
+	start = append(start, maj_r3...) //now [vars1 | prod1 | vars2 | prod2 | vars3 | prod3]
+
+	return start
+}
+
+/*
 Symbolic majority function. Calls SymMajorityMultiply and XorSlice.
 Performs xy ⨁ xz ⨁ yz ⨁ x ⨁ y on the majority tabs of the register.
 Returns slice of lengt len(r)+ (len(r)*(len(r)-1))/2 with the original variables in the first len(r) entries and products in the rest
@@ -193,6 +220,13 @@ func XorSlice(a []int, b []int) []int {
 	return res
 }
 
+//Takes two slices with first shorter than the second. Overwrites the first len(short) entries in long with long[i] = short[i] ^ long[i]
+func OverwriteXorSlice(short []int, long []int) {
+	for i := 0; i < len(short); i++ {
+		long[i] = short[i] ^ long[i]
+	}
+}
+
 /*
 multiplies two decision vectors with result being c[i]d[j] ^ c[j]d[i] for i /= j and result = c[i]d[j] for i=j.
 res slice has lenght len(c)*(len(c)-1)/2 + len(c).  c and d are assumed to be same lenght.
@@ -216,19 +250,6 @@ func SymMajorityMultiply(c []int, d []int) []int {
 }
 
 /*
-//Calls majority function for R1, R2, R3 with one inversed. Don't call on R4, it will crash
-func majorityOutput(r Register) int {
-	arr := r.ArrImposter
-
-	x := arr[r.Majs[0]]
-	y := arr[r.Majs[1]]
-	z := arr[r.Ært] ^ 1
-
-	return majority(x, y, z)
-}
-*/
-
-/*
 ###########################################################
 #### THIS IS WHERE THE SIMPLE CIPHER SYM STREAM EXISTS ####
 ###########################################################
@@ -236,7 +257,6 @@ func majorityOutput(r Register) int {
 
 func InitOneSymRegister() SymRegister {
 	reg := SymMakeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14) // equvalent to reg1
-	// plaintext := make([][]int, 19)
 	for i := 0; i < 19; i++ {
 		// reg.ArrImposter[i] = make([]int, 19)
 		reg.ArrImposter[i][i] = 1 // each entry in the diagonal set to 1 as x_i is only dependent on x_i when initialized
@@ -275,6 +295,28 @@ func SimpleKeyStreamSym(r SymRegister) [][]int {
 	for i := 0; i < 228; i++ {
 		SymClock(r)
 		keyStream[i] = r.ArrImposter[r.Length-1]
+	}
+	return keyStream
+}
+
+func SimpleKeyStreamSymSecondVersion(r SymRegister) [][]int {
+
+	// Init key stream array
+	keyStream := make([][]int, 228)
+	for i := 0; i < 228; i++ {
+		keyStream[i] = make([]int, r.Length)
+	}
+
+	// Clock the register 99 times
+	for i := 0; i < 99; i++ {
+		SymClock(r)
+	}
+
+	// clock 228 times and save keystream
+	for i := 0; i < 228; i++ {
+		SymClock(r)
+		keyStream[i] = SymMajorityOutput(r)
+		//Printf("Length of output from symMajorFunc %d\n", len(SymMajorityOutput(r)))
 	}
 	return keyStream
 }

@@ -98,16 +98,9 @@ func GaussPartial(a0 [][]int, b0 []int) ([]int, error) {
 	return x, nil
 }
 
-func solveByGaussElimination(A [][]int, b []int) []int {
-	augmentMatrix := makeAugmentedMatrix(A, b)
-	afterGauss := gaussElimination(augmentMatrix)
-	solution := backSubstitution(afterGauss)
-	return solution
-}
-
 func solveByGaussEliminationTryTwo(A [][]int, b []int) []int {
 	augmentMatrix := makeAugmentedMatrix(A, b)
-	afterGauss := gaussEliminationpart2(augmentMatrix)
+	afterGauss := gaussEliminationPart2(augmentMatrix)
 	solution := backSubstitution(afterGauss)
 
 	return solution
@@ -134,119 +127,172 @@ func makeAugmentedMatrix(A [][]int, b []int) [][]int {
 	return augMa
 }
 
-func gaussElimination(augMa [][]int) [][]int {
-	n := len(augMa[0]) - 1 // n is number of unknowns
+// https://stackoverflow.com/questions/11483925/how-to-implementing-gaussian-elimination-for-binary-equations
+func gaussEliminationPart2(augMa [][]int) [][]int {
+	noUnknownVars := len(augMa[0]) - 1 // n is number of unknowns //burde nok køre igennem dem alle sammen
+	noEquations := len(augMa)
 	// temp := make([][]float64, len(augMa))
 
-	for i := 0; i < n; i++ {
-		if augMa[i][i] == 0 { // should 0 be eps ?
-			// throw an error
-			fmt.Print("Divison by zero encountered \n")
-			continue
-		}
-		for j := i + 1; j < n; j++ {
-			ratio := augMa[j][i] / augMa[i][i]
-			//newBit := 1
-			//if augMa[j][i] == augMa[i][i] {
-			// newBit = 0
-			// }
+	for i := 0; i < noUnknownVars; i++ {
 
-			// fmt.Printf("augMa[j][i]: %d \n", augMa[j][i])
-			// fmt.Printf("augMa[i][i]: %d \n", augMa[i][i])
-			// fmt.Printf("ratio is: %v \n", ratio)
-
-			for k := 0; k < n+1; k++ {
-				augMa[j][k] = augMa[j][k] - ratio*augMa[i][k]
-				// fmt.Printf("augMa[j][k]: %d \n", augMa[j][k])
-				// fmt.Printf("augMa[i][k]: %d \n", augMa[i][k])
+		s := i
+		if augMa[i][i] == 0 {
+			// Håndter at den er 0, dvs.
+			for r := i + 1; r < noEquations; r++ {
+				// find en hvor den er 1 og byt rækker
+				if augMa[r][i] == 1 {
+					augCopyTo := make([]int, len(augMa[r]))
+					augCopyFrom := make([]int, len(augMa[i]))
+					copy(augCopyTo, augMa[r])
+					copy(augCopyFrom, augMa[i])
+					augMa[r] = augCopyFrom
+					augMa[i] = augCopyTo
+					s = r
+					break
+				}
 			}
 		}
+
+		// xor alle ræker efter r, hvor der står 1
+		// TODO: tjek om der skal laves check for at vi ikke er i sidste række når vi starter forloppet
+		sliceCopy := make([]int, len(augMa[i]))
+		copy(sliceCopy, augMa[i])
+		// fmt.Printf("Row %d, should be 1 in index %d: \n %d \n", s, i, sliceCopy)
+
+		for p := s + 1; p < noEquations; p++ {
+			if augMa[p][i] == 1 {
+				augAfterxor := make([]int, len(augMa[p]))
+				for j := 0; j <= noUnknownVars; j++ {
+					augAfterxor[j] = augMa[p][j] ^ sliceCopy[j]
+				}
+				augMa[p] = augAfterxor
+			}
+		}
+
 	}
-	// temp[0] = []float64(augMa[0])
+
 	return augMa
 }
 
 // https://www.codegrepper.com/code-examples/python/gauss+elimination+python+numpy
 func backSubstitution(augMatrix [][]int) []int {
-	numberOfUnknownVars := len(augMatrix[0]) - 1 // trying to get the length of coulumns
-	res := make([]int, numberOfUnknownVars)
-	res[numberOfUnknownVars-1] = augMatrix[numberOfUnknownVars - 1][numberOfUnknownVars] // either 0 or 1
-	fmt.Printf("This is augMatrix: %d \n", augMatrix)
+	noUnknownVars := len(augMatrix[0]) - 1 // n is number of unknowns //burde nok køre igennem dem alle sammen
+	res := make([]int, noUnknownVars)
+	res[noUnknownVars-1] = augMatrix[noUnknownVars-1][noUnknownVars] // either 0 or 1
+	// for n := 0; n < 19; n++ {
+	// 	fmt.Printf("This is augMatrix: %d \n", augMatrix[n])
+	// }
 
-	fmt.Printf("Amount of row: %d\n", len(augMatrix))
-	fmt.Printf("agMa[20][19]: %d\n", augMatrix[200][18])
+	for i := noUnknownVars - 2; i >= 0; i-- { // looks at every row not all zero
+		res[i] = augMatrix[i][noUnknownVars]
 
-	for i := numberOfUnknownVars - 2; i > -1; i-- { // looks at every row not all zero
-		if augMatrix[i][numberOfUnknownVars] == 1 {
-			res[i] = res[i+1] // this is the coefficient next to
-		}
-		
-		// fmt.Printf("first res[i] just set to: %d\n", res[i])
-		// fmt.Printf("This is res2: %d \n", res)
-
-		for j := i + 1; j < numberOfUnknownVars; j++ {
+		for j := i + 1; j < noUnknownVars; j++ {
 			if augMatrix[i][j] == 1 {
-				res[i] = res[i] ^ res[j] // this is the coefficient next to
+				res[i] = res[i] ^ res[j]
 			}
-					
-			// fmt.Printf("second res[i] just set to: %d \n", res[i])
-			// fmt.Printf("augMatrix[i][j] is: %d\n", augMatrix[i][j])
-			// fmt.Printf("(augMatrix[i][j] mod 2) is: %v\n", modu)
-
 		}
-		
-		res[i] = res[i] ^ augMatrix[i][numberOfUnknownVars]
-		// fmt.Printf("third res[%d] just set to: %d\n", i, res[i])
-		// fmt.Printf("This is res4: %d \n", res)
+
 	}
 	return res
 }
 
-// https://stackoverflow.com/questions/11483925/how-to-implementing-gaussian-elimination-for-binary-equations
-func gaussEliminationpart2(augMa [][]int) [][]int {
-	n := len(augMa[0]) - 1 // n is number of unknowns
-	// temp := make([][]float64, len(augMa))
+// taken from GaussEliminationPart2
+// for k := 0; k < noUnknownVars; k++ {
+// 	// Ensure we have non-zero entry in augma[k,k]
+// 	if augMa[k][k] == 0 {
+// 		for j := k + 1; j < noEquations; j++ {
+// 			if augMa[j][k] != 0 {
+// 				augCopyTo := make([]int, len(augMa[k]))
+// 				augCopyFrom := make([]int, len(augMa[j]))
+// 				copy(augCopyTo, augMa[k])
+// 				copy(augCopyFrom, augMa[j])
+// 				augMa[k] = augCopyFrom
+// 				augMa[j] = augCopyTo
+// 				break
+// 			}
+// 		}
+// 		if augMa[k][k] == 0 {
+// 			// Then we have a zero column
+// 			// This means we have no solutions or multiple solutinos
+// 			fmt.Printf("Zero column, so multiple or no solution")
+// 			continue
+// 		}
+// 		for I := k + 1; I <= n; I++ {
+// 			if augMa[I][k] == 1 {
+// 				for J := 0; I < n; I++ {
+// 					augMa[I][J] = augMa[I][J] ^ augMa[k][J]
+// 				}
+// 			}
+// 		}
+// 	}
+// }
 
-	for K := 0; K < n; K++ {
-		// Ensure we have non-zero entry in augma[k,k]
-		if augMa[K][K] == 0 {
-			for i := K+1; i <= n; i++ {
-				if augMa[i][K] != 0 {
-					augCopyTo := make([]int, len(augMa[K]))
-					augCopyFrom := make([]int, len(augMa[i]))
-					copy(augCopyTo, augMa[K])
-					copy(augCopyFrom, augMa[i])
-					augMa[K] = augCopyFrom
-					augMa[i] = augCopyTo
-					break
-				}
-			}
+// nom_row := len(augMa)
+// print("nom of row: %d \n", nom_row)
+// nom_col := len(augMa[0])
+// res := make([]int, nom_row)
+// for i := 0; i < nom_row ; i++ {
+// 	res[i] = augMa[i][nom_col-1]
+// }
 
-			if augMa[K][K] == 0 {
-				// Then we have a zero column
-				// This means we have no solutions or multiple solutinos
-				fmt.Printf("Zero column, so multiple or no solution")
-				continue
-			}
-		}
+// taken from backsubstitution
+// if augMatrix[i][noUnknownVars] == 1 {
+// 	res[i] = res[i+1] // this is the coefficient next to
+// }
 
-		for I := K + 1; I <= n; I++ {
-			if augMa[I][K] == 1 {
-				for J := 0; I <= n; I++ {
-					augMa[I][J] = augMa[I][J] ^ augMa[K][J]
-				}
-			}
-		}
+// fmt.Printf("first res[i] just set to: %d\n", res[i])
+// fmt.Printf("This is res2: %d \n", res)
 
-	}
+// for j := i + 1; j < noUnknownVars; j++ {
+// 	if augMatrix[i][j] == 1 {
+// 		res[i] = res[i] ^ res[j] // this is the coefficient next to
+// 	}
 
-	// nom_row := len(augMa)
-	// print("nom of row: %d \n", nom_row)
-	// nom_col := len(augMa[0])
-	// res := make([]int, nom_row)
-	// for i := 0; i < nom_row ; i++ {
-	// 	res[i] = augMa[i][nom_col-1]
-	// }
+// 	// fmt.Printf("second res[i] just set to: %d \n", res[i])
+// 	// fmt.Printf("augMatrix[i][j] is: %d\n", augMatrix[i][j])
+// 	// fmt.Printf("(augMatrix[i][j] mod 2) is: %v\n", modu)
 
-	return augMa
-}
+// }
+
+// fmt.Printf("third res[%d] just set to: %d\n", i, res[i])
+// fmt.Printf("This is res4: %d \n", res)
+
+// Not in use
+// func gaussElimination(augMa [][]int) [][]int {
+// 	n := len(augMa[0]) - 1 // n is number of unknowns
+// 	// temp := make([][]float64, len(augMa))
+
+// 	for i := 0; i < n; i++ {
+// 		if augMa[i][i] == 0 { // should 0 be eps ?
+// 			// throw an error
+// 			fmt.Print("Divison by zero encountered \n")
+// 			continue
+// 		}
+// 		for j := i + 1; j < n; j++ {
+// 			ratio := augMa[j][i] / augMa[i][i]
+// 			//newBit := 1
+// 			//if augMa[j][i] == augMa[i][i] {
+// 			// newBit = 0
+// 			// }
+
+// 			// fmt.Printf("augMa[j][i]: %d \n", augMa[j][i])
+// 			// fmt.Printf("augMa[i][i]: %d \n", augMa[i][i])
+// 			// fmt.Printf("ratio is: %v \n", ratio)
+
+// 			for k := 0; k < n+1; k++ {
+// 				augMa[j][k] = augMa[j][k] - ratio*augMa[i][k]
+// 				// fmt.Printf("augMa[j][k]: %d \n", augMa[j][k])
+// 				// fmt.Printf("augMa[i][k]: %d \n", augMa[i][k])
+// 			}
+// 		}
+// 	}
+// 	// temp[0] = []float64(augMa[0])
+// 	return augMa
+// }
+
+// func solveByGaussElimination(A [][]int, b []int) []int {
+// 	augmentMatrix := makeAugmentedMatrix(A, b)
+// 	afterGauss := gaussElimination(augmentMatrix)
+// 	solution := backSubstitution(afterGauss)
+// 	return solution
+// }

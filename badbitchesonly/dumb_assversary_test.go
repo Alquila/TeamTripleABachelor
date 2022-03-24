@@ -5,6 +5,8 @@ import (
 	// "reflect"
 	// "strconv"
 	// "strings"
+	"fmt"
+	"reflect"
 	"testing"
 	// "time"
 	// //"golang.org/x/tools/go/analysis/passes/nilfunc"
@@ -38,10 +40,73 @@ func NotAllowedBigBangTest(t *testing.T) {
 
 }
 
-func TestDoTheHack(t *testing.T) {
-	doTheHack()
-}
+// func TestDoTheSimpleHack(t *testing.T) {
+// 	doTheSimpleHack()
+// }
 
 func TestPrint2(t *testing.T) {
 	print("hello worlds")
+}
+
+func TestDoTheSimpleHack(t *testing.T) {
+	// TODO: make this a function in dumb_assversary.go plz
+
+	// init one register, in both OG and sym version
+	symReg := InitOneSymRegister()
+	reg := InitOneRegister()
+	orgReg := make([]int, 19)
+	copy(orgReg, reg.ArrImposter)
+
+	// make output keystream in both
+	symKeyStream := SimpleKeyStreamSym(symReg)
+	keyStream := SimpleKeyStream(reg)
+
+	// make sym version into [][]int if not allready
+
+	// use gauss to solve equations
+	//res := solveByGaussElimination(symKeyStream, keyStream)
+	res := solveByGaussEliminationTryTwo(symKeyStream, keyStream)
+
+	fmt.Printf("Res er: %d\n", res)
+	fmt.Printf("reg er: %d\n", orgReg)
+
+	// compare if found res is equal to init registers
+	if !reflect.DeepEqual(res, orgReg) {
+		t.Fail()
+		fmt.Printf("Res er: %d\n", res)
+		fmt.Printf("reg er: %d\n", orgReg)
+	}
+}
+
+func TestDoTheSimpleHackSecondVersion(t *testing.T) {
+	// TODO: make this a function in dumb_assversary.go plz
+
+	// init one register, in both OG and sym version
+	symReg := InitOneSymRegister()
+	reg := InitOneRegister()
+	orgReg := make([]int, 19)
+	copy(orgReg, reg.ArrImposter)
+
+	// make output keystream in both
+	symKeyStream := SimpleKeyStreamSymSecondVersion(symReg)
+	fmt.Printf("length of symKeyStream[0]: %d\n", len(symKeyStream[0]))
+	keyStream := SimpleKeyStreamSecondVersion(reg)
+	fmt.Printf("length of KeyStream: %d\n", len(keyStream))
+
+	// make sym version into [][]int if not allready
+
+	// use gauss to solve equations
+	//res := solveByGaussElimination(symKeyStream, keyStream)
+	res := solveByGaussEliminationTryTwo(symKeyStream, keyStream)
+
+	fmt.Printf("Res er: %d\n", res[0:19])
+	fmt.Printf("længden af res er: %d\n", len(res))
+	fmt.Printf("reg er: %d\n", orgReg)
+
+	// compare if found res is equal to init registers
+	if !reflect.DeepEqual(res[0:19], orgReg) {
+		t.Fail()
+		fmt.Printf("Res er: %d\n", res)
+		fmt.Printf("reg er: %d\n", orgReg)
+	}
 }
