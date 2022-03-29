@@ -42,3 +42,17 @@ func doTheSimpleHack() {
 // 	42
 // 	// brug gauss
 // }
+
+func DoTheKnownPlainTextHack() []int {
+	// // Init all four Registers
+	// initializeRegisters()
+	// SymInitializeRegisters()
+
+	// make stream cipher ?
+	b := makeKeyStream()
+	A := makeSymKeyStream()
+
+	x := solveByGaussEliminationTryTwo(A, b)
+
+	return x
+}

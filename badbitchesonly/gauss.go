@@ -131,6 +131,8 @@ func makeAugmentedMatrix(A [][]int, b []int) [][]int {
 func gaussEliminationPart2(augMa [][]int) [][]int {
 	noUnknownVars := len(augMa[0]) - 1 // n is number of unknowns //burde nok køre igennem dem alle sammen
 	noEquations := len(augMa)
+	fmt.Printf("len of unknown variable %d \n", noUnknownVars)
+	fmt.Printf("len of equations %d \n", noEquations)
 	// temp := make([][]float64, len(augMa))
 
 	for i := 0; i < noUnknownVars; i++ {

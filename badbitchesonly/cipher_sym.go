@@ -48,25 +48,25 @@ func SymSetRegisters() {
 }
 
 //Clock R1, R2, R3 based on R4 state
-func SymClockingUnit(r4 SymRegister) {
-	//arr := r4.ArrImposter
-	//maj := majority(arr[3], arr[7], arr[10])
-	//if maj == arr[10] {
+func SymClockingUnit(r4 Register) {
+	arr := r4.ArrImposter
+	maj := majority(arr[3], arr[7], arr[10])
 
 	// HARDCODING all registers is clocked every fucking time
-	SymClock(sr1)
-	print("clock R1\n")
-	//}
-	//if maj == arr[3] {
-	//clock R2
-	SymClock(sr2)
-	print("clock R2\n")
-	//}
-	//if maj == arr[7] {
-	//clock R3
-	SymClock(sr3)
-	print("clock R3\n")
-	//}
+	if maj == arr[10] {
+		SymClock(sr1)
+		print("clock R1\n")
+	}
+	if maj == arr[3] {
+		//clock R2
+		SymClock(sr2)
+		print("clock R2\n")
+	}
+	if maj == arr[7] {
+		//clock R3
+		SymClock(sr3)
+		print("clock R3\n")
+	}
 }
 
 func SymClock(r SymRegister) {
@@ -113,7 +113,7 @@ func SymMakeSessionKey() {
 	sym_session_key = make([][]int, 4) // REVIEW: der mangler noget her
 }
 
-func SymInitialiseRegisters() {
+func SymInitializeRegisters() {
 	// Reset registers
 	SymSetRegisters()
 
@@ -249,6 +249,30 @@ func SymMajorityMultiply(c []int, d []int) []int {
 	return res
 }
 
+func makeSymKeyStream() [][]int {
+
+	keyStream := make([][]int, 228)
+
+	SymInitializeRegisters()
+
+	// Clock the register 99 times
+	for i := 0; i < 99; i++ {
+		// FIXME: somehow make symClockingUnit, for now we clock all symreg
+		SymClockingUnit(r4)
+		SymClock(sr4)
+	}
+
+	// clock 228 times and save keystream
+	for i := 0; i < 228; i++ {
+		SymClockingUnit(r4)
+		//OverwriteXorSlice(r.ArrImposter[r.Length-1], aaa)
+		keyStream[i] = SymMakeFinalXOR(sr1, sr2, sr3)
+		// overw(SymMajorityOutput(r), r.ArrImposter[r.Length-1])
+		//Printf("Length of output from symMajorFunc %d\n", len(SymMajorityOutput(r)))
+	}
+	return keyStream
+}
+
 /*
 ###########################################################
 #### THIS IS WHERE THE SIMPLE CIPHER SYM STREAM EXISTS ####
@@ -315,7 +339,10 @@ func SimpleKeyStreamSymSecondVersion(r SymRegister) [][]int {
 	// clock 228 times and save keystream
 	for i := 0; i < 228; i++ {
 		SymClock(r)
-		keyStream[i] = SymMajorityOutput(r)
+		aaa := SymMajorityOutput(r)
+		OverwriteXorSlice(r.ArrImposter[r.Length-1], aaa)
+		keyStream[i] = aaa
+		// overw(SymMajorityOutput(r), r.ArrImposter[r.Length-1])
 		//Printf("Length of output from symMajorFunc %d\n", len(SymMajorityOutput(r)))
 	}
 	return keyStream

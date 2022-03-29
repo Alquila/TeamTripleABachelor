@@ -95,17 +95,17 @@ func clockingUnit(r4 Register) {
 	maj := majority(arr[3], arr[7], arr[10])
 	if maj == arr[10] {
 		Clock(r1)
-		print("clock R1\n")
+		// print("clock R1\n")
 	}
 	if maj == arr[3] {
 		//clock R2
 		Clock(r2)
-		print("clock R2\n")
+		// print("clock R2\n")
 	}
 	if maj == arr[7] {
 		//clock R3
 		Clock(r3)
-		print("clock R3\n")
+		// print("clock R3\n")
 	}
 }
 
@@ -168,7 +168,7 @@ func makeSessionKey() {
 }
 
 //makes 0's arrays, for 64 cycles clock registers and xor with i'th key bit, for 22 cycles clock registers and xor with i'th frame bit
-func initialiseRegisters() { // used to have session_key and frame_number as params, but made then global variables instead
+func initializeRegisters() { // used to have session_key and frame_number as params, but made then global variables instead
 	/* do A5/2 */
 	r1.ArrImposter = make([]int, r1.Length)
 	r2.ArrImposter = make([]int, r2.Length)
@@ -183,7 +183,7 @@ func initialiseRegisters() { // used to have session_key and frame_number as par
 
 		print("printing r1 \n")
 		prettyPrint(r1)
-		Printf("sk %d \n", session_key[i])
+		// Printf("sk %d \n", session_key[i])
 
 		r1.ArrImposter[0] = r1.ArrImposter[0] ^ session_key[i]
 		r2.ArrImposter[0] = r2.ArrImposter[0] ^ session_key[i]
@@ -206,7 +206,7 @@ func initialiseRegisters() { // used to have session_key and frame_number as par
 		r4.ArrImposter[0] = r4.ArrImposter[0] ^ frame_bits[i]
 	}
 
-	Printf("Initialised registers 1-4:")
+	Printf("Initialized registers 1-4:")
 	Println()
 	prettyPrint(r1)
 	prettyPrint(r2)
@@ -253,7 +253,7 @@ func makeKeyStream() []int {
 	keyStream := make([]int, 228)
 
 	/* Initialize internal state with K_c and frame number */
-	initialiseRegisters() // TODO: Test me
+	initializeRegisters() // TODO: Test me
 
 	/* Force bits R1[15], R2[16], R3[18], R4[10] to be 1 */
 	setIndicesToOne()
@@ -317,7 +317,7 @@ func SimpleKeyStreamSecondVersion(r Register) []int {
 
 	for i := 0; i < 228; i++ {
 		Clock(r)
-		keyStream[i] = majorityOutput(r)
+		keyStream[i] = majorityOutput(r) ^ r.ArrImposter[r.Length-1]
 	}
 	//fmt.Printf("Print register efter endnu 228 clocks: \n %d \n", r.ArrImposter)
 

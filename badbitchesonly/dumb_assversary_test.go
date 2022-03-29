@@ -99,9 +99,7 @@ func TestDoTheSimpleHackSecondVersion(t *testing.T) {
 	//res := solveByGaussElimination(symKeyStream, keyStream)
 	res := solveByGaussEliminationTryTwo(symKeyStream, keyStream)
 
-	fmt.Printf("Res er: %d\n", res[0:19])
 	fmt.Printf("længden af res er: %d\n", len(res))
-	fmt.Printf("reg er: %d\n", orgReg)
 
 	// compare if found res is equal to init registers
 	if !reflect.DeepEqual(res[0:19], orgReg) {
@@ -109,4 +107,28 @@ func TestDoTheSimpleHackSecondVersion(t *testing.T) {
 		fmt.Printf("Res er: %d\n", res)
 		fmt.Printf("reg er: %d\n", orgReg)
 	}
+	fmt.Printf("reg er: %d\n", orgReg)
+	fmt.Printf("Res er: %d\n", res[0:19])
+}
+
+func TestPlaintextAttack(t *testing.T) {
+	r4.ArrImposter = []int{0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1}
+	orgReg := make([]int, 17)
+	copy(orgReg, r4.ArrImposter)
+
+	session_key = make([]int, 64)
+
+	res := DoTheKnownPlainTextHack()
+
+	fmt.Printf("len af res er: %d\n", len(res))
+
+	// compare if found res is equal to init registers
+	if !reflect.DeepEqual(res[0:16], orgReg) {
+		t.Fail()
+		fmt.Printf("Res er: %d\n", res)
+		fmt.Printf("reg er: %d\n", orgReg)
+	}
+	fmt.Printf("reg er: %d\n", orgReg)
+	fmt.Printf("Res er: %d\n", res[0:19])
+
 }
