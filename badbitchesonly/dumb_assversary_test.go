@@ -132,3 +132,35 @@ func TestPlaintextAttack(t *testing.T) {
 	fmt.Printf("Res er: %d\n", res[0:19])
 
 }
+
+func TestFindDiffOfFrameNumbers(t *testing.T) {
+
+	res := FindDifferenceOfFrameNumbers(1, 2)
+
+	// LEAST significant bit is at index 0, so the bit is kinda 'reversed'
+	shouldBe := make([]int, 22)
+	shouldBe[0] = 1
+	shouldBe[1] = 1
+
+	if !reflect.DeepEqual(res, shouldBe) {
+		t.Fail()
+		fmt.Printf("Res er: %d\n", res)
+		fmt.Printf("shouldBe er: %d\n", shouldBe)
+	}
+}
+
+func TestDescribeNewFrameNumberWithOldVar(t *testing.T) {
+	firstSymReg := InitOneSymRegister()
+	prints(firstSymReg.ArrImposter[15], "række 15")
+
+	res := DescribeNewFrameWithOldVariables(0, 1, firstSymReg.ArrImposter)
+
+	fmt.Printf("res er: \n%d \n", res)
+	fmt.Printf("res er %d \n", len(res))
+	fmt.Printf("res[0] er %d \n", len(res[0]))
+	PrettySymPrintSlice(res)
+}
+
+func TestSymInit(t *testing.T) {
+	SymInitializeRegisters()
+}

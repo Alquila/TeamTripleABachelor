@@ -2,10 +2,7 @@ package main
 
 import (
 	. "fmt"
-	"math/rand"
 	"strconv"
-	"strings"
-	"time"
 )
 
 /* global variable declaration */
@@ -33,18 +30,18 @@ func SymMakeRegister(length int, tabs []int, major_idx []int, compliment_idx int
 		Ært:         compliment_idx}
 
 	for i := 0; i < reg.Length; i++ {
-		reg.ArrImposter[i] = make([]int, reg.Length)
+		reg.ArrImposter[i] = make([]int, reg.Length+1) //REVIEW ændret til +1
 	}
 
 	return reg
 }
 
+//Calls SymMakeRegister on each register. Each register is initialised and the symbolic slices are +1 of r.Lenght to make space for extra bit
 func SymSetRegisters() {
 	sr1 = SymMakeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14)
 	sr2 = SymMakeRegister(22, []int{21, 20}, []int{9, 13}, 16)
 	sr3 = SymMakeRegister(23, []int{22, 21, 20, 7}, []int{16, 18}, 13)
 	sr4 = SymMakeRegister(17, []int{16, 11}, nil, -1)
-
 }
 
 //Clock R1, R2, R3 based on R4 state
@@ -91,76 +88,73 @@ func SymClock(r SymRegister) {
 func SymCalculateNewBit(r SymRegister) []int {
 	slice_slice := r.ArrImposter
 
-	newbit := make([]int, r.Length) //all 0 slice for first xor
+	newbit := make([]int, r.Length+1) //all 0 slice for first xor //REVIEW +1
 
 	for i := range r.Tabs {
 		tabslice := slice_slice[r.Tabs[i]] //get the slice for the tap
 		//Printf("slice %d is %+v \n",r.Tabs[i], tabslice)
-		for i := 0; i < r.Length; i++ { //loop through the slices and xor them index-wise
+		for i := 0; i < r.Length+1; i++ { //loop through the slices and xor them index-wise //REVIEW +1
 			newbit[i] = newbit[i] ^ tabslice[i]
 		}
 	}
 	return newbit
 }
 
-func SymMakeSessionKey() {
-	rand.Seed(time.Now().Unix())
+// func SymMakeSessionKey() {
+// 	rand.Seed(time.Now().Unix())
 
-	key := make([]int, 64)
-	for i := 0; i < 64; i++ {
-		key[i] = rand.Intn(2)
-	}
-	sym_session_key = make([][]int, 4) // REVIEW: der mangler noget her
-}
+// 	key := make([]int, 64)
+// 	for i := 0; i < 64; i++ {
+// 		key[i] = rand.Intn(2)
+// 	}
+// 	sym_session_key = make([][]int, 4) // REVIEW: der mangler noget her
+// }
 
 func SymInitializeRegisters() {
 	// Reset registers
 	SymSetRegisters()
 
-	for i := 0; i < 64; i++ {
-		SymClock(sr1)
-		SymClock(sr2)
-		SymClock(sr3)
-		SymClock(sr4)
+	// for i := 0; i < 64; i++ {
+	// 	SymClock(sr1)
+	// 	SymClock(sr2)
+	// 	SymClock(sr3)
+	// 	SymClock(sr4)
 
-		// REVIEW: nomalt xor med sessions key - skal dette stadig gøres?
-		// REVIEW: we pretend that the session key is 0 #verySafe sorry Ivan
-		// session_key[i] skal XORs her
-	}
+	// }
 
 	// makes frame_number from int -> bits in array
 	//frame_bits := makeFrameNumberToBits(frame_number)
 
-	for i := 0; i < 22; i++ {
-		SymClock(sr1)
-		SymClock(sr2)
-		SymClock(sr3)
-		SymClock(sr4)
+	// for i := 0; i < 22; i++ {
+	// 	SymClock(sr1)
+	// 	SymClock(sr2)
+	// 	SymClock(sr3)
+	// 	SymClock(sr4)
+	// 	// : xor med framenumber
+	// 	// : we pretend that the framenumber is 0
+	// 	// frame_bits[i] skal XORs her
+	// }
 
-		// REVIEW: xor med framenumber
-		// REVIEW: we pretend that the framenumber is 0
-		// frame_bits[i] skal XORs her
-	}
+	//Set bits to 1 //REVIEW
+	sr1.ArrImposter[15][sr1.Length] = 1
+	sr2.ArrImposter[16][sr2.Length] = 1
+	sr3.ArrImposter[18][sr3.Length] = 1
+	sr4.ArrImposter[10][sr4.Length] = 1
+
+	Println("sr1:")
+	PrettySymPrintSlice(sr1.ArrImposter)
+	Println("sr2:")
+
+	PrettySymPrintSlice(sr2.ArrImposter)
+	Println("sr3:")
+	PrettySymPrintSlice(sr3.ArrImposter)
+	Println("sr4:")
+	PrettySymPrintSlice(sr4.ArrImposter)
+
 }
 
-// func symMakeFinalXOR() []int { // REVIEW: Skal tilføjes til flowdiagram
-// 	// register R1, majs = 12, 15, ært = 14
-
-// 	//maj_r1 := majorityOutput(r1)
-// 	//maj_r2 := majorityOutput(r2)
-// 	//maj_r3 := majorityOutput(r3)
-
-// 	//last_r1 := r1.ArrImposter[r1.Length-1]
-// 	//last_r2 := r2.ArrImposter[r2.Length-1]
-// 	//last_r3 := r3.ArrImposter[r3.Length-1]
-
-// 	//finalXOR := maj_r1 ^ last_r1 ^ maj_r2 ^ last_r2 ^ maj_r3 ^ last_r3 // all is XOR'ed
-
-// 	return finalXOR
-
-// }
-
 /*
+FIXME
 Makes the final xor of r1[-1] ⨁ maj(r1) ⨁ r2[-1] ⨁ maj(r2) ⨁ r3[-1] ⨁ maj(r3)
 returns [vars1 | prod1 | vars2 | prod2 | vars3 | prod3]
 Calls SymMajorityOutput and OverwriteXorSlice
@@ -175,14 +169,33 @@ func SymMakeFinalXOR(r1 SymRegister, r2 SymRegister, r3 SymRegister) []int {
 	maj_r3 := SymMajorityOutput(r3)
 
 	//Xor them "locally" together first
-	OverwriteXorSlice(last_r1, maj_r1) //[vars1 | prods1] = [vars1] ⨁ [vars1 | prods1]
+	OverwriteXorSlice(last_r1, maj_r1) //[vars1 | prods1][b] = [vars1][b] ⨁ [vars1 | prods1][b]
 	OverwriteXorSlice(last_r2, maj_r2)
 	OverwriteXorSlice(last_r3, maj_r3)
 
-	start := make([]int, len(maj_r1))
-	copy(start, maj_r1)              //start by res = [vars1 | prod1]
-	start = append(start, maj_r2...) //now [vars1 | prod1 | vars2 | prod2 ]
-	start = append(start, maj_r3...) //now [vars1 | prod1 | vars2 | prod2 | vars3 | prod3]
+	v1 := len(last_r1) - 1 //19
+	v2 := len(last_r2) - 1
+	v3 := len(last_r3) - 1
+	print("lenght of v1")
+	print(v1)
+	vars1 := maj_r1[0:v1] //vars1 points to the 19 [vars1] entries of maj_1
+
+	start := make([]int, len(vars1))
+	copy(start, vars1)                     //start by res = [vars1] (without the bit)
+	start = append(start, maj_r2[0:v2]...) //now [vars1 | vars2 ]
+	start = append(start, maj_r3[0:v3]...) //now [vars1 | vars2 | vars3]
+
+	bit_entry1 := len(maj_r1) - 1
+	bit_entry2 := len(maj_r2) - 1
+	bit_entry3 := len(maj_r3) - 1
+
+	start = append(start, maj_r1[v1:bit_entry1]...) //now [vars1 | vars2 | vars3 | prod1] without the bit entry
+	start = append(start, maj_r2[v2:bit_entry2]...) //now [vars1 | prod1 | vars2 | prod2 ]
+	start = append(start, maj_r3[v2:bit_entry3]...) //now [vars1 | prod1 | vars2 | prod2 | vars3 | prod3]
+
+	final_bit := maj_r1[bit_entry1] ^ maj_r2[bit_entry2] ^ maj_r3[bit_entry3]
+
+	start = append(start, []int{final_bit}...)
 
 	return start
 }
@@ -202,16 +215,18 @@ func SymMajorityOutput(r SymRegister) []int {
 	xz := SymMajorityMultiply(x, z)
 	yz := SymMajorityMultiply(y, z)
 	ee := XorSlice(xy, xz)
-	long_slice := XorSlice(ee, yz) //This is a xor of normal and product variables
+	long_slice := XorSlice(ee, yz) //This is a xor of normal and product variables //the last entry should be the bit entry
 	short_slice := XorSlice(x, y)  //This is only a xor of the normal variables
+	//REVIEW the long and short slice both have a bit in the last entry. these should be xored and added to the end of the res slice
 	// xor the "normal" variables in the start of the long slice [ vars | products ] ⨁ [ vars ]
-	for i := 0; i < len(short_slice); i++ {
+	for i := 0; i < len(short_slice)-1; i++ { //REVIEW -1 fordi så undgå bit indgang
 		long_slice[i] = long_slice[i] ^ short_slice[i]
 	}
+	long_slice[len(long_slice)-1] = long_slice[len(long_slice)-1] ^ short_slice[len(short_slice)-1] //REVIEW xor the bits together and place at the end
 	return long_slice
 }
 
-//Takes two slices and xors them indexwise together. Assumed to be of same lenght. Returns slice of size len(a)
+//Takes two slices and xors them indexwise together. Assumed to be of same lenght. Returns slice of size len(a) REVIEW should be fine
 func XorSlice(a []int, b []int) []int {
 	res := make([]int, len(a))
 	for i := 0; i < len(a); i++ {
@@ -221,30 +236,34 @@ func XorSlice(a []int, b []int) []int {
 }
 
 //Takes two slices with first shorter than the second. Overwrites the first len(short) entries in long with long[i] = short[i] ^ long[i]
+//long[len(long)-1] = long[len(long)-1] ^ short[len(short)-1]
 func OverwriteXorSlice(short []int, long []int) {
-	for i := 0; i < len(short); i++ {
+	for i := 0; i < len(short)-1; i++ {
 		long[i] = short[i] ^ long[i]
 	}
+	long[len(long)-1] = long[len(long)-1] ^ short[len(short)-1]
 }
 
 /*
 multiplies two decision vectors with result being c[i]d[j] ^ c[j]d[i] for i /= j and result = c[i]d[j] for i=j.
 res slice has lenght len(c)*(len(c)-1)/2 + len(c).  c and d are assumed to be same lenght.
 The original len(c) variables will be in the first len(c) indexes of result
+The slice should be the full slice including the last bit index
 */
 func SymMajorityMultiply(c []int, d []int) []int {
-	lenc := len(c)
+	lenc := len(c) - 1 //REVIEW -1 fordi vi ikke vil loop over den konkrete bit til sidst
 	leng := lenc * (lenc - 1) / 2
-	res := make([]int, leng+lenc)
+	res := make([]int, leng+lenc+1) //REVIEW +1 fordi der bliver lagt bit ind til sidst
 	acc := 0
 	for i := 0; i < lenc; i++ {
-		res[i] = c[i] * d[i]
+		res[i] = c[i]*d[i] ^ c[lenc] ^ d[lenc] //REVIEW d[lenc] er bit plads
 		for j := i + 1; j < lenc; j++ {
 			res[lenc+acc] = c[i]*d[j] ^ c[j]*d[i]
 			//Printf("res[%d] = %d*%d ^ %d*%d = %d \n", lenc+acc, c[i], d[j], c[j], d[i], res[lenc+acc])
 			acc++
 		}
 	}
+	res[len(res)-1] = c[lenc] * d[lenc] //REVIEW sidste plads er bits ganget sammen
 
 	return res
 }
@@ -285,29 +304,17 @@ func InitOneSymRegister() SymRegister {
 		// reg.ArrImposter[i] = make([]int, 19)
 		reg.ArrImposter[i][i] = 1 // each entry in the diagonal set to 1 as x_i is only dependent on x_i when initialized
 	}
+	reg.ArrImposter[15][15] = 0
+	reg.ArrImposter[15][len(reg.ArrImposter[15])-1] = 1
 	return reg
 }
-
-// NOT USED AS WE DO NOT CARE ABOUT THE PLAINTEXT
-// func EncryptSimpleSymPlaintext(plaintext []int) [][]int {
-// 	key := MakeSymPlaintext()
-// 	Printf("This is the key-stream: %d \n", key)
-// 	res := make([][]int, len(plaintext))
-// 	for i := range res {
-// 		res[i] = make([]int, 19)
-// 		for j := i; i < 19; i++ {
-// 			res[i][j] = key[i][i]
-// 		}
-// 	}
-// 	return res
-// }
 
 func SimpleKeyStreamSym(r SymRegister) [][]int {
 
 	// Init key stream array
 	keyStream := make([][]int, 228)
 	for i := 0; i < 228; i++ {
-		keyStream[i] = make([]int, r.Length)
+		keyStream[i] = make([]int, r.Length+1)
 	}
 
 	// Clock the register 99 times
@@ -328,7 +335,7 @@ func SimpleKeyStreamSymSecondVersion(r SymRegister) [][]int {
 	// Init key stream array
 	keyStream := make([][]int, 228)
 	for i := 0; i < 228; i++ {
-		keyStream[i] = make([]int, r.Length)
+		keyStream[i] = make([]int, r.Length) //REVIEW her skal det vel være +1
 	}
 
 	// Clock the register 99 times
@@ -391,8 +398,25 @@ func PrettyPrint(r SymRegister) {
 				accString += " x" + (str) + " ⨁ "
 			}
 		}
-		accString = strings.TrimRight(accString, "⨁ ")
+		// accString = strings.TrimRight(accString, "⨁ ")
+		accString = accString + strconv.Itoa(rMatrix[i][rLength])
 		Printf("")
 		println(accString)
 	}
+}
+
+func PrettySymPrintSlice(slice [][]int) {
+	for i := 0; i < len(slice); i++ { //19
+		accString := "["
+		for j := 0; j < len(slice[0])-1; j++ { //19
+			if slice[i][j] == 1 {
+				str := strconv.Itoa(j)
+				accString += "x" + (str) + " ⨁ "
+			}
+		}
+		accString += strconv.Itoa(slice[i][len(slice[0])-1]) + "]  \n"
+		print(accString)
+	}
+	Println()
+
 }

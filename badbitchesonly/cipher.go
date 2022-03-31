@@ -145,7 +145,7 @@ func calculateNewBit(r Register) int {
 	return newbit
 }
 
-func makeFrameNumberToBits(number int) []int {
+func MakeFrameNumberToBits(number int) []int {
 	// frame number will always be 22 bits
 	frame_bit := make([]int, 22)
 
@@ -192,7 +192,7 @@ func initializeRegisters() { // used to have session_key and frame_number as par
 	}
 
 	// makes frame_number from int -> bits in array
-	frame_bits := makeFrameNumberToBits(frame_number)
+	frame_bits := MakeFrameNumberToBits(frame_number)
 
 	for i := 0; i < 22; i++ {
 		Clock(r1)

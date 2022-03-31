@@ -19,6 +19,13 @@ Clock R1-R3
 
 # In Progress
 
+# Notation for extra bit
+For a register r.Lenght is the lenght of the actual register. 
+In the symbolic version the slices in the register will have lenght r.lenght+1 to account for the extra bit in the end.
+This mean that when indexing over a slice we will typically only index over r.Lenght and handle slice[len(r)-1] - the last index - sepperately
+When xoring two slices however the last bits are just xored together so there we can loop over len(r)
+When clocking we only loop over r.Lenght
+
 
 # TODO 
 

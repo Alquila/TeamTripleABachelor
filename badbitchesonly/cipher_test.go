@@ -461,18 +461,20 @@ func mean(a []int) float64 {
 }
 
 func Symaaa(c []string, d []string) []string {
-	lenc := len(c)
+	lenc := len(c) - 1 //REVIEW -1 fordi vi ikke vil loop over den konkrete bit til sidst
 	leng := lenc * (lenc - 1) / 2
-	res := make([]string, leng+lenc)
+	res := make([]string, leng+lenc+1) //REVIEW +1 fordi der bliver lagt bit ind til sidst
 	acc := 0
 	for i := 0; i < lenc; i++ {
-		res[i] = c[i] + d[i]
+		res[i] = c[i] + d[i] + c[lenc] + d[lenc] //REVIEW d[lenc] er bit plads
 		for j := i + 1; j < lenc; j++ {
 			res[lenc+acc] = c[i] + d[j]
+			//Printf("res[%d] = %d*%d ^ %d*%d = %d \n", lenc+acc, c[i], d[j], c[j], d[i], res[lenc+acc])
 			acc++
 		}
 	}
-	Println(acc)
+	res[len(res)-1] = c[lenc] + d[lenc]
+
 	return res
 }
 
@@ -481,8 +483,8 @@ func prints(res []int, text string) {
 }
 
 func TestSymaa(t *testing.T) {
-	c := []string{"0", "1", "2", "3", "4", "5"}
-	d := []string{"0", "1", "2", "3", "4", "5"}
+	c := []string{"0", "1", "2", "3", "4", "5", "a"}
+	d := []string{"0", "1", "2", "3", "4", "5", "b"}
 
 	res := Symaaa(c, d)
 	// print(res)
@@ -547,22 +549,6 @@ func PrettySymPrint(symReg SymRegister) {
 }
 
 //works on slice_slice
-func PrettySymPrintSlice(slice [][]int) {
-	for i := 0; i < len(slice[0]); i++ {
-		accString := "["
-		for j := 0; j < len(slice[0]); j++ {
-			if slice[i][j] == 1 {
-				str := strconv.Itoa(j)
-				accString += "x" + (str) + " ⨁ "
-			}
-		}
-		accString = strings.TrimRight(accString, "⨁ ")
-		accString += "]  \n"
-		print(accString)
-	}
-	Println()
-
-}
 
 func TestInitOneSymRegister(t *testing.T) {
 	reg := InitOneSymRegister()
@@ -579,10 +565,11 @@ func TestSimpleKeyStreamSym(t *testing.T) {
 
 func TestOverwriteXorSlice(t *testing.T) {
 	short := []int{1, 1, 0, 1, 1}
-	long := []int{0, 1, 0, 1, 1, 1, 1, 0}
+	long := []int{0, 1, 0, 1, 1, 1, 1, 1}
 	OverwriteXorSlice(short, long)
 	Printf("%+v \n", long)
 }
+
 func TestAppend(t *testing.T) {
 
 	a := []int{1, 2, 3, 4}

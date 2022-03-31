@@ -36,13 +36,6 @@ func doTheSimpleHack() {
 	}
 }
 
-// func Solve(A, k) {
-// 	// should solve Ax = k
-// 	// hopefully som go library has this func
-// 	42
-// 	// brug gauss
-// }
-
 func DoTheKnownPlainTextHack() []int {
 	// // Init all four Registers
 	// initializeRegisters()
@@ -55,4 +48,42 @@ func DoTheKnownPlainTextHack() []int {
 	x := solveByGaussEliminationTryTwo(A, b)
 
 	return x
+}
+
+/** TRYING TO USE THE DIFFERENCE IN FRAMENUMBER TO
+SEE WETHER THE INDEX IN REGISTER SHOULD BE THE
+SAME OR DIFFERENT WHEN INITIALIZING IT		   */
+
+func FindDifferenceOfFrameNumbers(f1 int, f2 int) []int {
+
+	f1_bits := MakeFrameNumberToBits(f1)
+	f2_bits := MakeFrameNumberToBits(f2)
+	res := XorSlice(f1_bits, f2_bits)
+
+	return res
+}
+
+func DescribeNewFrameWithOldVariables(f1 int, f2 int, orgReg [][]int) [][]int {
+
+	diff := FindDifferenceOfFrameNumbers(f1, f2)
+
+	// kan vi bare XOR diff med vores originale register ?
+
+	res := make([][]int, len(orgReg))
+
+	for i := range orgReg {
+		res[i] = make([]int, len(orgReg[0]))
+		copy(res[i], orgReg[i])
+	}
+
+	for i := range diff {
+		if diff[i] == 1 {
+			// XOR constant-index in expression
+			for j := range orgReg {
+				res[j][len(orgReg[0])-1] = orgReg[j][len(orgReg[0])-1] ^ 1
+			}
+		}
+	}
+
+	return res
 }
