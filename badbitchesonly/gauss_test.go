@@ -225,3 +225,20 @@ func TestGaussElimOnSecondExample(t *testing.T) {
 	}
 
 }
+
+func TestGaussElimination(t *testing.T) {
+	matrix := make([][]int, 4)
+
+	matrix[0] = []int{1, 0, 1, 1}
+	matrix[1] = []int{1, 0, 1, 0}
+	matrix[2] = []int{0, 1, 0, 1}
+	matrix[3] = []int{0, 1, 1, 1}
+
+	res := gaussEliminationPart2(matrix)
+
+	fmt.Printf("res is: \n %d", res)
+
+	// This should fail, as the last row is [0, 0, 0, 1]
+	// we need to make sure this says its wrong
+
+}
