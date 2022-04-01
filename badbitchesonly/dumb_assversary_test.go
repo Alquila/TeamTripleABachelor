@@ -160,7 +160,3 @@ func TestDescribeNewFrameNumberWithOldVar(t *testing.T) {
 	fmt.Printf("res[0] er %d \n", len(res[0]))
 	PrettySymPrintSlice(res)
 }
-
-func TestSymInit(t *testing.T) {
-	SymInitializeRegisters()
-}

@@ -129,7 +129,7 @@ func makeAugmentedMatrix(A [][]int, b []int) [][]int {
 
 // https://stackoverflow.com/questions/11483925/how-to-implementing-gaussian-elimination-for-binary-equations
 func gaussEliminationPart2(augMa [][]int) [][]int {
-	noUnknownVars := len(augMa[0]) - 1 // n is number of unknowns //burde nok køre igennem dem alle sammen
+	noUnknownVars := len(augMa[0]) - 2 // n is number of unknowns //burde nok køre igennem dem alle sammen
 	noEquations := len(augMa)
 	fmt.Printf("len of unknown variable %d \n", noUnknownVars)
 	fmt.Printf("len of equations %d \n", noEquations)
@@ -178,12 +178,9 @@ func gaussEliminationPart2(augMa [][]int) [][]int {
 
 // https://www.codegrepper.com/code-examples/python/gauss+elimination+python+numpy
 func backSubstitution(augMatrix [][]int) []int {
-	noUnknownVars := len(augMatrix[0]) - 1 // n is number of unknowns //burde nok køre igennem dem alle sammen
+	noUnknownVars := len(augMatrix[0]) - 2 // n is number of unknowns //burde nok køre igennem dem alle sammen
 	res := make([]int, noUnknownVars)
-	res[noUnknownVars-1] = augMatrix[noUnknownVars-1][noUnknownVars] // either 0 or 1
-	// for n := 0; n < 19; n++ {
-	// 	fmt.Printf("This is augMatrix: %d \n", augMatrix[n])
-	// }
+	res[noUnknownVars-1] = augMatrix[noUnknownVars-1][noUnknownVars-1] ^ augMatrix[noUnknownVars-1][noUnknownVars] // either 0 or 1
 
 	for i := noUnknownVars - 2; i >= 0; i-- { // looks at every row not all zero
 		res[i] = augMatrix[i][noUnknownVars]

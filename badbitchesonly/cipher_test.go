@@ -121,10 +121,11 @@ func TestSmallPrint(t *testing.T) {
 		Ært:         6}
 
 	for i := 0; i < r0.Length; i++ {
-		r0.ArrImposter[i] = make([]int, r0.Length)
+		r0.ArrImposter[i] = make([]int, r0.Length+1)
 	}
 
 	r0.ArrImposter[8][8] = 1
+	r0.ArrImposter[4][10] =1
 	r0.ArrImposter[1][1] = 1
 	r0.ArrImposter[5][5] = 1
 	r0.ArrImposter[3][3] = 1
@@ -415,13 +416,13 @@ func TestFinalXor(t *testing.T) {
 	// 4+5+8 = 17
 	// 4*3/2 + 5*4/2+ 8*7/2 = 44
 
-	// maj_r1 := SymMajorityOutput(r1)
-	// maj_r2 := SymMajorityOutput(r2)
-	// maj_r3 := SymMajorityOutput(r3)
+	maj_r1 := SymMajorityOutput(r1)
+	maj_r2 := SymMajorityOutput(r2)
+	maj_r3 := SymMajorityOutput(r3)
 
-	// prints(maj_r1, "r1 majority")
-	// prints(maj_r2, "r2 majority")
-	// prints(maj_r3, "r3 majority")
+	prints(maj_r1, "r1 majority")
+	prints(maj_r2, "r2 majority")
+	prints(maj_r3, "r3 majority")
 	// r1 majority[1 0 1 0 0 1 1 0 0 1]
 	// r2 majority[0 0 1 0 1 0 1 0 1 0 0 0 0 1 0]
 	// r3 majority[0 1 1 0 0 0 0 0 1 1 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
@@ -478,9 +479,7 @@ func Symaaa(c []string, d []string) []string {
 	return res
 }
 
-func prints(res []int, text string) {
-	Printf(text+"%+v \n", res)
-}
+
 
 func TestSymaa(t *testing.T) {
 	c := []string{"0", "1", "2", "3", "4", "5", "a"}
@@ -586,4 +585,9 @@ func TestAppend(t *testing.T) {
 	Printf("c %+v \n", c)
 	Printf("start %+v \n", start)
 
+}
+
+
+func TestSymInit(t *testing.T) {
+	SymInitializeRegisters()
 }

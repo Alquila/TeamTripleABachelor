@@ -63,15 +63,21 @@ func FindDifferenceOfFrameNumbers(f1 int, f2 int) []int {
 	return res
 }
 
+/**
+*	Describes the register after initialisation with framenumber 'f2' with the 
+*	variables used in framenumber 'f1'. 
+*	Also takes a register with 1 in diagonal ?
+*/
 func DescribeNewFrameWithOldVariables(f1 int, f2 int, orgReg [][]int) [][]int {
 
+	// gives os bitwise difference of frame numers
 	diff := FindDifferenceOfFrameNumbers(f1, f2)
-
-	// kan vi bare XOR diff med vores originale register ?
-
+	// init the predicted new symReg
 	res := make([][]int, len(orgReg))
 
+	// for each row in the register
 	for i := range orgReg {
+		// create the slice that represent the 
 		res[i] = make([]int, len(orgReg[0]))
 		copy(res[i], orgReg[i])
 	}

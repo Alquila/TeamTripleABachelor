@@ -30,11 +30,31 @@ func SymMakeRegister(length int, tabs []int, major_idx []int, compliment_idx int
 		Ært:         compliment_idx}
 
 	for i := 0; i < reg.Length; i++ {
-		reg.ArrImposter[i] = make([]int, reg.Length+1) //REVIEW ændret til +1
+		reg.ArrImposter[i] = make([]int, reg.Length) //REVIEW ændret til +1 //REVIEW ændret tilbage igen
 	}
 
 	return reg
 }
+
+func Bit_entry(reg SymRegister, bit_entry int) {
+	reg.ArrImposter[bit_entry] =  make([]int, reg.Length)
+	reg.ArrImposter[bit_entry][reg.Length-1] = 1
+	
+	// for i := 0; i < reg.Length; i++ {
+	// 	reg.ArrImposter[i] = make([]int, reg.Length) //REVIEW ændret til +1 //REVIEW ændret tilbage igen
+	// 	if i < bit_entry {
+	// 		reg.ArrImposter[i][i] = 1
+	// 	}
+	// 	if i == bit_entry {
+	// 		reg.ArrImposter[i][length-1] = 1
+	// 	}
+	// 	if i > bit_entry {
+	// 		reg.ArrImposter[i][i-1] = 1
+	// 	}
+	// }
+}
+
+
 
 //Calls SymMakeRegister on each register. Each register is initialised and the symbolic slices are +1 of r.Lenght to make space for extra bit
 func SymSetRegisters() {
@@ -88,30 +108,22 @@ func SymClock(r SymRegister) {
 func SymCalculateNewBit(r SymRegister) []int {
 	slice_slice := r.ArrImposter
 
-	newbit := make([]int, r.Length+1) //all 0 slice for first xor //REVIEW +1
+	newbit := make([]int, r.Length) //all 0 slice for first xor //REVIEW +1 //ændret tilbage 
 
 	for i := range r.Tabs {
 		tabslice := slice_slice[r.Tabs[i]] //get the slice for the tap
 		//Printf("slice %d is %+v \n",r.Tabs[i], tabslice)
-		for i := 0; i < r.Length+1; i++ { //loop through the slices and xor them index-wise //REVIEW +1
+		for i := 0; i < r.Length; i++ { //loop through the slices and xor them index-wise //REVIEW +1//ændret tilbage 
 			newbit[i] = newbit[i] ^ tabslice[i]
 		}
 	}
 	return newbit
 }
 
-// func SymMakeSessionKey() {
-// 	rand.Seed(time.Now().Unix())
 
-// 	key := make([]int, 64)
-// 	for i := 0; i < 64; i++ {
-// 		key[i] = rand.Intn(2)
-// 	}
-// 	sym_session_key = make([][]int, 4) // REVIEW: der mangler noget her
-// }
 
 func SymInitializeRegisters() {
-	// Reset registers
+	// Reset registers, all indexes are set to 0
 	SymSetRegisters()
 
 	// for i := 0; i < 64; i++ {
@@ -136,21 +148,31 @@ func SymInitializeRegisters() {
 	// }
 
 	//Set bits to 1 //REVIEW
-	sr1.ArrImposter[15][sr1.Length] = 1
-	sr2.ArrImposter[16][sr2.Length] = 1
-	sr3.ArrImposter[18][sr3.Length] = 1
-	sr4.ArrImposter[10][sr4.Length] = 1
+	sr1.ArrImposter[15][sr1.Length-1] = 1
+	sr2.ArrImposter[16][sr2.Length-1] = 1
+	sr3.ArrImposter[18][sr3.Length-1] = 1
+	sr4.ArrImposter[10][sr4.Length-1] = 1
 
 	Println("sr1:")
+	Printf("lenght %d \n", len(sr1.ArrImposter[0]))
+	Printf("lenght %d \n", len(sr1.ArrImposter[15]))
+	prints(sr1.ArrImposter[15], "sr1")
 	PrettySymPrintSlice(sr1.ArrImposter)
+	
 	Println("sr2:")
-
+	Printf("lenght %d \n", len(sr2.ArrImposter[0]))
 	PrettySymPrintSlice(sr2.ArrImposter)
 	Println("sr3:")
+	Printf("lenght %d \n", len(sr3.ArrImposter[0]))
 	PrettySymPrintSlice(sr3.ArrImposter)
 	Println("sr4:")
+	Printf("lenght %d \n", len(sr4.ArrImposter[0]))
 	PrettySymPrintSlice(sr4.ArrImposter)
 
+}
+
+func prints(res []int, text string) {
+	Printf(text+"%+v \n", res)
 }
 
 /*
