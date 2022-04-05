@@ -73,7 +73,7 @@ func FindDifferenceOfFrameNumbers(f1 int, f2 int) []int {
  */
 func DescribeNewFrameWithOldVariables(f1 int, f2 int, orgReg [][]int) [][]int {
 
-	// gives os bitwise difference of frame numers
+	// gives os bitwise difference of frame numbers
 	diff := FindDifferenceOfFrameNumbers(f1, f2)
 	fmt.Printf("The difference between the two framenumbers are: %d \n", diff)
 	// init the predicted new symReg
@@ -82,15 +82,17 @@ func DescribeNewFrameWithOldVariables(f1 int, f2 int, orgReg [][]int) [][]int {
 
 	// for each row in the register
 	for i := range orgReg {
-		// create the slice that represent the
+		// create the slice that represent the new frame with old variables
 		res[i] = make([]int, len(orgReg[0]))
 		copy(res[i], orgReg[i])
 	}
 
+	// for each bit in
 	for i := range diff {
-		if diff[i] == 1 { //dvs forskellige frame bits
+		if diff[i] == 1 { //dvs forskellige frame number bits
 			fmt.Printf("Diff[%d] is 1\n", i)
 			// XOR constant-index in expression
+			// REVIEW: This is wrong
 			res[i][len(orgReg[0])-1] = orgReg[i][len(orgReg[0])-1] ^ 1
 		}
 	}
