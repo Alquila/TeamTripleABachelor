@@ -113,6 +113,7 @@ func TestDoTheSimpleHackSecondVersion(t *testing.T) {
 
 func TestPlaintextAttack(t *testing.T) {
 	r4.ArrImposter = []int{0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1}
+	// sr4.ArrImposter = []int{0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1}
 	orgReg := make([]int, 17)
 	copy(orgReg, r4.ArrImposter)
 
@@ -151,12 +152,88 @@ func TestFindDiffOfFrameNumbers(t *testing.T) {
 
 func TestDescribeNewFrameNumberWithOldVar(t *testing.T) {
 	firstSymReg := InitOneSymRegister()
-	prints(firstSymReg.ArrImposter[15], "række 15")
+	Bit_entry(firstSymReg)
+	// prints(firstSymReg.ArrImposter[15], "række 15")
+	// prints(firstSymReg.ArrImposter[0], "række 0")
+	// prints(firstSymReg.ArrImposter[16], "række 16")
 
 	res := DescribeNewFrameWithOldVariables(0, 1, firstSymReg.ArrImposter)
 
-	fmt.Printf("res er: \n%d \n", res)
+	// fmt.Printf("res er: \n%d \n", res)
+	println("res er")
+	for i := 0; i < len(res); i++ {
+		prints(res[i], "")
+	}
 	fmt.Printf("res er %d \n", len(res))
 	fmt.Printf("res[0] er %d \n", len(res[0]))
-	PrettySymPrintSlice(res)
+	PrettySymPrintSliceBit(res, 15)
+
+	shouldBe := make([][]int, 19)
+	for i := 0; i < 19; i++ {
+		if i == 0 {
+			shouldBe[i] = []int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
+		} else if i < 15 {
+			shouldBe[i] = make([]int, 19)
+			shouldBe[i][i] = 1
+		} else if i == 15 {
+			shouldBe[i] = []int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
+		} else {
+			shouldBe[i] = make([]int, 19)
+			shouldBe[i][i-1] = 1
+		}
+	}
+	// fmt.Printf("shouldBe: %d \n", shouldBe)
+	println("shouldBe er")
+	for i := 0; i < len(shouldBe); i++ {
+		prints(shouldBe[i], "")
+	}
+	// shouldBe[0] = []int{""}
+	// shouldBe[0]
+	if !reflect.DeepEqual(res, shouldBe) {
+		t.Fail()
+		t.Log("The result is not correct")
+	}
+
+}
+
+func TestDescribeNewFrameWithVariables8And15(t *testing.T) {
+	firstSymReg := InitOneSymRegister()
+	Bit_entry(firstSymReg)
+
+	res := DescribeNewFrameWithOldVariables(8, 15, firstSymReg.ArrImposter)
+	// fmt.Printf("res is: \n %d \n", res)
+	println("res er")
+	for i := 0; i < len(res); i++ {
+		prints(res[i], "")
+	}
+	PrettySymPrintSliceBit(res, firstSymReg.set1)
+	prints(res[0], "")
+	shouldBe := make([][]int, 19)
+	for i := 0; i < 19; i++ {
+		if i == 0 {
+			shouldBe[i] = []int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
+		} else if i == 1 {
+			shouldBe[i] = []int{0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
+		} else if i == 2 {
+			shouldBe[i] = []int{0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
+		} else if i < 15 {
+			shouldBe[i] = make([]int, 19)
+			shouldBe[i][i] = 1
+		} else if i == 15 {
+			shouldBe[i] = []int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
+		} else {
+			shouldBe[i] = make([]int, 19)
+			shouldBe[i][i-1] = 1
+		}
+	}
+	PrettySymPrintSliceBit(shouldBe, firstSymReg.set1)
+	if !reflect.DeepEqual(res, shouldBe) {
+		t.Fail()
+		t.Log("The result is not correct")
+	}
+
+}
+
+func Test(t *testing.T) {
+
 }

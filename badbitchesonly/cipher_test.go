@@ -125,7 +125,7 @@ func TestSmallPrint(t *testing.T) {
 	}
 
 	r0.ArrImposter[8][8] = 1
-	r0.ArrImposter[4][10] =1
+	r0.ArrImposter[4][10] = 1
 	r0.ArrImposter[1][1] = 1
 	r0.ArrImposter[5][5] = 1
 	r0.ArrImposter[3][3] = 1
@@ -397,15 +397,15 @@ func TestClockingUnit(t *testing.T) {
 func TestFinalXor(t *testing.T) {
 	//hooow to teeeeest
 	//right now we just show that it takes the three registers and calculates the majority and takes the last slice in each and xors it all together. returns a long array with all the stuff
-	r1 := SymMakeRegister(4, []int{1, 3}, []int{0, 2}, 3)
+	r1 := SymMakeRegister(4, []int{1, 3}, []int{0, 2}, 3, 0)
 	for i := 0; i < 4; i++ {
 		r1.ArrImposter[i][i] = 1 // each entry in the diagonal set to 1 as x_i is only dependent on x_i when initialized
 	}
-	r2 := SymMakeRegister(5, []int{1, 3}, []int{2, 4}, 0)
+	r2 := SymMakeRegister(5, []int{1, 3}, []int{2, 4}, 0, 0)
 	for i := 0; i < 5; i++ {
 		r2.ArrImposter[i][i] = 1 // each entry in the diagonal set to 1 as x_i is only dependent on x_i when initialized
 	}
-	r3 := SymMakeRegister(8, []int{3, 4, 6, 5}, []int{1, 2}, 0)
+	r3 := SymMakeRegister(8, []int{3, 4, 6, 5}, []int{1, 2}, 0, 0)
 	for i := 0; i < 8; i++ {
 		r3.ArrImposter[i][i] = 1 // each entry in the diagonal set to 1 as x_i is only dependent on x_i when initialized
 	}
@@ -478,8 +478,6 @@ func Symaaa(c []string, d []string) []string {
 
 	return res
 }
-
-
 
 func TestSymaa(t *testing.T) {
 	c := []string{"0", "1", "2", "3", "4", "5", "a"}
@@ -586,7 +584,6 @@ func TestAppend(t *testing.T) {
 	Printf("start %+v \n", start)
 
 }
-
 
 func TestSymInit(t *testing.T) {
 	SymInitializeRegisters()

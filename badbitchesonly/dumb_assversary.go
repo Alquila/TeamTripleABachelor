@@ -58,36 +58,40 @@ func FindDifferenceOfFrameNumbers(f1 int, f2 int) []int {
 
 	f1_bits := MakeFrameNumberToBits(f1)
 	f2_bits := MakeFrameNumberToBits(f2)
+	fmt.Printf("f1 is: %d \n", f1_bits)
+	fmt.Printf("f2 is: %d \n", f2_bits)
+
 	res := XorSlice(f1_bits, f2_bits)
 
 	return res
 }
 
 /**
-*	Describes the register after initialisation with framenumber 'f2' with the 
-*	variables used in framenumber 'f1'. 
+*	Describes the register after initialisation with framenumber 'f2' with the
+*	variables used in framenumber 'f1'.
 *	Also takes a register with 1 in diagonal ?
-*/
+ */
 func DescribeNewFrameWithOldVariables(f1 int, f2 int, orgReg [][]int) [][]int {
 
 	// gives os bitwise difference of frame numers
 	diff := FindDifferenceOfFrameNumbers(f1, f2)
+	fmt.Printf("The difference between the two framenumbers are: %d \n", diff)
 	// init the predicted new symReg
-	res := make([][]int, len(orgReg))
+	length := len(orgReg)
+	res := make([][]int, length)
 
 	// for each row in the register
 	for i := range orgReg {
-		// create the slice that represent the 
+		// create the slice that represent the
 		res[i] = make([]int, len(orgReg[0]))
 		copy(res[i], orgReg[i])
 	}
 
 	for i := range diff {
-		if diff[i] == 1 {
+		if diff[i] == 1 { //dvs forskellige frame bits
+			fmt.Printf("Diff[%d] is 1\n", i)
 			// XOR constant-index in expression
-			for j := range orgReg {
-				res[j][len(orgReg[0])-1] = orgReg[j][len(orgReg[0])-1] ^ 1
-			}
+			res[i][len(orgReg[0])-1] = orgReg[i][len(orgReg[0])-1] ^ 1
 		}
 	}
 

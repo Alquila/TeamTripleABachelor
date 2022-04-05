@@ -110,7 +110,7 @@ func clockingUnit(r4 Register) {
 }
 
 //TODO Majority function
-//Move all the bits to the right, rightmost bit is dicarded!!!, input bit is specified by the taps of the register
+//Move all the bits to the right, rightmost bit is discarded!!!, input bit is specified by the taps of the register
 func Clock(r Register) {
 	arr := r.ArrImposter
 
