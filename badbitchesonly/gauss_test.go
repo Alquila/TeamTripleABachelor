@@ -136,19 +136,19 @@ func TestMakeAugmentedMatrix(t *testing.T) {
 func TestGaussEliminationPart2(t *testing.T) {
 	augMa := make([][]int, 4)
 
-	augMa[0] = []int{1, 1, 1, 0, 1}
-	augMa[1] = []int{1, 1, 0, 1, 1}
-	augMa[2] = []int{1, 0, 1, 1, 0}
-	augMa[3] = []int{0, 1, 1, 1, 1}
+	augMa[0] = []int{1, 1, 1, 0, 0, 1}
+	augMa[1] = []int{1, 1, 0, 1, 0, 1}
+	augMa[2] = []int{1, 0, 1, 1, 0, 0}
+	augMa[3] = []int{0, 1, 1, 1, 0, 1}
 
 	res := gaussEliminationPart2(augMa)
 	fmt.Printf("This is the result of the Gauss elimination: %d \n", res)
 
 	shouldBe := make([][]int, 4)
-	shouldBe[0] = []int{1, 1, 1, 0, 1}
-	shouldBe[1] = []int{0, 1, 0, 1, 1}
-	shouldBe[2] = []int{0, 0, 1, 1, 0}
-	shouldBe[3] = []int{0, 0, 0, 1, 0}
+	shouldBe[0] = []int{1, 1, 1, 0, 0, 1}
+	shouldBe[1] = []int{0, 1, 0, 1, 0, 1}
+	shouldBe[2] = []int{0, 0, 1, 1, 0, 0}
+	shouldBe[3] = []int{0, 0, 0, 1, 0, 0}
 
 	if !reflect.DeepEqual(res, shouldBe) {
 		t.Log("The result of the Gauss elimination wrong")
@@ -162,8 +162,8 @@ func TestGaussEliminationPart2(t *testing.T) {
 
 func TestBackSubstitutionBinary(t *testing.T) {
 	augMatrix := make([][]int, 4)
-	augMatrix[0] = []int{1, 1, 1, 0, 1}
-	augMatrix[1] = []int{0, 1, 0, 1, 1}
+	augMatrix[0] = []int{1, 1, 1, 0, 0, 1}
+	augMatrix[1] = []int{0, 1, 0, 1, 0, 1}
 	augMatrix[2] = []int{0, 0, 1, 1, 0}
 	augMatrix[3] = []int{0, 0, 0, 1, 0}
 

@@ -181,8 +181,11 @@ func backSubstitution(augMatrix [][]int) []int {
 	noUnknownVars := len(augMatrix[0]) - 2 // n is number of unknowns //burde nok køre igennem dem alle sammen
 	res := make([]int, noUnknownVars)
 	
-	for i := 0 ; 
-; 	rres[i] = augMatrix[i][noUnUnknownVars]es[noUnknownVars-1] = augMatrix[noUnknownVars-1][noUnknownVars-1] ^ augMatrix[noUnknownVars-1][noUnknownVars] // either 0 or 1
+	for i := 0 ; i < noUnknownVars ; i++ {
+		res[i] = augMatrix[i][noUnknownVars]
+	}
+
+	res[noUnknownVars-1] = augMatrix[noUnknownVars-1][noUnknownVars-1] ^ augMatrix[noUnknownVars-1][noUnknownVars] // either 0 or 1
 
 
 	for i := noUnknownVars - 2; i >= 0; i-- { // looks at every row not all zero
