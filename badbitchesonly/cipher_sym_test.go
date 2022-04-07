@@ -42,8 +42,4 @@ func TestHowFrames(t *testing.T) {
 
 }
 
-func printmatrix(matrix [][]int) {
-	for i := 0; i < len(matrix); i++ {
-		prints(matrix[i], "")
-	}
-}
+

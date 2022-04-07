@@ -157,7 +157,7 @@ func TestDescribeNewFrameNumberWithOldVar(t *testing.T) {
 	// prints(firstSymReg.ArrImposter[0], "række 0")
 	// prints(firstSymReg.ArrImposter[16], "række 16")
 
-	res := DescribeNewFrameWithOldVariables(0, 1, firstSymReg.ArrImposter)
+	res := DescribeNewFrameWithOldVariables(0, 1, firstSymReg)
 
 	// fmt.Printf("res er: \n%d \n", res)
 	println("res er")
@@ -200,7 +200,7 @@ func TestDescribeNewFrameWithVariables8And15(t *testing.T) {
 	firstSymReg := InitOneSymRegister()
 	Bit_entry(firstSymReg)
 
-	res := DescribeNewFrameWithOldVariables(8, 15, firstSymReg.ArrImposter)
+	res := DescribeNewFrameWithOldVariables(8, 15, firstSymReg)
 	// fmt.Printf("res is: \n %d \n", res)
 	println("res er")
 	for i := 0; i < len(res); i++ {
@@ -234,6 +234,20 @@ func TestDescribeNewFrameWithVariables8And15(t *testing.T) {
 
 }
 
-func Test(t *testing.T) {
+func TestFindDifferenceOfFrameNumbers(t *testing.T) {
+	diff := FindDifferenceOfFrameNumbers(136, 1357)	
+	fmt.Printf("diff:  %d", diff)
+}
+
+func TestDescribeFrameWithOldVariables2(t *testing.T) {
+	firstSymReg := InitOneSymRegister()
+	Bit_entry(firstSymReg)
+
+	res := DescribeNewFrameWithOldVariables(136, 1357, firstSymReg)
+
+	println("res er")
+	for i := 0; i < len(res); i++ {
+		prints(res[i], "")
+	}	
 
 }

@@ -20,7 +20,7 @@ type SymRegister struct {
 	set1        int
 }
 
-var sym_session_key [][]int
+// var sym_session_key [][]int
 
 func SymMakeRegister(length int, tabs []int, major_idx []int, compliment_idx int, bit_idx int) SymRegister {
 	reg := SymRegister{
@@ -29,7 +29,7 @@ func SymMakeRegister(length int, tabs []int, major_idx []int, compliment_idx int
 		Tabs:        tabs,
 		Majs:        major_idx,
 		Ært:         compliment_idx,
-		set1:        bit_idx} //REVIEW tilføjet
+		set1:        bit_idx} 
 
 	for i := 0; i < reg.Length; i++ {
 		reg.ArrImposter[i] = make([]int, reg.Length)
@@ -70,7 +70,6 @@ func SymClockingUnit(r4 Register) {
 	arr := r4.ArrImposter
 	maj := majority(arr[3], arr[7], arr[10])
 
-	// HARDCODING all registers is clocked every fucking time
 	if maj == arr[10] {
 		SymClock(sr1)
 		print("clock R1\n")
@@ -123,42 +122,52 @@ func SymInitializeRegisters() {
 	// Reset registers, all indexes are set to 0
 	SymSetRegisters()
 
-	// for i := 0; i < 64; i++ {
-	// 	SymClock(sr1)
-	// 	SymClock(sr2)
-	// 	SymClock(sr3)
-	// 	SymClock(sr4)
+	/* for i := 0; i < 64; i++ {
+	 	SymClock(sr1)
+		SymClock(sr2)
+	 	SymClock(sr3)
+	 	SymClock(sr4)
+	}
+	*/
 
-	// }
+	/* for i := 0; i < 22; i++ {
+		SymClock(sr1)
+	 	SymClock(sr2)
+	 	SymClock(sr3)
+	 	SymClock(sr4)
+	 	// : xor med framenumber
+	 	// : we pretend that the framenumber is 0
+	 	// frame_bits[i] skal XORs her
+	}*/
+	//REVIEW noget med noget framenumber f' her eller et eller andet sted
 
-	// makes frame_number from int -> bits in array
-	//frame_bits := makeFrameNumberToBits(frame_number)
-
-	// for i := 0; i < 22; i++ {
-	// 	SymClock(sr1)
-	// 	SymClock(sr2)
-	// 	SymClock(sr3)
-	// 	SymClock(sr4)
-	// 	// : xor med framenumber
-	// 	// : we pretend that the framenumber is 0
-	// 	// frame_bits[i] skal XORs her
-	// }
-
-	//Set bits to 1 //REVIEW
+	//Set bits to 1 
 	Bit_entry(sr1)
 	Bit_entry(sr2)
 	Bit_entry(sr3)
 	sr4.ArrImposter[10] = 1
 }
 
-func prints(res []int, text string) {
-	Printf(text+"%+v \n", res)
+func SymInitializeRegistersFrame(old_frame int, new_frame int) {
+
+	SymSetRegisters()
+
+	sr1.ArrImposter = DescribeNewFrameWithOldVariables(old_frame, new_frame, sr1)
+	sr2.ArrImposter = DescribeNewFrameWithOldVariables(old_frame, new_frame, sr2)
+	sr3.ArrImposter = DescribeNewFrameWithOldVariables(old_frame, new_frame, sr3)
+
+	//FIXME R4?
+
+	Bit_entry(sr1)
+	Bit_entry(sr2)
+	Bit_entry(sr3)
+	sr4.ArrImposter[10] = 1
 }
 
+
 /*
-FIXME
 Makes the final xor of r1[-1] ⨁ maj(r1) ⨁ r2[-1] ⨁ maj(r2) ⨁ r3[-1] ⨁ maj(r3)
-returns [vars1 | prod1 | vars2 | prod2 | vars3 | prod3]
+returns [vars1 | prod1 | vars2 | prod2 | vars3 | prod3 | b]
 Calls SymMajorityOutput and OverwriteXorSlice
 */
 func SymMakeFinalXOR(r1 SymRegister, r2 SymRegister, r3 SymRegister) []int {
@@ -180,7 +189,7 @@ func SymMakeFinalXOR(r1 SymRegister, r2 SymRegister, r3 SymRegister) []int {
 	v3 := len(last_r3) - 1
 	print("lenght of v1")
 	print(v1)
-	vars1 := maj_r1[0:v1] //vars1 points to the 19 [vars1] entries of maj_1
+	vars1 := maj_r1[0:v1] //vars1 points to the 19 [vars1] entries of maj_1 //REVIEW the 18 variables, maj_r1[v1] vil være x_01
 
 	start := make([]int, len(vars1))
 	copy(start, vars1)                     //start by res = [vars1] (without the bit)
@@ -195,9 +204,10 @@ func SymMakeFinalXOR(r1 SymRegister, r2 SymRegister, r3 SymRegister) []int {
 	start = append(start, maj_r2[v2:bit_entry2]...) //now [vars1 | prod1 | vars2 | prod2 ]
 	start = append(start, maj_r3[v2:bit_entry3]...) //now [vars1 | prod1 | vars2 | prod2 | vars3 | prod3]
 
-	final_bit := maj_r1[bit_entry1] ^ maj_r2[bit_entry2] ^ maj_r3[bit_entry3]
-
+	final_bit := maj_r1[bit_entry1] ^ maj_r2[bit_entry2] ^ maj_r3[bit_entry3] 
+	
 	start = append(start, []int{final_bit}...)
+	//now [vars1 | prod1 | vars2 | prod2 | vars3 | prod3 | b ]
 
 	return start
 }
@@ -228,7 +238,7 @@ func SymMajorityOutput(r SymRegister) []int {
 	return long_slice
 }
 
-//Takes two slices and xors them indexwise together. Assumed to be of same lenght. Returns slice of size len(a) REVIEW should be fine
+//Takes two slices and xors them indexwise together. Assumed to be of same lenght. Returns slice of size len(a) 
 func XorSlice(a []int, b []int) []int {
 	res := make([]int, len(a))
 	for i := 0; i < len(a); i++ {
@@ -277,7 +287,7 @@ func makeSymKeyStream() [][]int {
 
 	// Clock the register 99 times
 	for i := 0; i < 99; i++ {
-		// FIXME: somehow make symClockingUnit, for now we clock all symreg
+		
 		SymClockingUnit(r4)
 		Clock(sr4)
 	}
@@ -337,7 +347,7 @@ func SimpleKeyStreamSymSecondVersion(r SymRegister) [][]int {
 	// Init key stream array
 	keyStream := make([][]int, 228)
 	for i := 0; i < 228; i++ {
-		keyStream[i] = make([]int, r.Length) //REVIEW her skal det vel være +1
+		keyStream[i] = make([]int, r.Length) 
 	}
 
 	// Clock the register 99 times
@@ -432,4 +442,15 @@ func PrettySymPrintSliceBit(rMatrix [][]int, bit_entry int) {
 		println(accString)
 	}
 
+}
+
+
+func prints(res []int, text string) {
+	Printf(text+"%+v \n", res)
+}
+
+func printmatrix(matrix [][]int) {
+	for i := 0; i < len(matrix); i++ {
+		prints(matrix[i], "")
+	}
 }

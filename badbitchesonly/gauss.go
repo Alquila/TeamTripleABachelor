@@ -107,22 +107,22 @@ func solveByGaussEliminationTryTwo(A [][]int, b []int) []int {
 }
 
 func makeAugmentedMatrix(A [][]int, b []int) [][]int {
-	amountOfRows := len(A)       // this is row
-	amountOfColumns := len(A[0]) // this is column
+	amountOfRows := len(A)        		// this is row
+	amountOfVars := len(A[0]) - 1    // this is column
 	augMa := make([][]int, amountOfRows)
 	fmt.Printf("Amount of rows of A %d\n", amountOfRows)
-	fmt.Printf("Amount of Columns of A: %d\n", amountOfColumns)
+	fmt.Printf("Amount of vars of A: %d\n", amountOfVars)
 	fmt.Printf("length of b: %d \n", len(b))
 
 	for i := 0; i < amountOfRows; i++ {
-		augMa[i] = make([]int, amountOfColumns+1) //@Amalie hvor lange skal de være
+		augMa[i] = make([]int, amountOfVars+1) //@Amalie hvor lange skal de være
 	}
 
 	for i := 0; i < amountOfRows; i++ {
-		for j := 0; j < amountOfColumns; j++ {
+		for j := 0; j < amountOfVars; j++ {
 			augMa[i][j] = A[i][j]
 		}
-		augMa[i][amountOfColumns] = b[i]
+		augMa[i][amountOfVars] = b[i]
 	}
 	return augMa
 }
@@ -180,7 +180,10 @@ func gaussEliminationPart2(augMa [][]int) [][]int {
 func backSubstitution(augMatrix [][]int) []int {
 	noUnknownVars := len(augMatrix[0]) - 2 // n is number of unknowns //burde nok køre igennem dem alle sammen
 	res := make([]int, noUnknownVars)
-	res[noUnknownVars-1] = augMatrix[noUnknownVars-1][noUnknownVars-1] ^ augMatrix[noUnknownVars-1][noUnknownVars] // either 0 or 1
+	
+	for i := 0 ; 
+; 	rres[i] = augMatrix[i][noUnUnknownVars]es[noUnknownVars-1] = augMatrix[noUnknownVars-1][noUnknownVars-1] ^ augMatrix[noUnknownVars-1][noUnknownVars] // either 0 or 1
+
 
 	for i := noUnknownVars - 2; i >= 0; i-- { // looks at every row not all zero
 		res[i] = augMatrix[i][noUnknownVars]
