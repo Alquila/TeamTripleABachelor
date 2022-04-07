@@ -74,17 +74,17 @@ func SymClockingUnit(r4 Register) {
 
 	if maj == arr[10] {
 		SymClock(sr1)
-		print("clock R1\n")
+		// print("clock R1\n")
 	}
 	if maj == arr[3] {
 		//clock R2
 		SymClock(sr2)
-		print("clock R2\n")
+		// print("clock R2\n")
 	}
 	if maj == arr[7] {
 		//clock R3
 		SymClock(sr3)
-		print("clock R3\n")
+		// print("clock R3\n")
 	}
 }
 
@@ -124,46 +124,15 @@ func SymInitializeRegisters() {
 	// Reset registers, all indexes are set to 0
 	SymSetRegisters()
 
-	/* for i := 0; i < 64; i++ {
-	 	SymClock(sr1)
-		SymClock(sr2)
-	 	SymClock(sr3)
-	 	SymClock(sr4)
-	}
-	*/
-
-	/* for i := 0; i < 22; i++ {
-		SymClock(sr1)
-	 	SymClock(sr2)
-	 	SymClock(sr3)
-	 	SymClock(sr4)
-	 	// : xor med framenumber
-	 	// : we pretend that the framenumber is 0
-	 	// frame_bits[i] skal XORs her
-	}*/
 	//REVIEW noget med noget framenumber f' her eller et eller andet sted
+	sr1.ArrImposter = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr1)
+	sr2.ArrImposter = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr2)
+	sr3.ArrImposter = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr3)
 
 	//Set bits to 1
 	Bit_entry(sr1)
 	Bit_entry(sr2)
 	Bit_entry(sr3)
-	sr4.ArrImposter[10] = 1
-}
-
-func SymInitializeRegistersFrame(old_frame int, new_frame int) {
-
-	SymSetRegisters()
-
-	sr1.ArrImposter = DescribeNewFrameWithOldVariables(old_frame, new_frame, sr1)
-	sr2.ArrImposter = DescribeNewFrameWithOldVariables(old_frame, new_frame, sr2)
-	sr3.ArrImposter = DescribeNewFrameWithOldVariables(old_frame, new_frame, sr3)
-
-	//FIXME R4?
-
-	Bit_entry(sr1)
-	Bit_entry(sr2)
-	Bit_entry(sr3)
-	sr4.ArrImposter[10] = 1
 }
 
 /*
@@ -188,8 +157,8 @@ func SymMakeFinalXOR(r1 SymRegister, r2 SymRegister, r3 SymRegister) []int {
 	v1 := len(last_r1) - 1 //19
 	v2 := len(last_r2) - 1
 	v3 := len(last_r3) - 1
-	print("lenght of v1")
-	print(v1)
+	// print("lenght of v1")
+	// print(v1)
 	vars1 := maj_r1[0:v1] //vars1 points to the 19 [vars1] entries of maj_1 //REVIEW the 18 variables, maj_r1[v1] vil være x_01
 
 	start := make([]int, len(vars1))
@@ -289,20 +258,57 @@ func makeSymKeyStream() [][]int {
 	// Clock the register 99 times
 	for i := 0; i < 99; i++ {
 
-		SymClockingUnit(r4)
+		SymClockingUnit(sr4)
 		Clock(sr4)
 	}
 
 	// clock 228 times and save keystream
 	for i := 0; i < 228; i++ {
-		SymClockingUnit(r4)
+		SymClockingUnit(sr4)
 		Clock(sr4)
-		//OverwriteXorSlice(r.ArrImposter[r.Length-1], aaa)
 		keyStream[i] = SymMakeFinalXOR(sr1, sr2, sr3)
-		// overw(SymMajorityOutput(r), r.ArrImposter[r.Length-1])
-		//Printf("Length of output from symMajorFunc %d\n", len(SymMajorityOutput(r)))
 	}
 	return keyStream
+}
+
+func MakeTwoKeyStream() ([]int, [][]int) {
+	// all registers contain 0s
+	makeRegisters()
+
+	//Init sym registers sr1, sr2, sr3
+	SymInitializeRegisters()
+
+	keyStreamSym := make([][]int, 228)
+
+	keyStream := make([]int, 228)
+
+	/* Initialize internal state with K_c and frame number */
+	initializeRegisters() // TODO: Test me
+
+	/* Force bits R1[15], R2[16], R3[18], R4[10] to be 1 */
+	setIndicesToOne()
+
+	Print("r1 is \n")
+	prettyPrint(r1)
+
+	/* Run A5/2 for 99 clocks and ignore output */
+	for i := 0; i < 99; i++ {
+		// do the clock thingy and ignore
+		clockingUnit(r4)
+		SymClockingUnit(r4)
+		Clock(r4)
+	}
+
+	/* Run A5/2 for 228 clocks and use outputs as key-stream */
+	for i := 0; i < 228; i++ {
+		// do the clock thingy and output
+		clockingUnit(r4)
+		SymClockingUnit(r4)
+		Clock(r4)
+		keyStream[i] = makeFinalXOR()
+		keyStreamSym[i] = SymMakeFinalXOR(sr1, sr2, sr3)
+	}
+	return keyStream, keyStreamSym
 }
 
 /*

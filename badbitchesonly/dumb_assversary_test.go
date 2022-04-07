@@ -112,19 +112,22 @@ func TestDoTheSimpleHackSecondVersion(t *testing.T) {
 }
 
 func TestPlaintextAttack(t *testing.T) {
-	r4.ArrImposter = []int{0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1}
-	// sr4.ArrImposter = []int{0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1}
-	orgReg := make([]int, 17)
-	copy(orgReg, r4.ArrImposter)
+	orgReg := []int{0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0}
+	// sr4.ArrImposter = []int{0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1}
+	// orgReg := make([]int, 17)
+	// copy(orgReg, r4.ArrImposter)
 
 	session_key = make([]int, 64)
+	original_frame_number = 55
+	current_frame_number = 55
 
 	res := DoTheKnownPlainTextHack()
 
 	fmt.Printf("len af res er: %d\n", len(res))
 
+	// offset := r1.Length + r2.Length + r3.Length
 	// compare if found res is equal to init registers
-	if !reflect.DeepEqual(res[0:16], orgReg) {
+	if !reflect.DeepEqual(res[0:17], orgReg) {
 		t.Fail()
 		fmt.Printf("Res er: %d\n", res)
 		fmt.Printf("reg er: %d\n", orgReg)
@@ -271,4 +274,31 @@ func TestDescribeFrameWithOldVariables2(t *testing.T) {
 		t.Log("The result is wrong")
 	}
 
+}
+
+func TestAppendFunction(t *testing.T) {
+
+	A1 := make([][]int, 3)
+	A1[0] = []int{1, 1, 1}
+	A1[1] = []int{1, 1, 1}
+	A1[2] = []int{1, 1, 1}
+
+	A2 := make([][]int, 3)
+	A2[0] = []int{2, 2, 2}
+	A2[1] = []int{2, 2, 2}
+	A2[2] = []int{2, 2, 2}
+
+	// A := make([][]int, 0)
+	A := append(A1, A2...)
+	// A = append(A, A2...)
+
+	// b := make([]int, 684)
+	// b = append(b, b1...)
+	// b = append(b, b2...)
+	// b = append(b, b3...)
+
+	fmt.Printf("This is A: \n%d\n", A)
+	fmt.Printf("This is A1: \n%d\n", A1)
+	fmt.Printf("This is A2: \n%d\n", A2)
+	// fmt.Printf("This is b: \n%d", b)
 }

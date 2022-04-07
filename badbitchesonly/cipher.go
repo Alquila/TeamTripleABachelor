@@ -181,8 +181,8 @@ func initializeRegisters() { // used to have session_key and frame_number as par
 		Clock(r3)
 		Clock(r4)
 
-		print("printing r1 \n")
-		prettyPrint(r1)
+		// print("printing r1 \n")
+		// prettyPrint(r1)
 		// Printf("sk %d \n", session_key[i])
 
 		r1.ArrImposter[0] = r1.ArrImposter[0] ^ session_key[i]
@@ -206,12 +206,12 @@ func initializeRegisters() { // used to have session_key and frame_number as par
 		r4.ArrImposter[0] = r4.ArrImposter[0] ^ frame_bits[i]
 	}
 
-	Printf("Initialized registers 1-4:")
+	//Printf("Initialized registers 1-4:")
 	Println()
-	prettyPrint(r1)
-	prettyPrint(r2)
-	prettyPrint(r3)
-	prettyPrint(r4)
+	//prettyPrint(r1)
+	//prettyPrint(r2)
+	//prettyPrint(r3)
+	//prettyPrint(r4)
 }
 
 func setIndicesToOne() {

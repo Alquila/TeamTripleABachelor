@@ -184,7 +184,7 @@ func backSubstitution(augMatrix [][]int) []int {
 	noCol := len(augMatrix[0])
 	// bitCol := noCol
 	res := make([]int, noUnknownVars)
-	fmt.Printf("len of unknown variable %d \n", noUnknownVars)
+	// fmt.Printf("len of unknown variable %d \n", noUnknownVars)
 
 	res[noUnknownVars-1] = augMatrix[noUnknownVars-1][noUnknownVars] // either 0 or 1
 

@@ -42,16 +42,21 @@ func DoTheKnownPlainTextHack() []int {
 	// SymInitializeRegisters()
 
 	// make stream cipher ?
-	b := makeKeyStream()
-	A := makeSymKeyStream()
+	b1, A1 := MakeTwoKeyStream()
 
-	// current_frame_number++
-	// b2 := makeKeyStream()
-	// A2 := makeSymKeyStream()
+	current_frame_number++
+	b2, A2 := MakeTwoKeyStream()
 
-	// current_frame_number++
-	// b3 := makeKeyStream()
-	// A3 := makeSymKeyStream()
+	current_frame_number++
+	b3, A3 := MakeTwoKeyStream()
+
+	// A := make([][]int, 684)
+	A := append(A1, A2...)
+	A = append(A, A3...)
+	// A = append(A, A3...)
+
+	b := append(b1, b2...)
+	b = append(b, b3...)
 
 	x := solveByGaussEliminationTryTwo(A, b)
 
