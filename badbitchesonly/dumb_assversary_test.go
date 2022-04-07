@@ -235,7 +235,7 @@ func TestDescribeNewFrameWithVariables8And15(t *testing.T) {
 }
 
 func TestFindDifferenceOfFrameNumbers(t *testing.T) {
-	diff := FindDifferenceOfFrameNumbers(136, 1357)	
+	diff := FindDifferenceOfFrameNumbers(136, 1357)
 	fmt.Printf("diff:  %d", diff)
 }
 
@@ -248,6 +248,27 @@ func TestDescribeFrameWithOldVariables2(t *testing.T) {
 	println("res er")
 	for i := 0; i < len(res); i++ {
 		prints(res[i], "")
-	}	
+	}
+
+	shouldBe := make([][]int, firstSymReg.Length)
+
+	for i := range shouldBe {
+		shouldBe[i] = make([]int, len(firstSymReg.ArrImposter[0]))
+		copy(shouldBe[i], firstSymReg.ArrImposter[i])
+
+		if i == 3 || i == 4 || i == 5 || i == 7 || i == 11 || i == 13 || i == 14 || i == 15 {
+			shouldBe[i][len(firstSymReg.ArrImposter[0])-1] = 1
+		}
+	}
+
+	println("shouldBe er")
+	for i := 0; i < len(res); i++ {
+		prints(shouldBe[i], "")
+	}
+
+	if !reflect.DeepEqual(res, shouldBe) {
+		t.Fail()
+		t.Log("The result is wrong")
+	}
 
 }

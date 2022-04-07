@@ -164,11 +164,35 @@ func TestBackSubstitutionBinary(t *testing.T) {
 	augMatrix := make([][]int, 4)
 	augMatrix[0] = []int{1, 1, 1, 0, 0, 1}
 	augMatrix[1] = []int{0, 1, 0, 1, 0, 1}
-	augMatrix[2] = []int{0, 0, 1, 1, 0}
-	augMatrix[3] = []int{0, 0, 0, 1, 0}
+	augMatrix[2] = []int{0, 0, 1, 1, 0, 0}
+	augMatrix[3] = []int{0, 0, 0, 1, 0, 0}
 
 	//shouldBe := make([]int, 4)
 	shouldBe := []int{0, 1, 0, 0}
+
+	res := backSubstitution(augMatrix)
+	fmt.Printf("This is the result of the backSubstitution: %d \n", res)
+
+	if !reflect.DeepEqual(res, shouldBe) {
+		t.Log("The result of the backSubstitution is wrong")
+		t.Fail()
+	}
+
+	if reflect.DeepEqual(res, shouldBe) {
+		t.Log("The result of the backSubstitution was correct")
+
+	}
+}
+
+func TestBackSubstitutionConstant(t *testing.T) {
+	augMatrix := make([][]int, 4)
+	augMatrix[0] = []int{1, 1, 1, 0, 0, 1}
+	augMatrix[1] = []int{0, 1, 0, 1, 0, 1}
+	augMatrix[2] = []int{0, 0, 1, 1, 1, 0}
+	augMatrix[3] = []int{0, 0, 0, 1, 0, 0}
+
+	//shouldBe := make([]int, 4)
+	shouldBe := []int{0, 1, 1, 0}
 
 	res := backSubstitution(augMatrix)
 	fmt.Printf("This is the result of the backSubstitution: %d \n", res)

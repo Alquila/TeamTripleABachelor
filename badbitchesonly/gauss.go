@@ -107,8 +107,8 @@ func solveByGaussEliminationTryTwo(A [][]int, b []int) []int {
 }
 
 func makeAugmentedMatrix(A [][]int, b []int) [][]int {
-	amountOfRows := len(A)        		// this is row
-	amountOfVars := len(A[0]) - 1    // this is column
+	amountOfRows := len(A)    // this is row
+	amountOfVars := len(A[0]) // this is column
 	augMa := make([][]int, amountOfRows)
 	fmt.Printf("Amount of rows of A %d\n", amountOfRows)
 	fmt.Printf("Amount of vars of A: %d\n", amountOfVars)
@@ -129,14 +129,13 @@ func makeAugmentedMatrix(A [][]int, b []int) [][]int {
 
 // https://stackoverflow.com/questions/11483925/how-to-implementing-gaussian-elimination-for-binary-equations
 func gaussEliminationPart2(augMa [][]int) [][]int {
-	noUnknownVars := len(augMa[0]) - 2 // n is number of unknowns //burde nok køre igennem dem alle sammen
+	noUnknownVars := len(augMa[0]) - 2 // n is number of unknowns
 	noEquations := len(augMa)
 	fmt.Printf("len of unknown variable %d \n", noUnknownVars)
 	fmt.Printf("len of equations %d \n", noEquations)
 	// temp := make([][]float64, len(augMa))
 
 	for i := 0; i < noUnknownVars; i++ {
-
 		s := i
 		if augMa[i][i] == 0 {
 			// Håndter at den er 0, dvs.
@@ -159,12 +158,15 @@ func gaussEliminationPart2(augMa [][]int) [][]int {
 		// TODO: tjek om der skal laves check for at vi ikke er i sidste række når vi starter forloppet
 		sliceCopy := make([]int, len(augMa[i]))
 		copy(sliceCopy, augMa[i])
-		// fmt.Printf("Row %d, should be 1 in index %d: \n %d \n", s, i, sliceCopy)
+		//fmt.Printf("Row %d, should be 1 in index %d: \n %d \n", s, i, sliceCopy)
 
+		noCol := len(augMa[0])
 		for p := s + 1; p < noEquations; p++ {
+			// fmt.Printf("j is %d \n", p)
 			if augMa[p][i] == 1 {
 				augAfterxor := make([]int, len(augMa[p]))
-				for j := 0; j <= noUnknownVars; j++ {
+				for j := 0; j < noCol; j++ {
+					// fmt.Printf("j is %d, ", j)
 					augAfterxor[j] = augMa[p][j] ^ sliceCopy[j]
 				}
 				augMa[p] = augAfterxor
@@ -178,26 +180,30 @@ func gaussEliminationPart2(augMa [][]int) [][]int {
 
 // https://www.codegrepper.com/code-examples/python/gauss+elimination+python+numpy
 func backSubstitution(augMatrix [][]int) []int {
-	noUnknownVars := len(augMatrix[0]) - 2 // n is number of unknowns //burde nok køre igennem dem alle sammen
+	noUnknownVars := len(augMatrix[0]) - 2 // n is number of unknowns
+	noCol := len(augMatrix[0])
+	// bitCol := noCol
 	res := make([]int, noUnknownVars)
-	
-	for i := 0 ; i < noUnknownVars ; i++ {
-		res[i] = augMatrix[i][noUnknownVars]
-	}
+	fmt.Printf("len of unknown variable %d \n", noUnknownVars)
 
-	res[noUnknownVars-1] = augMatrix[noUnknownVars-1][noUnknownVars-1] ^ augMatrix[noUnknownVars-1][noUnknownVars] // either 0 or 1
-
+	res[noUnknownVars-1] = augMatrix[noUnknownVars-1][noUnknownVars] // either 0 or 1
 
 	for i := noUnknownVars - 2; i >= 0; i-- { // looks at every row not all zero
-		res[i] = augMatrix[i][noUnknownVars]
-
+		res[i] = augMatrix[i][noCol-1]
+		//prints(res, "res")
 		for j := i + 1; j < noUnknownVars; j++ {
+			//fmt.Printf("i is %d, j is %d \n", i, j)
 			if augMatrix[i][j] == 1 {
 				res[i] = res[i] ^ res[j]
 			}
 		}
-
 	}
+
+	for i := 0; i < noUnknownVars; i++ { // xor constant bit på res
+		res[i] = res[i] ^ augMatrix[i][noUnknownVars]
+	}
+	//prints(res, "res")
+
 	return res
 }
 

@@ -12,7 +12,7 @@ var r2 Register
 var r3 Register
 var r4 Register
 
-var frame_number int
+var current_frame_number int
 var session_key []int
 
 type Register struct {
@@ -192,7 +192,7 @@ func initializeRegisters() { // used to have session_key and frame_number as par
 	}
 
 	// makes frame_number from int -> bits in array
-	frame_bits := MakeFrameNumberToBits(frame_number)
+	frame_bits := MakeFrameNumberToBits(current_frame_number)
 
 	for i := 0; i < 22; i++ {
 		Clock(r1)
@@ -247,8 +247,6 @@ func makeKeyStream() []int {
 
 	// all registers contain 0s
 	makeRegisters()
-
-	frame_number++
 
 	keyStream := make([]int, 228)
 
@@ -360,5 +358,3 @@ func MakeSimpleKeyStream() []int {
 	return keyStream
 
 }
-
-

@@ -218,7 +218,7 @@ func TestSetIndiciesToOne(t *testing.T) {
 
 func TestRegistersAreSameAfterInitWithSameFrameNumber(t *testing.T) { // TODO: test at initreg er forskellig når framenumber er forskellig :-)
 	makeRegisters()
-	frame_number = 22
+	current_frame_number = 22
 	makeSessionKey()
 	initializeRegisters()
 	reg1 := make([]int, 19)
@@ -447,7 +447,7 @@ func TestFinalXor(t *testing.T) {
 
 func TestKeyStreamSimple(t *testing.T) {
 	makeSessionKey() // TODO snak om hvor vores loop skal være, som kalder makeKeyStream for nye frames
-	frame_number = -1
+	current_frame_number = -1
 	x := makeKeyStream()
 	Printf("%+v \n", x)
 	Printf("mean %f \n", mean(x))

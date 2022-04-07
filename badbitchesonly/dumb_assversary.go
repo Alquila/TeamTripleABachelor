@@ -45,6 +45,14 @@ func DoTheKnownPlainTextHack() []int {
 	b := makeKeyStream()
 	A := makeSymKeyStream()
 
+	// current_frame_number++
+	// b2 := makeKeyStream()
+	// A2 := makeSymKeyStream()
+
+	// current_frame_number++
+	// b3 := makeKeyStream()
+	// A3 := makeSymKeyStream()
+
 	x := solveByGaussEliminationTryTwo(A, b)
 
 	return x
@@ -81,10 +89,10 @@ func DescribeNewFrameWithOldVariables(f1 int, f2 int, orgReg SymRegister) [][]in
 	res := make([]int, length)
 
 	/*
-		Here res is initialised. Res is used to simulate what indices gets 
+		Here res is initialised. Res is used to simulate what indices gets
 		affected by the difference in frame number.
-		Res should be used to determine which indices need to have their 
-		'constant' index = 1 after the initialisation process. 
+		Res should be used to determine which indices need to have their
+		'constant' index = 1 after the initialisation process.
 	*/
 	// for each row in the register
 	// for i := range orgReg.ArrImposter {
@@ -95,7 +103,7 @@ func DescribeNewFrameWithOldVariables(f1 int, f2 int, orgReg SymRegister) [][]in
 
 	// what to go through every indice in frame-number-difference-array
 	for i := range diff {
-		
+
 		// this is copied from cipher_sym.SymCalculateNewBit
 		// new bit is the bit that is placed at index 0
 		newbit := 0 // newbit is now zerom.  jLANOÅQFWoåNKDVz
@@ -104,17 +112,17 @@ func DescribeNewFrameWithOldVariables(f1 int, f2 int, orgReg SymRegister) [][]in
 		for i := range orgReg.Tabs {
 			// print(i)
 
-			// takes the index corresponding to tab[i] in res and 
+			// takes the index corresponding to tab[i] in res and
 			// XOR with newbit
 			newbit = newbit ^ res[orgReg.Tabs[i]]
 		}
 
 		// this is copied from cipher.Clock
-		for i := len(res) - 1; i > 0; i-- { 
+		for i := len(res) - 1; i > 0; i-- {
 			res[i] = res[i-1]
 		}
 
-		res[0] = newbit 
+		res[0] = newbit
 
 		if diff[i] == 1 { //dvs forskellige frame number bits
 			fmt.Printf("Diff[%d] is 1\n", i)
@@ -124,14 +132,13 @@ func DescribeNewFrameWithOldVariables(f1 int, f2 int, orgReg SymRegister) [][]in
 		}
 	}
 
-	// this is the register to be returned desribind the current 
+	// this is the register to be returned desribind the current
 	// frame with varibales from previous frame
 	newReg := make([][]int, length)
 	for i := range newReg {
-		newReg[i] = make([]int, len(orgReg.ArrImposter[0])) 
+		newReg[i] = make([]int, len(orgReg.ArrImposter[0]))
 		copy(newReg[i], orgReg.ArrImposter[i])
 	}
-
 
 	// create the new reg from old variables, based on res
 	for i := range res {
@@ -143,7 +150,7 @@ func DescribeNewFrameWithOldVariables(f1 int, f2 int, orgReg SymRegister) [][]in
 	}
 
 	newReg[orgReg.set1] = make([]int, len(orgReg.ArrImposter[0]))
-	newReg[orgReg.set1][len(orgReg.ArrImposter[0]) - 1] = 1
+	newReg[orgReg.set1][len(orgReg.ArrImposter[0])-1] = 1
 
 	return newReg
 }

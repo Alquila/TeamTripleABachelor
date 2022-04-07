@@ -5,6 +5,8 @@ import (
 	"strconv"
 )
 
+var original_frame_number int
+
 /* global variable declaration */
 var sr1 SymRegister
 var sr2 SymRegister
@@ -29,7 +31,7 @@ func SymMakeRegister(length int, tabs []int, major_idx []int, compliment_idx int
 		Tabs:        tabs,
 		Majs:        major_idx,
 		Ært:         compliment_idx,
-		set1:        bit_idx} 
+		set1:        bit_idx}
 
 	for i := 0; i < reg.Length; i++ {
 		reg.ArrImposter[i] = make([]int, reg.Length)
@@ -141,7 +143,7 @@ func SymInitializeRegisters() {
 	}*/
 	//REVIEW noget med noget framenumber f' her eller et eller andet sted
 
-	//Set bits to 1 
+	//Set bits to 1
 	Bit_entry(sr1)
 	Bit_entry(sr2)
 	Bit_entry(sr3)
@@ -163,7 +165,6 @@ func SymInitializeRegistersFrame(old_frame int, new_frame int) {
 	Bit_entry(sr3)
 	sr4.ArrImposter[10] = 1
 }
-
 
 /*
 Makes the final xor of r1[-1] ⨁ maj(r1) ⨁ r2[-1] ⨁ maj(r2) ⨁ r3[-1] ⨁ maj(r3)
@@ -204,8 +205,8 @@ func SymMakeFinalXOR(r1 SymRegister, r2 SymRegister, r3 SymRegister) []int {
 	start = append(start, maj_r2[v2:bit_entry2]...) //now [vars1 | prod1 | vars2 | prod2 ]
 	start = append(start, maj_r3[v2:bit_entry3]...) //now [vars1 | prod1 | vars2 | prod2 | vars3 | prod3]
 
-	final_bit := maj_r1[bit_entry1] ^ maj_r2[bit_entry2] ^ maj_r3[bit_entry3] 
-	
+	final_bit := maj_r1[bit_entry1] ^ maj_r2[bit_entry2] ^ maj_r3[bit_entry3]
+
 	start = append(start, []int{final_bit}...)
 	//now [vars1 | prod1 | vars2 | prod2 | vars3 | prod3 | b ]
 
@@ -238,7 +239,7 @@ func SymMajorityOutput(r SymRegister) []int {
 	return long_slice
 }
 
-//Takes two slices and xors them indexwise together. Assumed to be of same lenght. Returns slice of size len(a) 
+//Takes two slices and xors them indexwise together. Assumed to be of same lenght. Returns slice of size len(a)
 func XorSlice(a []int, b []int) []int {
 	res := make([]int, len(a))
 	for i := 0; i < len(a); i++ {
@@ -287,7 +288,7 @@ func makeSymKeyStream() [][]int {
 
 	// Clock the register 99 times
 	for i := 0; i < 99; i++ {
-		
+
 		SymClockingUnit(r4)
 		Clock(sr4)
 	}
@@ -347,7 +348,7 @@ func SimpleKeyStreamSymSecondVersion(r SymRegister) [][]int {
 	// Init key stream array
 	keyStream := make([][]int, 228)
 	for i := 0; i < 228; i++ {
-		keyStream[i] = make([]int, r.Length) 
+		keyStream[i] = make([]int, r.Length)
 	}
 
 	// Clock the register 99 times
@@ -443,7 +444,6 @@ func PrettySymPrintSliceBit(rMatrix [][]int, bit_entry int) {
 	}
 
 }
-
 
 func prints(res []int, text string) {
 	Printf(text+"%+v \n", res)
