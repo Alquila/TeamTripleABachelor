@@ -302,3 +302,27 @@ func TestAppendFunction(t *testing.T) {
 	fmt.Printf("This is A2: \n%d\n", A2)
 	// fmt.Printf("This is b: \n%d", b)
 }
+
+func TestMAKETEST(t *testing.T) {
+
+	/*
+		Make concrete instances of r1, r2, r3 and r4
+		Then clock them with the first frame number and copy these registers <- these we want to recover
+		initialize the sym registers with the first framenumber (will just be ish I matrix)
+		force bits to 1
+
+		run the 99 clocks and 288 clocks with both symbol and actual registers and save
+
+		Take the concrete instances of r1, r2, r3 and r4 and xor with frame_number +1
+		Describe sym registers with differences between frames
+		Force bits to 1 (how does this affect the symbolic registers exactly?)
+
+		run the 99 clocks and 288 clocks with both symbol and actual registers and save
+
+		repeat
+
+		Stuff it into Gauss
+
+	*/
+
+}

@@ -275,12 +275,12 @@ func MakeTwoKeyStream() ([]int, [][]int) {
 	// all registers contain 0s
 	makeRegisters()
 
-	//Init sym registers sr1, sr2, sr3
-	SymInitializeRegisters()
-
 	keyStreamSym := make([][]int, 228)
 
 	keyStream := make([]int, 228)
+
+	//Init sym registers sr1, sr2, sr3
+	SymInitializeRegisters()
 
 	/* Initialize internal state with K_c and frame number */
 	initializeRegisters() // TODO: Test me
