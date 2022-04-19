@@ -238,11 +238,12 @@ func TestGaussElimOnSecondExample(t *testing.T) {
 	// TODO: check if backsub is working here also
 	// res should be [0,1,0,1,1,0]
 	//shouldBe := make([]int, 4)
-	regShouldBe := []int{0, 1, 0, 1, 1, 0}
+	regShouldBe := []int{1, 0, 0, 1, 0}
 
 	resBack := backSubstitution(res)
 	fmt.Printf("This is the result of the backSubstitution: %d \n", resBack)
 
+	// gets a row with [0,0,0,0,0,1,0] might be caught by error-gauss-stuff
 	if !reflect.DeepEqual(resBack, regShouldBe) {
 		t.Log("The result of the backSubstitution is wrong")
 		t.Fail()
