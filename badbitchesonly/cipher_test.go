@@ -221,6 +221,7 @@ func TestRegistersAreSameAfterInitWithSameFrameNumber(t *testing.T) { // TODO: t
 	current_frame_number = 22
 	makeSessionKey()
 	initializeRegisters()
+	setIndicesToOne()
 	reg1 := make([]int, 19)
 	reg2 := make([]int, 22)
 	reg3 := make([]int, 23)
@@ -241,6 +242,7 @@ func TestRegistersAreSameAfterInitWithSameFrameNumber(t *testing.T) { // TODO: t
 
 	//printAll()
 	initializeRegisters()
+	setIndicesToOne()
 	Printf("Initialise registers again: \n")
 	printAll()
 

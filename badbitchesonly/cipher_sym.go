@@ -155,12 +155,12 @@ func SymMakeFinalXOR(r1 SymRegister, r2 SymRegister, r3 SymRegister) []int {
 	OverwriteXorSlice(last_r2, maj_r2)
 	OverwriteXorSlice(last_r3, maj_r3)
 
-	v1 := len(last_r1) - 1 //19
+	v1 := len(last_r1) - 1 //18?
 	v2 := len(last_r2) - 1
 	v3 := len(last_r3) - 1
 	// print("lenght of v1")
 	// print(v1)
-	vars1 := maj_r1[0:v1] //vars1 points to the 19 [vars1] entries of maj_1 //REVIEW the 18 variables, maj_r1[v1] vil være x_01
+	vars1 := maj_r1[0:v1] //vars1 points to the 19 [vars1] entries of maj_1 //REVIEW the 18 variables, maj_r1[v1] vil være x_01 som vi ikke vil have med
 
 	start := make([]int, len(vars1))
 	copy(start, vars1)                     //start by res = [vars1] (without the bit)
@@ -186,7 +186,7 @@ func SymMakeFinalXOR(r1 SymRegister, r2 SymRegister, r3 SymRegister) []int {
 /*
 Symbolic majority function. Calls SymMajorityMultiply and XorSlice.
 Performs xy ⨁ xz ⨁ yz ⨁ x ⨁ y on the majority tabs of the register.
-Returns slice of lengt len(r)+ (len(r)*(len(r)-1))/2 with the original variables in the first len(r) entries and products in the rest
+Returns slice of lengt len(r)+ (len(r)*(len(r)-1))/2 with the original variables in the first len(r)-1 entries and products in the rest
 */
 func SymMajorityOutput(r SymRegister) []int {
 	arr := r.ArrImposter
@@ -340,7 +340,7 @@ func SimpleKeyStreamSym(r SymRegister) [][]int {
 	// Init key stream array
 	keyStream := make([][]int, 228)
 	for i := 0; i < 228; i++ {
-		keyStream[i] = make([]int, r.Length+1)
+		keyStream[i] = make([]int, r.Length)
 	}
 
 	// Clock the register 99 times

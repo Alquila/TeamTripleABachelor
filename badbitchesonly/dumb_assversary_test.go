@@ -52,8 +52,6 @@ func TestPrint2(t *testing.T) {
 }
 
 func TestDoTheSimpleHack(t *testing.T) {
-	// TODO: make this a function in dumb_assversary.go plz
-
 	// init one register, in both OG and sym version
 	symReg := InitOneSymRegister()
 	reg := InitOneRegister()
@@ -64,12 +62,12 @@ func TestDoTheSimpleHack(t *testing.T) {
 	symKeyStream := SimpleKeyStreamSym(symReg)
 	keyStream := SimpleKeyStream(reg)
 
-	// make sym version into [][]int if not allready
-
 	// use gauss to solve equations
 	//res := solveByGaussElimination(symKeyStream, keyStream)
 	res := solveByGaussEliminationTryTwo(symKeyStream, keyStream)
 
+	fmt.Printf("length of res is: %d\n", len(res))
+	// fmt.Printf("length of sym")
 	// fmt.Printf("Res er: %d\n", res)
 	// fmt.Printf("reg er: %d\n", orgReg)
 
@@ -89,6 +87,8 @@ func TestDoTheSimpleHackSecondVersion(t *testing.T) {
 	orgReg := make([]int, 19)
 	copy(orgReg, reg.ArrImposter)
 
+	assert.Equal(t, orgReg, reg.ArrImposter, "orgReg and reg are not the same")
+
 	// make output keystream in both
 	symKeyStream := SimpleKeyStreamSymSecondVersion(symReg)
 	fmt.Printf("length of symKeyStream[0]: %d\n", len(symKeyStream[0]))
@@ -106,7 +106,7 @@ func TestDoTheSimpleHackSecondVersion(t *testing.T) {
 	// compare if found res is equal to init registers
 	if !reflect.DeepEqual(res[0:19], orgReg) {
 		t.Fail()
-		fmt.Printf("Res er: %d\n", res[0:19])
+		fmt.Printf("Res er: %d\n", res)
 		fmt.Printf("reg er: %d\n", orgReg)
 	}
 	// fmt.Printf("reg er: %d\n", orgReg)
