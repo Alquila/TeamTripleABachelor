@@ -46,7 +46,7 @@ func Bit_entry(reg SymRegister) {
 	// reg.ArrImposter[reg.bit_entry][reg.Length-1] = 1
 	bit_entry := reg.set1
 	for i := 0; i < reg.Length; i++ {
-		reg.ArrImposter[i] = make([]int, reg.Length)
+		// reg.ArrImposter[i] = make([]int, reg.Length)
 		if i < bit_entry {
 			reg.ArrImposter[i][i] = 1
 		}
@@ -59,17 +59,18 @@ func Bit_entry(reg SymRegister) {
 	}
 }
 
-//Calls SymMakeRegister on each register. Each register is initialised and the symbolic slices are +1 of r.Lenght to make space for extra bit
+//Calls SymMakeRegister on each register. Each register is initialised with array initialized for every entry, but no values inserted. Copies r4.ArrImposter into sr4
 func SymSetRegisters() {
 	sr1 = SymMakeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14, 15)
 	sr2 = SymMakeRegister(22, []int{21, 20}, []int{9, 13}, 16, 16)
 	sr3 = SymMakeRegister(23, []int{22, 21, 20, 7}, []int{16, 18}, 13, 18)
-	sr4 = makeR4()
+	sr4 = makeRegister(17, []int{16, 11}, nil, -1)
+	copy(sr4.ArrImposter, r4.ArrImposter)
 }
 
-//Clock R1, R2, R3 based on R4 state
-func SymClockingUnit(r4 Register) {
-	arr := r4.ArrImposter
+//Clock SR1, SR2, SR3 based on given state
+func SymClockingUnit(rr4 Register) {
+	arr := rr4.ArrImposter
 	maj := majority(arr[3], arr[7], arr[10])
 
 	if maj == arr[10] {
@@ -120,11 +121,11 @@ func SymCalculateNewBit(r SymRegister) []int {
 	return newbit
 }
 
+//Calls SymSetRegisters and inits them all to 0. Describes the registers with the current and original framenumber. Sets the bits entry to 1. Copies r4 into sr4
 func SymInitializeRegisters() {
 	// Reset registers, all indexes are set to 0
 	SymSetRegisters()
 
-	//REVIEW noget med noget framenumber f' her eller et eller andet sted
 	sr1.ArrImposter = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr1)
 	sr2.ArrImposter = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr2)
 	sr3.ArrImposter = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr3)
@@ -137,7 +138,7 @@ func SymInitializeRegisters() {
 
 /*
 Makes the final xor of r1[-1] ⨁ maj(r1) ⨁ r2[-1] ⨁ maj(r2) ⨁ r3[-1] ⨁ maj(r3)
-returns [vars1 | prod1 | vars2 | prod2 | vars3 | prod3 | b]
+returns [vars1 | vars2 | vars3 | prod1 | prod2 prod3 | b ]
 Calls SymMajorityOutput and OverwriteXorSlice
 */
 func SymMakeFinalXOR(r1 SymRegister, r2 SymRegister, r3 SymRegister) []int {
@@ -171,13 +172,13 @@ func SymMakeFinalXOR(r1 SymRegister, r2 SymRegister, r3 SymRegister) []int {
 	bit_entry3 := len(maj_r3) - 1
 
 	start = append(start, maj_r1[v1:bit_entry1]...) //now [vars1 | vars2 | vars3 | prod1] without the bit entry
-	start = append(start, maj_r2[v2:bit_entry2]...) //now [vars1 | prod1 | vars2 | prod2 ]
-	start = append(start, maj_r3[v2:bit_entry3]...) //now [vars1 | prod1 | vars2 | prod2 | vars3 | prod3]
+	start = append(start, maj_r2[v2:bit_entry2]...) //now [vars1 | vars2 | vars3 | prod1 | prod2 ]
+	start = append(start, maj_r3[v2:bit_entry3]...) //now [vars1 | vars2 | vars3 | prod1 | prod2 | prod3]
 
 	final_bit := maj_r1[bit_entry1] ^ maj_r2[bit_entry2] ^ maj_r3[bit_entry3]
 
 	start = append(start, []int{final_bit}...)
-	//now [vars1 | prod1 | vars2 | prod2 | vars3 | prod3 | b ]
+	//now [vars1 | vars2 | vars3 | prod1 | prod2 prod3 | b ]
 
 	return start
 }
@@ -275,23 +276,29 @@ func MakeTwoKeyStream() ([]int, [][]int) {
 	// all registers contain 0s
 	makeRegisters()
 
-	keyStreamSym := make([][]int, 228)
-
-	keyStream := make([]int, 228)
+	/* Initialize internal state with K_c and frame number */
+	initializeRegisters() // TODO: Test me
 
 	//Init sym registers sr1, sr2, sr3
 	SymInitializeRegisters()
 
-	/* Initialize internal state with K_c and frame number */
-	initializeRegisters() // TODO: Test me
-
 	/* Force bits R1[15], R2[16], R3[18], R4[10] to be 1 */
 	setIndicesToOne()
 
-	Print("r1 is \n")
+	Print("r1 is ")
 	prettyPrint(r1)
+	Print("r4 is ")
+	prettyPrint(r4)
 
-	/* Run A5/2 for 99 clocks and ignore output */
+	return RunA5_2()
+}
+
+func RunA5_2() ([]int, [][]int) {
+	keyStreamSym := make([][]int, 228)
+
+	keyStream := make([]int, 228)
+
+	/* Run A5/2 for 99 clocks and ignore output  */
 	for i := 0; i < 99; i++ {
 		// do the clock thingy and ignore
 		clockingUnit(r4)
@@ -308,6 +315,7 @@ func MakeTwoKeyStream() ([]int, [][]int) {
 		keyStream[i] = makeFinalXOR()
 		keyStreamSym[i] = SymMakeFinalXOR(sr1, sr2, sr3)
 	}
+
 	return keyStream, keyStreamSym
 }
 
@@ -319,12 +327,11 @@ func MakeTwoKeyStream() ([]int, [][]int) {
 
 func InitOneSymRegister() SymRegister {
 	reg := SymMakeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14, 15) // equvalent to reg1
-	for i := 0; i < 19; i++ {
-		// reg.ArrImposter[i] = make([]int, 19)
-		reg.ArrImposter[i][i] = 1 // each entry in the diagonal set to 1 as x_i is only dependent on x_i when initialized
-	}
-	reg.ArrImposter[15][15] = 0
-	reg.ArrImposter[15][len(reg.ArrImposter[15])-1] = 1
+	// for i := 0; i < 19; i++ {
+	// 	// reg.ArrImposter[i] = make([]int, 19)
+	// 	reg.ArrImposter[i][i] = 1 // each entry in the diagonal set to 1 as x_i is only dependent on x_i when initialized
+	// }
+	Bit_entry(reg)
 	return reg
 }
 

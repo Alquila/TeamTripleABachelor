@@ -36,19 +36,28 @@ func doTheSimpleHack() {
 	}
 }
 
-func DoTheKnownPlainTextHack() []int {
+func DoTheKnownPlainTextHack() ([]int, []int, []int, []int) {
 	// // Init all four Registers
 	// initializeRegisters()
 	// SymInitializeRegisters()
 
 	// make stream cipher ?
-	b1, A1 := MakeTwoKeyStream()
+	sr1.ArrImposter = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr1)
+	sr2.ArrImposter = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr2)
+	sr3.ArrImposter = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr3)
+	b1, A1 := RunA5_2()
 
 	current_frame_number++
-	b2, A2 := MakeTwoKeyStream()
+	sr1.ArrImposter = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr1)
+	sr2.ArrImposter = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr2)
+	sr3.ArrImposter = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr3)
+	b2, A2 := RunA5_2()
 
 	current_frame_number++
-	b3, A3 := MakeTwoKeyStream()
+	sr1.ArrImposter = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr1)
+	sr2.ArrImposter = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr2)
+	sr3.ArrImposter = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr3)
+	b3, A3 := RunA5_2()
 
 	// A := make([][]int, 684)
 	A := append(A1, A2...)
@@ -60,19 +69,67 @@ func DoTheKnownPlainTextHack() []int {
 
 	x := solveByGaussEliminationTryTwo(A, b)
 
-	return x
+	// I think we should handle stuff here
+	// on index set_1, set it to 1 and move rest of slice one
+	// do this or each of the registers ?
+
+	r1_solved, r2_solved, r3_solved, r4_solved := MakeGaussResultToRegisters(x)
+
+	return r1_solved, r2_solved, r3_solved, r4_solved
+}
+
+func MakeGaussResultToRegisters(res []int) ([]int, []int, []int, []int) {
+	offset := 0
+
+	r1_res := make([]int, r1.Length)
+	reg_range := r1.Length - 1
+	copy(r1_res, res[:reg_range])
+	offset = reg_range
+
+	r2_res := make([]int, r2.Length)
+	reg_range += r2.Length - 1
+	copy(r2_res, res[offset:reg_range])
+	offset = reg_range
+
+	r3_res := make([]int, r3.Length)
+	reg_range += r3.Length - 1
+	copy(r3_res, res[offset:reg_range])
+	offset = reg_range
+
+	r4_res := make([]int, r4.Length)
+	reg_range += r4.Length - 1
+	copy(r4_res, res[offset:reg_range])
+	offset = reg_range
+
+	// Move r1
+	putConstantBackInRes(r1_res, sr1.set1)
+	putConstantBackInRes(r2_res, sr2.set1)
+	putConstantBackInRes(r3_res, sr3.set1)
+	putConstantBackInRes(r4_res, 10) // hardcoded for register 4 as this has no symbolic representation
+
+	return r1_res, r2_res, r3_res, r4_res
+}
+
+func putConstantBackInRes(arr []int, constantIndex int) []int {
+	arr_size := len(arr)
+
+	for i := (arr_size - 1); i > constantIndex-1; i-- {
+		arr[i] = arr[i-1]
+	}
+	arr[constantIndex] = 1
+
+	return arr
 }
 
 /** TRYING TO USE THE DIFFERENCE IN FRAMENUMBER TO
 SEE WETHER THE INDEX IN REGISTER SHOULD BE THE
 SAME OR DIFFERENT WHEN INITIALIZING IT		   */
-
 func FindDifferenceOfFrameNumbers(f1 int, f2 int) []int {
 
 	f1_bits := MakeFrameNumberToBits(f1)
 	f2_bits := MakeFrameNumberToBits(f2)
-	fmt.Printf("f1 is: %d \n", f1_bits)
-	fmt.Printf("f2 is: %d \n", f2_bits)
+	// fmt.Printf("f1 is: %d \n", f1_bits)
+	// fmt.Printf("f2 is: %d \n", f2_bits)
 
 	res := XorSlice(f1_bits, f2_bits)
 
@@ -88,7 +145,7 @@ func DescribeNewFrameWithOldVariables(f1 int, f2 int, orgReg SymRegister) [][]in
 
 	// gives os bitwise difference of frame numbers
 	diff := FindDifferenceOfFrameNumbers(f1, f2)
-	fmt.Printf("The difference between the two framenumbers are: %d \n", diff)
+	// fmt.Printf("The difference between the two framenumbers are: %d \n", diff)
 	// init the predicted new symReg
 	length := len(orgReg.ArrImposter)
 	res := make([]int, length)
@@ -104,7 +161,7 @@ func DescribeNewFrameWithOldVariables(f1 int, f2 int, orgReg SymRegister) [][]in
 	// 	// create a slice with all zeroes
 	// 	res[i] = make([]int, len(orgReg.ArrImposter[0]))
 	// }
-	fmt.Printf("This is res after init: %d \n", res)
+	// fmt.Printf("This is res after init: %d \n", res)
 
 	// what to go through every indice in frame-number-difference-array
 	for i := range diff {
@@ -130,7 +187,7 @@ func DescribeNewFrameWithOldVariables(f1 int, f2 int, orgReg SymRegister) [][]in
 		res[0] = newbit
 
 		if diff[i] == 1 { //dvs forskellige frame number bits
-			fmt.Printf("Diff[%d] is 1\n", i)
+			// fmt.Printf("Diff[%d] is 1\n", i)
 			// XOR constant-index in expression
 			// REVIEW: This is wrong
 			res[0] = res[0] ^ 1
@@ -144,6 +201,7 @@ func DescribeNewFrameWithOldVariables(f1 int, f2 int, orgReg SymRegister) [][]in
 		newReg[i] = make([]int, len(orgReg.ArrImposter[0]))
 		copy(newReg[i], orgReg.ArrImposter[i])
 	}
+	// fmt.Printf("This is newreg: \n%d\n", newReg)
 
 	// create the new reg from old variables, based on res
 	for i := range res {
@@ -156,6 +214,8 @@ func DescribeNewFrameWithOldVariables(f1 int, f2 int, orgReg SymRegister) [][]in
 
 	newReg[orgReg.set1] = make([]int, len(orgReg.ArrImposter[0]))
 	newReg[orgReg.set1][len(orgReg.ArrImposter[0])-1] = 1
+
+	// fmt.Printf("This is newreg: \n%d\n", newReg)
 
 	return newReg
 }

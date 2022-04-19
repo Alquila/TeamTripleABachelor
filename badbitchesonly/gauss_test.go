@@ -47,30 +47,30 @@ func TestWhatDoesGaussPartialOutput(t *testing.T) { // i do not understand what 
 
 }
 
-func TestBackSubstitution(t *testing.T) {
-	augMa := make([][]int, 3)
+// func TestBackSubstitution(t *testing.T) {
+// 	augMa := make([][]int, 3)
 
-	augMa[0] = []int{-3, 2, -1, -1}
-	augMa[1] = []int{0, -2, 5, -9}
-	augMa[2] = []int{0, 0, -2, 2}
+// 	augMa[0] = []int{-3, 2, -1, -1}
+// 	augMa[1] = []int{0, -2, 5, -9}
+// 	augMa[2] = []int{0, 0, -2, 2}
 
-	// fmt.Printf("augMa[0]: %d \n", augMa[0])
-	// fmt.Printf("augMa[:][0]: %d \n", augMa[:][0])
-	// fmt.Printf("augMa: %d \n", augMa)
-	// fmt.Printf("length of augMa: %d \n", len(augMa))
+// 	// fmt.Printf("augMa[0]: %d \n", augMa[0])
+// 	// fmt.Printf("augMa[:][0]: %d \n", augMa[:][0])
+// 	// fmt.Printf("augMa: %d \n", augMa)
+// 	// fmt.Printf("length of augMa: %d \n", len(augMa))
 
-	res := backSubstitution(augMa)
+// 	res := backSubstitution(augMa)
 
-	fmt.Printf("This is the result: %d \n", res)
+// 	fmt.Printf("This is the result: %d \n", res)
 
-	shouldBe := []int{2, 2, -1}
+// 	shouldBe := []int{2, 2, -1}
 
-	if !reflect.DeepEqual(res, shouldBe) {
-		t.Log("The result of the back substitution is wrong")
-		t.Fail()
-	}
+// 	if !reflect.DeepEqual(res, shouldBe) {
+// 		t.Log("The result of the back substitution is wrong")
+// 		t.Fail()
+// 	}
 
-}
+// }
 
 // func TestGaussElimination(t *testing.T) {
 // 	augMa := make([][]int, 3)
@@ -250,19 +250,19 @@ func TestGaussElimOnSecondExample(t *testing.T) {
 
 }
 
-func TestGaussElimination(t *testing.T) {
-	matrix := make([][]int, 4)
+// func TestGaussElimination(t *testing.T) {
+// 	matrix := make([][]int, 4)
 
-	matrix[0] = []int{1, 0, 1, 1}
-	matrix[1] = []int{1, 0, 1, 0}
-	matrix[2] = []int{0, 1, 0, 1}
-	matrix[3] = []int{0, 1, 1, 1}
+// 	matrix[0] = []int{1, 0, 1, 1}
+// 	matrix[1] = []int{1, 0, 1, 0}
+// 	matrix[2] = []int{0, 1, 0, 1}
+// 	matrix[3] = []int{0, 1, 1, 1}
 
-	res := gaussEliminationPart2(matrix)
+// 	res := gaussEliminationPart2(matrix)
 
-	fmt.Printf("res is: \n %d", res)
+// 	fmt.Printf("res is: \n %d", res)
 
-	// This should fail, as the last row is [0, 0, 0, 1]
-	// we need to make sure this says its wrong
+// 	// This should fail, as the last row is [0, 0, 0, 1]
+// 	// we need to make sure this says its wrong
 
-}
+// }

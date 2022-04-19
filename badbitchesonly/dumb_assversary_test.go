@@ -8,6 +8,9 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	// "github.com/tidwall/assert"
 	// "time"
 	// //"golang.org/x/tools/go/analysis/passes/nilfunc"
 )
@@ -67,8 +70,8 @@ func TestDoTheSimpleHack(t *testing.T) {
 	//res := solveByGaussElimination(symKeyStream, keyStream)
 	res := solveByGaussEliminationTryTwo(symKeyStream, keyStream)
 
-	fmt.Printf("Res er: %d\n", res)
-	fmt.Printf("reg er: %d\n", orgReg)
+	// fmt.Printf("Res er: %d\n", res)
+	// fmt.Printf("reg er: %d\n", orgReg)
 
 	// compare if found res is equal to init registers
 	if !reflect.DeepEqual(res, orgReg) {
@@ -79,7 +82,6 @@ func TestDoTheSimpleHack(t *testing.T) {
 }
 
 func TestDoTheSimpleHackSecondVersion(t *testing.T) {
-	// TODO: make this a function in dumb_assversary.go plz
 
 	// init one register, in both OG and sym version
 	symReg := InitOneSymRegister()
@@ -104,36 +106,43 @@ func TestDoTheSimpleHackSecondVersion(t *testing.T) {
 	// compare if found res is equal to init registers
 	if !reflect.DeepEqual(res[0:19], orgReg) {
 		t.Fail()
-		fmt.Printf("Res er: %d\n", res)
+		fmt.Printf("Res er: %d\n", res[0:19])
 		fmt.Printf("reg er: %d\n", orgReg)
 	}
-	fmt.Printf("reg er: %d\n", orgReg)
-	fmt.Printf("Res er: %d\n", res[0:19])
+	// fmt.Printf("reg er: %d\n", orgReg)
+	// fmt.Printf("Res er: %d\n", res[0:19])
 }
 
 func TestPlaintextAttack(t *testing.T) {
-	orgReg := []int{0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0}
-	// sr4.ArrImposter = []int{0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1}
-	// orgReg := make([]int, 17)
-	// copy(orgReg, r4.ArrImposter)
+	//orgReg := []int{0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0}
+	//sr4.ArrImposter = []int{0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1}
+	//orgReg := make([]int, 17) [0 0 0 1 1 1 1 1 0 0 0 0 0 0 0 1 1 1 0]
+	//copy(orgReg, r4.ArrImposter)
 
 	session_key = make([]int, 64)
 	original_frame_number = 55
 	current_frame_number = 55
 
-	res := DoTheKnownPlainTextHack()
+	sr1.ArrImposter = make([][]int, r1.Length)
+	sr2.ArrImposter = make([][]int, r2.Length)
+	sr3.ArrImposter = make([][]int, r3.Length)
+	sr4.ArrImposter = make([]int, r4.Length)
 
-	fmt.Printf("len af res er: %d\n", len(res))
+	res1, _, _, res4 := DoTheKnownPlainTextHack()
+
+	//fmt.Printf("len af res er: %d\n", len(res4)) // should be 656 as this is the number of unknown vars
 
 	// offset := r1.Length + r2.Length + r3.Length
 	// compare if found res is equal to init registers
-	if !reflect.DeepEqual(res[0:17], orgReg) {
+	if !reflect.DeepEqual(res4, sr4.ArrImposter) {
 		t.Fail()
-		fmt.Printf("Res er: %d\n", res)
-		fmt.Printf("reg er: %d\n", orgReg)
+		fmt.Printf("Res er: %d\n", res4)
+		fmt.Printf("reg1 er: %d\n", res1)
+		// fmt.Printf("reg er: %d\n", orgReg)
+		fmt.Printf("reg er: %d\n", sr4.ArrImposter)
 	}
-	fmt.Printf("reg er: %d\n", orgReg)
-	fmt.Printf("Res er: %d\n", res[0:19])
+	// fmt.Printf("reg er: %d\n", orgReg)
+	// fmt.Printf("Res er: %d\n", res[offset:offset+17])
 
 }
 
@@ -322,7 +331,143 @@ func TestMAKETEST(t *testing.T) {
 		repeat
 
 		Stuff it into Gauss
-
 	*/
 
+	/* init r1 r2 r3 r4 */
+	makeRegisters()
+	/* set frame number */
+	current_frame_number = 42
+	original_frame_number = 42
+
+	key := make([]int, 64)
+	session_key = key
+
+	/* init registers with key and framenumber*/
+	initializeRegisters()
+	setIndicesToOne()
+	// fmt.Printf("This is r1 after init: \n%v\n", r1.ArrImposter)
+
+	/*save initial state registers*/
+	old_r1 := make([]int, r1.Length)
+	copy(old_r1, r1.ArrImposter)
+	old_r2 := make([]int, r2.Length)
+	copy(old_r2, r2.ArrImposter)
+	old_r3 := make([]int, r3.Length)
+	copy(old_r3, r3.ArrImposter)
+	old_r4 := make([]int, r4.Length)
+	copy(old_r4, r4.ArrImposter)
+
+	fmt.Printf("This is old_r1 after init: \n%v\n", old_r1)
+	fmt.Printf("This is old_r2 after init: \n%v\n", old_r2)
+	fmt.Printf("This is old_r3 after init: \n%v\n", old_r3)
+	fmt.Printf("This is old_r4 after init: \n%v\n", old_r4)
+
+	/*should init the SymRegisters to ~I with bit in the last entry. Sr4 has copy of r4.ArrImposter */
+	SymInitializeRegisters()
+
+	assert.Equal(t, old_r1, r1.ArrImposter, "r1")
+	assert.Equal(t, old_r2, r2.ArrImposter, "r2")
+	assert.Equal(t, old_r3, r3.ArrImposter, "r3")
+	assert.Equal(t, old_r4, r4.ArrImposter, "r3")
+
+	keyStream1 := make([]int, 228)
+	keyStreamSym1 := make([][]int, 228)
+	assert.Equal(t, r4.ArrImposter, sr4.ArrImposter, "R4 and SR4 are not the same")
+
+	/* Run A5/2 for 99 clocks and ignore output */
+	for i := 0; i < 99; i++ {
+		clockingUnit(r4)
+		Clock(r4)
+		SymClockingUnit(sr4)
+		Clock(sr4)
+	}
+	assert.Equal(t, r4.ArrImposter, sr4.ArrImposter, "R4 and SR4 are not the same")
+
+	/* Run A5/2 for 228 clocks and use outputs as key-stream */
+	for i := 0; i < 228; i++ {
+		clockingUnit(r4)
+		SymClockingUnit(sr4)
+		Clock(r4)
+		Clock(sr4)
+		keyStream1[i] = makeFinalXOR()
+		keyStreamSym1[i] = SymMakeFinalXOR(sr1, sr2, sr3)
+	}
+
+	//Do it all again
+	current_frame_number++
+	initializeRegisters()
+	setIndicesToOne()
+
+	SymInitializeRegisters()
+
+	keyStream2 := make([]int, 228)
+	keyStreamSym2 := make([][]int, 228)
+	assert.Equal(t, r4.ArrImposter, sr4.ArrImposter, "R4 and SR4 are not the same pt 2")
+
+	/* Run A5/2 for 99 clocks and ignore output */
+	for i := 0; i < 99; i++ {
+		clockingUnit(r4)
+		Clock(r4)
+		SymClockingUnit(sr4)
+		Clock(sr4)
+	}
+	assert.Equal(t, r4.ArrImposter, sr4.ArrImposter, "R4 and SR4 are not the same pt 2")
+
+	/* Run A5/2 for 228 clocks and use outputs as key-stream */
+	for i := 0; i < 228; i++ {
+		clockingUnit(r4)
+		SymClockingUnit(sr4)
+		Clock(r4)
+		Clock(sr4)
+		keyStream2[i] = makeFinalXOR()
+		keyStreamSym2[i] = SymMakeFinalXOR(sr1, sr2, sr3)
+	}
+
+	//Do it all again
+	current_frame_number++
+	initializeRegisters()
+	setIndicesToOne()
+
+	SymInitializeRegisters()
+
+	keyStream3 := make([]int, 228)
+	keyStreamSym3 := make([][]int, 228)
+	assert.Equal(t, r4.ArrImposter, sr4.ArrImposter, "R4 and SR4 are not the same pt 3")
+
+	/* Run A5/2 for 99 clocks and ignore output */
+	for i := 0; i < 99; i++ {
+		clockingUnit(r4)
+		Clock(r4)
+		SymClockingUnit(sr4)
+		Clock(sr4)
+	}
+	assert.Equal(t, r4.ArrImposter, sr4.ArrImposter, "R4 and SR4 are not the same pt 3")
+
+	/* Run A5/2 for 228 clocks and use outputs as key-stream */
+	for i := 0; i < 228; i++ {
+		clockingUnit(r4)
+		SymClockingUnit(sr4)
+		Clock(r4)
+		Clock(sr4)
+		keyStream3[i] = makeFinalXOR()
+		keyStreamSym3[i] = SymMakeFinalXOR(sr1, sr2, sr3)
+	}
+
+	A := append(keyStreamSym1, keyStreamSym2...)
+	A = append(A, keyStreamSym3...)
+	// A = append(A, A3...)
+
+	b := append(keyStream1, keyStream2...)
+	b = append(b, keyStream3...)
+
+	x := solveByGaussEliminationTryTwo(A, b)
+
+	r1_solved, _, _, _ := MakeGaussResultToRegisters(x)
+
+	if !reflect.DeepEqual(r1_solved, old_r1) {
+		t.Fail()
+		fmt.Printf("Res er: %d\n", r1_solved)
+		fmt.Printf("old er: %d\n", old_r1)
+		// fmt.Printf("x er: %d\n", x[0:19])
+	}
 }

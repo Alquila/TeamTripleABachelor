@@ -102,6 +102,8 @@ func solveByGaussEliminationTryTwo(A [][]int, b []int) []int {
 	augmentMatrix := makeAugmentedMatrix(A, b)
 	afterGauss := gaussEliminationPart2(augmentMatrix)
 	solution := backSubstitution(afterGauss)
+	// fmt.Printf("Gauss: %d\n", solution)
+	// fmt.Printf("Gauss lenght: %d\n", len(solution))
 
 	return solution
 }
@@ -202,108 +204,6 @@ func backSubstitution(augMatrix [][]int) []int {
 	for i := 0; i < noUnknownVars; i++ { // xor constant bit på res
 		res[i] = res[i] ^ augMatrix[i][noUnknownVars]
 	}
-	//prints(res, "res")
 
 	return res
 }
-
-// taken from GaussEliminationPart2
-// for k := 0; k < noUnknownVars; k++ {
-// 	// Ensure we have non-zero entry in augma[k,k]
-// 	if augMa[k][k] == 0 {
-// 		for j := k + 1; j < noEquations; j++ {
-// 			if augMa[j][k] != 0 {
-// 				augCopyTo := make([]int, len(augMa[k]))
-// 				augCopyFrom := make([]int, len(augMa[j]))
-// 				copy(augCopyTo, augMa[k])
-// 				copy(augCopyFrom, augMa[j])
-// 				augMa[k] = augCopyFrom
-// 				augMa[j] = augCopyTo
-// 				break
-// 			}
-// 		}
-// 		if augMa[k][k] == 0 {
-// 			// Then we have a zero column
-// 			// This means we have no solutions or multiple solutinos
-// 			fmt.Printf("Zero column, so multiple or no solution")
-// 			continue
-// 		}
-// 		for I := k + 1; I <= n; I++ {
-// 			if augMa[I][k] == 1 {
-// 				for J := 0; I < n; I++ {
-// 					augMa[I][J] = augMa[I][J] ^ augMa[k][J]
-// 				}
-// 			}
-// 		}
-// 	}
-// }
-
-// nom_row := len(augMa)
-// print("nom of row: %d \n", nom_row)
-// nom_col := len(augMa[0])
-// res := make([]int, nom_row)
-// for i := 0; i < nom_row ; i++ {
-// 	res[i] = augMa[i][nom_col-1]
-// }
-
-// taken from backsubstitution
-// if augMatrix[i][noUnknownVars] == 1 {
-// 	res[i] = res[i+1] // this is the coefficient next to
-// }
-
-// fmt.Printf("first res[i] just set to: %d\n", res[i])
-// fmt.Printf("This is res2: %d \n", res)
-
-// for j := i + 1; j < noUnknownVars; j++ {
-// 	if augMatrix[i][j] == 1 {
-// 		res[i] = res[i] ^ res[j] // this is the coefficient next to
-// 	}
-
-// 	// fmt.Printf("second res[i] just set to: %d \n", res[i])
-// 	// fmt.Printf("augMatrix[i][j] is: %d\n", augMatrix[i][j])
-// 	// fmt.Printf("(augMatrix[i][j] mod 2) is: %v\n", modu)
-
-// }
-
-// fmt.Printf("third res[%d] just set to: %d\n", i, res[i])
-// fmt.Printf("This is res4: %d \n", res)
-
-// Not in use
-// func gaussElimination(augMa [][]int) [][]int {
-// 	n := len(augMa[0]) - 1 // n is number of unknowns
-// 	// temp := make([][]float64, len(augMa))
-
-// 	for i := 0; i < n; i++ {
-// 		if augMa[i][i] == 0 { // should 0 be eps ?
-// 			// throw an error
-// 			fmt.Print("Divison by zero encountered \n")
-// 			continue
-// 		}
-// 		for j := i + 1; j < n; j++ {
-// 			ratio := augMa[j][i] / augMa[i][i]
-// 			//newBit := 1
-// 			//if augMa[j][i] == augMa[i][i] {
-// 			// newBit = 0
-// 			// }
-
-// 			// fmt.Printf("augMa[j][i]: %d \n", augMa[j][i])
-// 			// fmt.Printf("augMa[i][i]: %d \n", augMa[i][i])
-// 			// fmt.Printf("ratio is: %v \n", ratio)
-
-// 			for k := 0; k < n+1; k++ {
-// 				augMa[j][k] = augMa[j][k] - ratio*augMa[i][k]
-// 				// fmt.Printf("augMa[j][k]: %d \n", augMa[j][k])
-// 				// fmt.Printf("augMa[i][k]: %d \n", augMa[i][k])
-// 			}
-// 		}
-// 	}
-// 	// temp[0] = []float64(augMa[0])
-// 	return augMa
-// }
-
-// func solveByGaussElimination(A [][]int, b []int) []int {
-// 	augmentMatrix := makeAugmentedMatrix(A, b)
-// 	afterGauss := gaussElimination(augmentMatrix)
-// 	solution := backSubstitution(afterGauss)
-// 	return solution
-// }

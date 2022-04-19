@@ -49,7 +49,7 @@ func makeR3() Register {
 }
 
 func makeR4() Register {
-	r4 = makeRegister(17, []int{16, 11}, nil, -1)
+	r4 := makeRegister(17, []int{16, 11}, nil, -1)
 	return r4
 }
 
@@ -207,7 +207,7 @@ func initializeRegisters() { // used to have session_key and frame_number as par
 	}
 
 	//Printf("Initialized registers 1-4:")
-	Println()
+	// Println()
 	//prettyPrint(r1)
 	//prettyPrint(r2)
 	//prettyPrint(r3)
@@ -282,7 +282,7 @@ func makeKeyStream() []int {
 func InitOneRegister() Register {
 	reg := makeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14)
 	reg.ArrImposter = []int{1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0}
-
+	reg.ArrImposter[15] = 1
 	return reg
 }
 
