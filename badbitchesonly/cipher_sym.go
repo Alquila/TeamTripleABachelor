@@ -331,7 +331,7 @@ func InitOneSymRegister() SymRegister {
 	// 	// reg.ArrImposter[i] = make([]int, 19)
 	// 	reg.ArrImposter[i][i] = 1 // each entry in the diagonal set to 1 as x_i is only dependent on x_i when initialized
 	// }
-	Bit_entry(reg)
+	// Bit_entry(reg)
 	return reg
 }
 
