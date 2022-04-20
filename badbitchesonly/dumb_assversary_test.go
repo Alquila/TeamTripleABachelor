@@ -164,13 +164,15 @@ func TestFindDiffOfFrameNumbers(t *testing.T) {
 
 func TestDescribeNewFrameNumberWithOldVar(t *testing.T) {
 	firstSymReg := InitOneSymRegister()
-	Bit_entry(firstSymReg)
+	
 	// prints(firstSymReg.ArrImposter[15], "række 15")
 	// prints(firstSymReg.ArrImposter[0], "række 0")
 	// prints(firstSymReg.ArrImposter[16], "række 16")
 
-	res := DescribeNewFrameWithOldVariables(0, 1, firstSymReg)
-
+	firstSymReg.ArrImposter = DescribeNewFrameWithOldVariables(0, 1, firstSymReg)
+	
+	Bit_entry(firstSymReg)
+	res := firstSymReg.ArrImposter
 	// fmt.Printf("res er: \n%d \n", res)
 	println("res er")
 	for i := 0; i < len(res); i++ {
@@ -183,7 +185,10 @@ func TestDescribeNewFrameNumberWithOldVar(t *testing.T) {
 	shouldBe := make([][]int, 19)
 	for i := 0; i < 19; i++ {
 		if i == 0 {
-			shouldBe[i] = []int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
+			shouldBe[i] = []int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+		} else if i == 2 || i == 3 || i == 4 || i == 7 {
+			shouldBe[i] = []int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
+			shouldBe[i][i] = 1
 		} else if i < 15 {
 			shouldBe[i] = make([]int, 19)
 			shouldBe[i][i] = 1
@@ -198,6 +203,10 @@ func TestDescribeNewFrameNumberWithOldVar(t *testing.T) {
 	println("shouldBe er")
 	for i := 0; i < len(shouldBe); i++ {
 		prints(shouldBe[i], "")
+	}
+	println("res er")
+	for i := 0; i < len(res); i++ {
+		prints(res[i], "")
 	}
 	// shouldBe[0] = []int{""}
 	// shouldBe[0]

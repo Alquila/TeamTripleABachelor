@@ -140,82 +140,74 @@ func FindDifferenceOfFrameNumbers(f1 int, f2 int) []int {
 *	Describes the register after initialisation with framenumber 'f2' with the
 *	variables used in framenumber 'f1'.
 *	Also takes a register with 1 in diagonal ?
+*	The provided 'original_reg' should have the last entry as 'compliment' entry in the innermost slice
  */
-func DescribeNewFrameWithOldVariables(f1 int, f2 int, orgReg SymRegister) [][]int {
+func DescribeNewFrameWithOldVariables(original_framenum int, current_framenum int, original_reg SymRegister) [][]int {
 
 	// gives os bitwise difference of frame numbers
-	diff := FindDifferenceOfFrameNumbers(f1, f2)
-	// fmt.Printf("The difference between the two framenumbers are: %d \n", diff)
+	diff := FindDifferenceOfFrameNumbers(original_framenum, current_framenum)
+	
 	// init the predicted new symReg
-	length := len(orgReg.ArrImposter)
-	res := make([]int, length)
+	length := len(original_reg.ArrImposter)
 
-	/*
-		Here res is initialised. Res is used to simulate what indices gets
+	/*	Res is used to simulate what indices gets
 		affected by the difference in frame number.
 		Res should be used to determine which indices need to have their
 		'constant' index = 1 after the initialisation process.
 	*/
-	// for each row in the register
-	// for i := range orgReg.ArrImposter {
-	// 	// create a slice with all zeroes
-	// 	res[i] = make([]int, len(orgReg.ArrImposter[0]))
-	// }
-	// fmt.Printf("This is res after init: %d \n", res)
+	res := make([]int, length)
 
 	// what to go through every indice in frame-number-difference-array
 	for i := range diff {
 
 		// this is copied from cipher_sym.SymCalculateNewBit
 		// new bit is the bit that is placed at index 0
-		newbit := 0 // newbit is now zerom.  jLANOÅQFWoåNKDVz
+		newbit := 0 // newbit is now zero
 
 		// do the feedback function
-		for i := range orgReg.Tabs {
-			// print(i)
-
+		for j := range original_reg.Tabs {
 			// takes the index corresponding to tab[i] in res and
 			// XOR with newbit
-			newbit = newbit ^ res[orgReg.Tabs[i]]
+			newbit = newbit ^ res[original_reg.Tabs[j]]
 		}
 
 		// this is copied from cipher.Clock
-		for i := len(res) - 1; i > 0; i-- {
-			res[i] = res[i-1]
+		// shift each entry one to the right 
+		for j := len(res) - 1; j > 0; j-- {
+			res[j] = res[j-1]
 		}
 
+		// place the result of the feedback in the first entry in the 
+		// resulting array
 		res[0] = newbit
 
 		if diff[i] == 1 { //dvs forskellige frame number bits
-			// fmt.Printf("Diff[%d] is 1\n", i)
-			// XOR constant-index in expression
-			// REVIEW: This is wrong
+			// the 'newbit' at index 0 gets influenced by the i'th entry 
+			// in current_framenum which differs from original_framenum
 			res[0] = res[0] ^ 1
 		}
 	}
 
-	// this is the register to be returned desribind the current
+	// this is the register to be returned describing the current
 	// frame with varibales from previous frame
 	newReg := make([][]int, length)
-	for i := range newReg {
-		newReg[i] = make([]int, len(orgReg.ArrImposter[0]))
-		copy(newReg[i], orgReg.ArrImposter[i])
+	for i := range newReg {		// for each entry in the outermost array
+		newReg[i] = make([]int, len(original_reg.ArrImposter[0]))
+		// copy each 'expression' 
+		copy(newReg[i], original_reg.ArrImposter[i])
 	}
-	// fmt.Printf("This is newreg: \n%d\n", newReg)
 
 	// create the new reg from old variables, based on res
 	for i := range res {
 		if res[i] == 0 {
 			continue
 		} else {
-			newReg[i][len(orgReg.ArrImposter[0])-1] = 1
+			newReg[i][len(original_reg.ArrImposter[0])-1] = newReg[i][len(original_reg.ArrImposter[0])-1] ^ 1
 		}
 	}
 
-	newReg[orgReg.set1] = make([]int, len(orgReg.ArrImposter[0]))
-	newReg[orgReg.set1][len(orgReg.ArrImposter[0])-1] = 1
-
-	// fmt.Printf("This is newreg: \n%d\n", newReg)
+	newReg[original_reg.set1] = make([]int, len(original_reg.ArrImposter[0]))
+	newReg[original_reg.set1][len(original_reg.ArrImposter[0])-1] = 1
 
 	return newReg
 }
