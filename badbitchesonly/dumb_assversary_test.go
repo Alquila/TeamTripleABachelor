@@ -480,3 +480,13 @@ func TestMAKETEST(t *testing.T) {
 		// fmt.Printf("x er: %d\n", x[0:19])
 	}
 }
+
+func TestDescribeSimpleSymWithFrame(t *testing.T) {
+
+	sreg := SymMakeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14, 15) // equvalent to reg1
+	for i := 0; i < 19; i++ {
+		// reg.ArrImposter[i] = make([]int, 19)
+		sreg.ArrImposter[i][i] = 1 // each entry in the diagonal set to 1 as x_i is only dependent on x_i when initialized
+	}
+
+}
