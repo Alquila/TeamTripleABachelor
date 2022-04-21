@@ -59,7 +59,7 @@ func Bit_entry(reg SymRegister) {
 	}
 }
 
-//Calls SymMakeRegister on each register. Each register is initialised with array initialized for every entry, but no values inserted. Copies r4.ArrImposter into sr4
+// SymSetRegisters Calls SymMakeRegister on each register. Each register is initialised with array initialized for every entry, but no values inserted. Copies r4.ArrImposter into sr4
 func SymSetRegisters() {
 	sr1 = SymMakeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14, 15)
 	sr2 = SymMakeRegister(22, []int{21, 20}, []int{9, 13}, 16, 16)
@@ -68,7 +68,7 @@ func SymSetRegisters() {
 	copy(sr4.ArrImposter, r4.ArrImposter)
 }
 
-//Clock SR1, SR2, SR3 based on given state
+// SymClockingUnit Clock SR1, SR2, SR3 based on given state
 func SymClockingUnit(rr4 Register) {
 	arr := rr4.ArrImposter
 	maj := majority(arr[3], arr[7], arr[10])
@@ -105,7 +105,7 @@ func SymClock(r SymRegister) {
 
 }
 
-//Calculate the new int slice by xor'ing the tab-slices together row-wise
+// SymCalculateNewBit Calculate the new int slice by xor'ing the tab-slices together row-wise
 func SymCalculateNewBit(r SymRegister) []int {
 	slice_slice := r.ArrImposter
 
@@ -121,7 +121,7 @@ func SymCalculateNewBit(r SymRegister) []int {
 	return newbit
 }
 
-//Calls SymSetRegisters and inits them all to 0. Describes the registers with the current and original framenumber. Sets the bits entry to 1. Copies r4 into sr4
+// SymInitializeRegisters Calls SymSetRegisters and inits them all to 0. Describes the registers with the current and original framenumber. Sets the bits entry to 1. Copies r4 into sr4
 func SymInitializeRegisters() {
 	// Reset registers, all indexes are set to 0
 	SymSetRegisters()
@@ -137,6 +137,7 @@ func SymInitializeRegisters() {
 }
 
 /*
+SymMakeFinalXOR
 Makes the final xor of r1[-1] ⨁ maj(r1) ⨁ r2[-1] ⨁ maj(r2) ⨁ r3[-1] ⨁ maj(r3)
 returns [vars1 | vars2 | vars3 | prod1 | prod2 prod3 | b ]
 Calls SymMajorityOutput and OverwriteXorSlice
@@ -159,7 +160,7 @@ func SymMakeFinalXOR(r1 SymRegister, r2 SymRegister, r3 SymRegister) []int {
 	v1 := len(last_r1) - 1 //18?
 	v2 := len(last_r2) - 1
 	v3 := len(last_r3) - 1
-	// print("lenght of v1")
+	// print("length of v1")
 	// print(v1)
 	vars1 := maj_r1[0:v1] //vars1 points to the 19 [vars1] entries of maj_1 //REVIEW the 18 variables, maj_r1[v1] vil være x_01 som vi ikke vil have med
 
@@ -185,9 +186,10 @@ func SymMakeFinalXOR(r1 SymRegister, r2 SymRegister, r3 SymRegister) []int {
 }
 
 /*
-	Symbolic majority function. Calls SymMajorityMultiply and XorSlice.
-	Performs xy ⨁ xz ⨁ yz ⨁ x ⨁ y on the majority tabs of the register.
-	Returns slice of lengt len(r)+ (len(r)*(len(r)-1))/2 with the original variables in the first len(r)-1 entries and products in the rest
+SymMajorityOutput
+Symbolic majority function. Calls SymMajorityMultiply and XorSlice.
+Performs xy ⨁ xz ⨁ yz ⨁ x ⨁ y on the majority tabs of the register.
+Returns slice of lengt len(r)+ (len(r)*(len(r)-1))/2 with the original variables in the first len(r)-1 entries and products in the rest
 */
 func SymMajorityOutput(r SymRegister) []int {
 	arr := r.ArrImposter
@@ -210,7 +212,7 @@ func SymMajorityOutput(r SymRegister) []int {
 	return long_slice
 }
 
-//Takes two slices and xors them indexwise together. Assumed to be of same lenght. Returns slice of size len(a)
+//XorSlice Takes two slices and xors them indexwise together. Assumed to be of same lenght. Returns slice of size len(a)
 func XorSlice(a []int, b []int) []int {
 	res := make([]int, len(a))
 	for i := 0; i < len(a); i++ {
@@ -219,8 +221,11 @@ func XorSlice(a []int, b []int) []int {
 	return res
 }
 
-//Takes two slices with first shorter than the second. Overwrites the first len(short) entries in long with long[i] = short[i] ^ long[i]
-//long[len(long)-1] = long[len(long)-1] ^ short[len(short)-1]
+/*
+OverwriteXorSlice
+Takes two slices with first shorter than the second. Overwrites the first len(short) entries in long with long[i] = short[i] ^ long[i]
+long[len(long)-1] = long[len(long)-1] ^ short[len(short)-1]
+*/
 func OverwriteXorSlice(short []int, long []int) {
 	for i := 0; i < len(short)-1; i++ {
 		long[i] = short[i] ^ long[i]
