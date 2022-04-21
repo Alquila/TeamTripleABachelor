@@ -1,8 +1,5 @@
 package main
 
-func new
-
-
-func main() {
-
+func new_Gauss() {
+	
 }
