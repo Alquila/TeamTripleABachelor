@@ -247,6 +247,46 @@ func TestBackSubstitution2(t *testing.T) {
 
 }
 
+func TestGaussEliminationPart2_2(t *testing.T) {
+	a := make([][]int, 4)
+	a[0] = []int{1, 0, 1, 1, 0}
+	a[1] = []int{1, 1, 0, 1, 1}
+	a[2] = []int{1, 0, 0, 1, 0}
+	a[3] = []int{0, 0, 1, 1, 1}
+
+	shouldBe1 := make([][]int, 4)
+	shouldBe1[0] = []int{1, 0, 1, 1, 0}
+	shouldBe1[1] = []int{0, 1, 1, 0, 1}
+	shouldBe1[2] = []int{0, 0, 1, 0, 0}
+	shouldBe1[3] = []int{0, 0, 0, 1, 1}
+
+	res := gaussEliminationPart2(a)
+
+	if !reflect.DeepEqual(res, shouldBe1) {
+		t.Log("Not correct :(")
+		t.Fail()
+	}
+
+	b := make([][]int, 4)
+	b[0] = []int{1, 0, 1, 0, 0}
+	b[1] = []int{1, 1, 0, 1, 1}
+	b[2] = []int{1, 0, 0, 1, 0}
+	b[3] = []int{0, 0, 1, 0, 1}
+
+	shouldBe2 := make([][]int, 4)
+	shouldBe2[0] = []int{1, 0, 1, 0, 0}
+	shouldBe2[1] = []int{0, 1, 1, 1, 1}
+	shouldBe2[2] = []int{0, 0, 1, 1, 0}
+	shouldBe2[3] = []int{0, 0, 0, 1, 1}
+
+	res2 := gaussEliminationPart2(b)
+
+	if !reflect.DeepEqual(res2, shouldBe2) {
+		t.Log("Not correct :(")
+		t.Fail()
+	}
+}
+
 func TestGaussElimOnSecondExample(t *testing.T) {
 	//FIXME this test is wrong as there is a 1=0 in shouldbe for bit entry
 	matrix := make([][]int, 6)
