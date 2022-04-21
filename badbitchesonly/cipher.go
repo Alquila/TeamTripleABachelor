@@ -293,13 +293,16 @@ func SimpleKeyStream(r Register) []int {
 	for i := 0; i < 99; i++ {
 		Clock(r)
 	}
-	//fmt.Printf("Print register efter 99 clocks: \n %d \n", r.ArrImposter)
+	// Printf("Print register efter 99 clocks: \n %d \n", r.ArrImposter)
 
 	for i := 0; i < 228; i++ {
 		Clock(r)
 		keyStream[i] = r.ArrImposter[r.Length-1]
+		if i == 200 {
+			// Printf(" 200'th bit is %d \n", r.ArrImposter[r.Length-1])
+		}
 	}
-	//fmt.Printf("Print register efter endnu 228 clocks: \n %d \n", r.ArrImposter)
+	// Printf("Print register efter endnu 228 clocks: \n %d \n", r.ArrImposter)
 
 	return keyStream
 }

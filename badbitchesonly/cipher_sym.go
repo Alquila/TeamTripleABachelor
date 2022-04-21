@@ -142,6 +142,7 @@ returns [vars1 | vars2 | vars3 | prod1 | prod2 prod3 | b ]
 Calls SymMajorityOutput and OverwriteXorSlice
 */
 func SymMakeFinalXOR(r1 SymRegister, r2 SymRegister, r3 SymRegister) []int {
+	// save last entry in each register
 	last_r1 := r1.ArrImposter[r1.Length-1]
 	last_r2 := r2.ArrImposter[r2.Length-1]
 	last_r3 := r3.ArrImposter[r3.Length-1]
@@ -184,9 +185,9 @@ func SymMakeFinalXOR(r1 SymRegister, r2 SymRegister, r3 SymRegister) []int {
 }
 
 /*
-Symbolic majority function. Calls SymMajorityMultiply and XorSlice.
-Performs xy ⨁ xz ⨁ yz ⨁ x ⨁ y on the majority tabs of the register.
-Returns slice of lengt len(r)+ (len(r)*(len(r)-1))/2 with the original variables in the first len(r)-1 entries and products in the rest
+	Symbolic majority function. Calls SymMajorityMultiply and XorSlice.
+	Performs xy ⨁ xz ⨁ yz ⨁ x ⨁ y on the majority tabs of the register.
+	Returns slice of lengt len(r)+ (len(r)*(len(r)-1))/2 with the original variables in the first len(r)-1 entries and products in the rest
 */
 func SymMajorityOutput(r SymRegister) []int {
 	arr := r.ArrImposter
@@ -228,17 +229,20 @@ func OverwriteXorSlice(short []int, long []int) {
 }
 
 /*
-multiplies two decision vectors with result being c[i]d[j] ^ c[j]d[i] for i /= j and result = c[i]d[j] for i=j.
-res slice has lenght len(c)*(len(c)-1)/2 + len(c).  c and d are assumed to be same lenght.
-The original len(c) variables will be in the first len(c) indexes of result
-The slice should be the full slice including the last bit index
+	multiplies two decision vectors with result being c[i]d[j] ^ c[j]d[i] for i /= j and result = c[i]d[j] for i=j.
+	res slice has lenght len(c)*(len(c)-1)/2 + len(c).  c and d are assumed to be same lenght.
+	The original len(c) variables will be in the first len(c) indexes of result
+	The slice should be the full slice including the last bit index
+
+	the decision vectors corresponds to our symbolic representation, and express whether a specific unknown variable
+	is part of the expression
 */
 func SymMajorityMultiply(c []int, d []int) []int {
-	lenc := len(c) - 1 //REVIEW -1 fordi vi ikke vil loop over den konkrete bit til sidst
-	leng := lenc * (lenc - 1) / 2
+	lenc := len(c) - 1              //REVIEW -1 fordi vi ikke vil loop over den konkrete bit til sidst
+	leng := lenc * (lenc - 1) / 2   // for r1 : (18 * 17) / 2
 	res := make([]int, leng+lenc+1) //REVIEW +1 fordi der bliver lagt bit ind til sidst
 	acc := 0
-	for i := 0; i < lenc; i++ {
+	for i := 0; i < lenc; i++ { //REVIEW: SHOULD WE DO LENC -1 HERE ? - Amalie
 		res[i] = c[i]*d[i] ^ c[lenc] ^ d[lenc] //REVIEW d[lenc] er bit plads
 		for j := i + 1; j < lenc; j++ {
 			res[lenc+acc] = c[i]*d[j] ^ c[j]*d[i]
@@ -325,6 +329,7 @@ func RunA5_2() ([]int, [][]int) {
 ###########################################################
 */
 
+//Makes a r1 symregister with all 0's
 func InitOneSymRegister() SymRegister {
 	reg := SymMakeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14, 15) // equvalent to reg1
 	// for i := 0; i < 19; i++ {
@@ -352,7 +357,11 @@ func SimpleKeyStreamSym(r SymRegister) [][]int {
 	for i := 0; i < 228; i++ {
 		SymClock(r)
 		keyStream[i] = r.ArrImposter[r.Length-1]
+		if i == 200 {
+			// Printf(" 200'th bit is %d \n", r.ArrImposter[r.Length-1])
+		}
 	}
+	// PrettySymPrintSliceBit(r.ArrImposter, r.set1)
 	return keyStream
 }
 
@@ -451,7 +460,7 @@ func PrettySymPrintSliceBit(rMatrix [][]int, bit_entry int) {
 			}
 		}
 		// accString = strings.TrimRight(accString, "⨁ ")
-		accString = accString + strconv.Itoa(rMatrix[i][rLength-1])
+		accString = accString + strconv.Itoa(rMatrix[i][len(rMatrix[0])-1])
 		Printf("")
 		println(accString)
 	}
@@ -464,6 +473,6 @@ func prints(res []int, text string) {
 
 func printmatrix(matrix [][]int) {
 	for i := 0; i < len(matrix); i++ {
-		prints(matrix[i], "")
+		prints(matrix[i], strconv.Itoa(i))
 	}
 }

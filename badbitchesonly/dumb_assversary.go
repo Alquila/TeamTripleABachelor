@@ -112,13 +112,19 @@ func MakeGaussResultToRegisters(res []int) ([]int, []int, []int, []int) {
 
 func putConstantBackInRes(arr []int, constantIndex int) []int {
 	arr_size := len(arr)
+	newarr := make([]int, arr_size+1)
+	copy(newarr, arr)
 
 	for i := (arr_size - 1); i > constantIndex-1; i-- {
-		arr[i] = arr[i-1]
+		newarr[i] = arr[i-1]
 	}
-	arr[constantIndex] = 1
+	newarr[constantIndex] = 1
 
-	return arr
+	// for i := constantIndex - 1; i >= 0; i-- {
+	// 	newarr[i] = arr[i]
+	// }
+
+	return newarr
 }
 
 /** TRYING TO USE THE DIFFERENCE IN FRAMENUMBER TO
@@ -146,7 +152,7 @@ func DescribeNewFrameWithOldVariables(original_framenum int, current_framenum in
 
 	// gives os bitwise difference of frame numbers
 	diff := FindDifferenceOfFrameNumbers(original_framenum, current_framenum)
-	
+
 	// init the predicted new symReg
 	length := len(original_reg.ArrImposter)
 
@@ -172,17 +178,17 @@ func DescribeNewFrameWithOldVariables(original_framenum int, current_framenum in
 		}
 
 		// this is copied from cipher.Clock
-		// shift each entry one to the right 
+		// shift each entry one to the right
 		for j := len(res) - 1; j > 0; j-- {
 			res[j] = res[j-1]
 		}
 
-		// place the result of the feedback in the first entry in the 
+		// place the result of the feedback in the first entry in the
 		// resulting array
 		res[0] = newbit
 
 		if diff[i] == 1 { //dvs forskellige frame number bits
-			// the 'newbit' at index 0 gets influenced by the i'th entry 
+			// the 'newbit' at index 0 gets influenced by the i'th entry
 			// in current_framenum which differs from original_framenum
 			res[0] = res[0] ^ 1
 		}
@@ -191,9 +197,9 @@ func DescribeNewFrameWithOldVariables(original_framenum int, current_framenum in
 	// this is the register to be returned describing the current
 	// frame with varibales from previous frame
 	newReg := make([][]int, length)
-	for i := range newReg {		// for each entry in the outermost array
+	for i := range newReg { // for each entry in the outermost array
 		newReg[i] = make([]int, len(original_reg.ArrImposter[0]))
-		// copy each 'expression' 
+		// copy each 'expression'
 		copy(newReg[i], original_reg.ArrImposter[i])
 	}
 

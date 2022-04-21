@@ -51,12 +51,13 @@ func TestPrint2(t *testing.T) {
 	print("hello worlds")
 }
 
-func TestDoTheSimpleHack(t *testing.T) {
+func TestDoTheSimpleHack1(t *testing.T) {
 	// init one register, in both OG and sym version
 	symReg := InitOneSymRegister()
 	reg := InitOneRegister()
 	orgReg := make([]int, 19)
 	copy(orgReg, reg.ArrImposter)
+	Bit_entry(symReg)
 
 	// make output keystream in both
 	symKeyStream := SimpleKeyStreamSym(symReg)
@@ -66,15 +67,17 @@ func TestDoTheSimpleHack(t *testing.T) {
 	//res := solveByGaussElimination(symKeyStream, keyStream)
 	res := solveByGaussEliminationTryTwo(symKeyStream, keyStream)
 
+	r1_res := putConstantBackInRes(res, 15)
+
 	fmt.Printf("length of res is: %d\n", len(res))
 	// fmt.Printf("length of sym")
 	// fmt.Printf("Res er: %d\n", res)
 	// fmt.Printf("reg er: %d\n", orgReg)
 
 	// compare if found res is equal to init registers
-	if !reflect.DeepEqual(res, orgReg) {
+	if !reflect.DeepEqual(r1_res, orgReg) {
 		t.Fail()
-		fmt.Printf("Res er: %d\n", res)
+		fmt.Printf("r1_res er: %d\n", r1_res)
 		fmt.Printf("reg er: %d\n", orgReg)
 	}
 }
@@ -83,7 +86,9 @@ func TestDoTheSimpleHackSecondVersion(t *testing.T) {
 
 	// init one register, in both OG and sym version
 	symReg := InitOneSymRegister()
+	Bit_entry(symReg)
 	reg := InitOneRegister()
+	// orgReg is init, has entry for each variable, including the one set to 1
 	orgReg := make([]int, 19)
 	copy(orgReg, reg.ArrImposter)
 
@@ -99,6 +104,7 @@ func TestDoTheSimpleHackSecondVersion(t *testing.T) {
 
 	// use gauss to solve equations
 	//res := solveByGaussElimination(symKeyStream, keyStream)
+	// fmt.Printf("symKeyStream: \n%d\n", symKeyStream)
 	res := solveByGaussEliminationTryTwo(symKeyStream, keyStream)
 
 	fmt.Printf("længden af res er: %d\n", len(res))
@@ -106,8 +112,9 @@ func TestDoTheSimpleHackSecondVersion(t *testing.T) {
 	// compare if found res is equal to init registers
 	if !reflect.DeepEqual(res[0:19], orgReg) {
 		t.Fail()
-		fmt.Printf("Res er: %d\n", res)
+		fmt.Printf("Res er: %d\n", res[0:19])
 		fmt.Printf("reg er: %d\n", orgReg)
+		t.Log("The result is wrong :(")
 	}
 	// fmt.Printf("reg er: %d\n", orgReg)
 	// fmt.Printf("Res er: %d\n", res[0:19])
@@ -231,12 +238,9 @@ func TestDescribeNewFrameWithVariables8And15(t *testing.T) {
 	prints(res[0], "")
 	shouldBe := make([][]int, 19)
 	for i := 0; i < 19; i++ {
-		if i == 0 {
-			shouldBe[i] = []int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
-		} else if i == 1 {
-			shouldBe[i] = []int{0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
-		} else if i == 2 {
-			shouldBe[i] = []int{0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
+		if i == 0 || i == 2 || i == 4 || i == 5 || i == 6 || i == 7 {
+			shouldBe[i] = []int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
+			shouldBe[i][i] = 1
 		} else if i < 15 {
 			shouldBe[i] = make([]int, 19)
 			shouldBe[i][i] = 1
@@ -472,6 +476,9 @@ func TestMAKETEST(t *testing.T) {
 	x := solveByGaussEliminationTryTwo(A, b)
 
 	r1_solved, _, _, _ := MakeGaussResultToRegisters(x)
+
+	after_init := []int{1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1}
+	assert.Equal(t, after_init, old_r1)
 
 	if !reflect.DeepEqual(r1_solved, old_r1) {
 		t.Fail()

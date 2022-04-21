@@ -156,16 +156,17 @@ func TestGaussEliminationPart2(t *testing.T) {
 	}
 
 	if reflect.DeepEqual(res, shouldBe) {
-		t.Log("The result of the Gauss elimination was correct")
+		fmt.Print("The result of the Gauss elimination was correct")
 	}
 }
 
 func TestBackSubstitutionBinary(t *testing.T) {
-	augMatrix := make([][]int, 4)
+	augMatrix := make([][]int, 5)
 	augMatrix[0] = []int{1, 1, 1, 0, 0, 1}
 	augMatrix[1] = []int{0, 1, 0, 1, 0, 1}
 	augMatrix[2] = []int{0, 0, 1, 1, 0, 0}
 	augMatrix[3] = []int{0, 0, 0, 1, 0, 0}
+	augMatrix[4] = []int{0, 0, 0, 0, 1, 1}
 
 	//shouldBe := make([]int, 4)
 	shouldBe := []int{0, 1, 0, 0}
@@ -174,14 +175,37 @@ func TestBackSubstitutionBinary(t *testing.T) {
 	fmt.Printf("This is the result of the backSubstitution: %d \n", res)
 
 	if !reflect.DeepEqual(res, shouldBe) {
-		t.Log("The result of the backSubstitution is wrong")
+		t.Log("The result of the backSubstitution is wrong\n")
 		t.Fail()
 	}
 
 	if reflect.DeepEqual(res, shouldBe) {
-		t.Log("The result of the backSubstitution was correct")
+		fmt.Print("The result of the backSubstitution was correct\n")
+	}
+
+	augMatrix = make([][]int, 5)
+	augMatrix[0] = []int{1, 1, 1, 0, 0, 1}
+	augMatrix[1] = []int{0, 1, 0, 1, 0, 1}
+	augMatrix[2] = []int{0, 0, 1, 1, 1, 0}
+	augMatrix[3] = []int{0, 0, 0, 1, 0, 0}
+	augMatrix[4] = []int{0, 0, 0, 0, 1, 1}
+
+	//shouldBe := make([]int, 4)
+	shouldBe = []int{1, 1, 1, 0}
+
+	res = backSubstitution(augMatrix)
+	fmt.Printf("This is the second result of the backSubstitution: %d \n", res)
+
+	if !reflect.DeepEqual(res, shouldBe) {
+		t.Log("The second result of the backSubstitution is wrong \n")
+		t.Fail()
+	}
+
+	if reflect.DeepEqual(res, shouldBe) {
+		fmt.Print("The second result of the backSubstitution was correct \n")
 
 	}
+
 }
 
 func TestBackSubstitutionConstant(t *testing.T) {
@@ -209,6 +233,7 @@ func TestBackSubstitutionConstant(t *testing.T) {
 }
 
 func TestGaussElimOnSecondExample(t *testing.T) {
+	//FIXME this test is wrong as there is a 1=0 in shouldbe for bit entry
 	matrix := make([][]int, 6)
 
 	matrix[0] = []int{0, 1, 1, 1, 0, 1, 0}

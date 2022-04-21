@@ -134,3 +134,48 @@ func TestFinalXorSomething(t *testing.T) {
 	prints(res[v1+v2+v3:v2+v3+bit_entry1], "maj bits sr1 finalxor\n")
 	print(res[len(res)-1])
 }
+
+func TestSymClock(t *testing.T) {
+	reg := InitOneSymRegister()
+	// for i := 0; i < 19; i++ {
+	// 	prints(reg.ArrImposter[i], "")
+	// } <- her er der bare masser af nuller
+	Bit_entry(reg)
+	// for i := 0; i < 19; i++ {
+	// 	prints(reg.ArrImposter[i], "")
+	// } // <- her er der 1 taller diagonal
+	PrettySymPrintSliceBit(reg.ArrImposter, reg.set1)
+	SymClock(reg)
+	SymClock(reg)
+	SymClock(reg)
+	for i := 0; i < 16; i++ {
+		SymClock(reg)
+	}
+	PrettySymPrintSliceBit(reg.ArrImposter, reg.set1)
+	SymClock(reg)
+	// SymClock(reg)
+	PrettySymPrintSliceBit(reg.ArrImposter, reg.set1)
+}
+
+func TestCompliance(t *testing.T) {
+	symReg := InitOneSymRegister()
+	reg := InitOneRegister()
+	orgReg := make([]int, 19)
+	copy(orgReg, reg.ArrImposter)
+	prints(orgReg, "Original reg")
+	Bit_entry(symReg)
+
+	// make output keystream in both
+	reg1 := SimpleKeyStreamSym(symReg)
+	reg2 := SimpleKeyStream(reg)
+
+	prints(reg1[0], "reg1[0")
+	prints(reg1[1], "reg1[1]")
+	PrettySymPrintSliceBit(reg1[:20], symReg.set1)
+	prints(reg2[:20], "res")
+
+	res := solveByGaussEliminationTryTwo(reg1, reg2)
+	prints(res, "gauss")
+	prints(orgReg, "Original reg")
+
+}

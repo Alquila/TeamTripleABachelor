@@ -126,6 +126,7 @@ func makeAugmentedMatrix(A [][]int, b []int) [][]int {
 		}
 		augMa[i][amountOfVars] = b[i]
 	}
+
 	return augMa
 }
 
@@ -186,9 +187,11 @@ func backSubstitution(augMatrix [][]int) []int {
 	noCol := len(augMatrix[0])
 	// bitCol := noCol
 	res := make([]int, noUnknownVars)
-	// fmt.Printf("len of unknown variable %d \n", noUnknownVars)
+	// fmt.Printf("len of unknown variable %d \n", noUnknownVars) //18
 
-	res[noUnknownVars-1] = augMatrix[noUnknownVars-1][noUnknownVars] // either 0 or 1
+	// printmatrix(augMatrix[:21])
+	// prints(augMatrix[noUnknownVars-1], "augma[-1]")		FIXME: should XOR with the'bitentry'
+	res[noUnknownVars-1] = augMatrix[noUnknownVars-1][noUnknownVars] // either 0 or 1 //FIXME +1?
 
 	for i := noUnknownVars - 2; i >= 0; i-- { // looks at every row not all zero
 		res[i] = augMatrix[i][noCol-1]
@@ -199,10 +202,7 @@ func backSubstitution(augMatrix [][]int) []int {
 				res[i] = res[i] ^ res[j]
 			}
 		}
-	}
-
-	for i := 0; i < noUnknownVars; i++ { // xor constant bit på res
-		res[i] = res[i] ^ augMatrix[i][noUnknownVars]
+		res[i] = res[i] ^ augMatrix[i][noCol-2]
 	}
 
 	return res
