@@ -281,7 +281,7 @@ func makeKeyStream() []int {
 
 func InitOneRegister() Register {
 	reg := makeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14)
-	reg.ArrImposter = []int{1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0}
+	reg.ArrImposter = []int{1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0}
 	reg.ArrImposter[15] = 1
 	return reg
 }

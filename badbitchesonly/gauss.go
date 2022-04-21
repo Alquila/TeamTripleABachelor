@@ -183,18 +183,22 @@ func gaussEliminationPart2(augMa [][]int) [][]int {
 
 // https://www.codegrepper.com/code-examples/python/gauss+elimination+python+numpy
 func backSubstitution(augMatrix [][]int) []int {
-	noUnknownVars := len(augMatrix[0]) - 2 // n is number of unknowns
-	noCol := len(augMatrix[0])
-	// bitCol := noCol
+	len := len(augMatrix[0])
+	noUnknownVars := len - 2 // n is number of unknowns
+	lastCol := len - 1
+	bitCol := len - 2
+	fmt.Printf("len of augma: %d, noOfUnknownvars: %d, last col at: augMa[%d], bit entry at: augMa[%d] \n", len, noUnknownVars, lastCol, bitCol)
 	res := make([]int, noUnknownVars)
-	// fmt.Printf("len of unknown variable %d \n", noUnknownVars) //18
 
 	// printmatrix(augMatrix[:21])
-	// prints(augMatrix[noUnknownVars-1], "augma[-1]")		FIXME: should XOR with the'bitentry'
-	res[noUnknownVars-1] = augMatrix[noUnknownVars-1][noUnknownVars] // either 0 or 1 //FIXME +1?
+	// prints(augMatrix[noUnknownVars-1], "augma[-1]")
+	//start from the last variable = aug[x_n][k_n]
+	res[noUnknownVars-1] = augMatrix[noUnknownVars-1][lastCol] ^ augMatrix[noUnknownVars-1][bitCol] //FIXME what coll do we want
 
 	for i := noUnknownVars - 2; i >= 0; i-- { // looks at every row not all zero
-		res[i] = augMatrix[i][noCol-1]
+		res[i] = augMatrix[i][lastCol]
+		// prints(augMatrix[i], "")
+		// fmt.Printf("res[i] is %d", res[i])
 		//prints(res, "res")
 		for j := i + 1; j < noUnknownVars; j++ {
 			//fmt.Printf("i is %d, j is %d \n", i, j)
@@ -202,7 +206,8 @@ func backSubstitution(augMatrix [][]int) []int {
 				res[i] = res[i] ^ res[j]
 			}
 		}
-		res[i] = res[i] ^ augMatrix[i][noCol-2]
+		res[i] = res[i] ^ augMatrix[i][bitCol]
+		// fmt.Printf("res[i] is %d", res[i])
 	}
 
 	return res

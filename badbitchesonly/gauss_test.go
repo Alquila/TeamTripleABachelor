@@ -177,9 +177,7 @@ func TestBackSubstitutionBinary(t *testing.T) {
 	if !reflect.DeepEqual(res, shouldBe) {
 		t.Log("The result of the backSubstitution is wrong\n")
 		t.Fail()
-	}
-
-	if reflect.DeepEqual(res, shouldBe) {
+	} else {
 		fmt.Print("The result of the backSubstitution was correct\n")
 	}
 
@@ -199,11 +197,8 @@ func TestBackSubstitutionBinary(t *testing.T) {
 	if !reflect.DeepEqual(res, shouldBe) {
 		t.Log("The second result of the backSubstitution is wrong \n")
 		t.Fail()
-	}
-
-	if reflect.DeepEqual(res, shouldBe) {
+	} else {
 		fmt.Print("The second result of the backSubstitution was correct \n")
-
 	}
 
 }
@@ -216,7 +211,7 @@ func TestBackSubstitutionConstant(t *testing.T) {
 	augMatrix[3] = []int{0, 0, 0, 1, 0, 0}
 
 	//shouldBe := make([]int, 4)
-	shouldBe := []int{0, 1, 1, 0}
+	shouldBe := []int{1, 1, 1, 0}
 
 	res := backSubstitution(augMatrix)
 	fmt.Printf("This is the result of the backSubstitution: %d \n", res)
@@ -230,6 +225,26 @@ func TestBackSubstitutionConstant(t *testing.T) {
 		t.Log("The result of the backSubstitution was correct")
 
 	}
+}
+
+func TestBackSubstitution2(t *testing.T) {
+	a := make([][]int, 5)
+	a[0] = []int{1, 0, 1, 0, 1, 1}
+	a[1] = []int{0, 1, 1, 1, 0, 0}
+	a[2] = []int{0, 0, 1, 0, 1, 1}
+	a[3] = []int{0, 0, 0, 1, 1, 0}
+	a[4] = []int{0, 0, 0, 0, 1, 1}
+
+	shouldBe := []int{0, 1, 0, 1}
+
+	res := backSubstitution(a)
+	fmt.Printf("res is: %d \n", res)
+
+	if !reflect.DeepEqual(res, shouldBe) {
+		t.Log("Not correct :(")
+		t.Fail()
+	}
+
 }
 
 func TestGaussElimOnSecondExample(t *testing.T) {
