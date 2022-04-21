@@ -164,13 +164,13 @@ func TestFindDiffOfFrameNumbers(t *testing.T) {
 
 func TestDescribeNewFrameNumberWithOldVar(t *testing.T) {
 	firstSymReg := InitOneSymRegister()
-	
+
 	// prints(firstSymReg.ArrImposter[15], "række 15")
 	// prints(firstSymReg.ArrImposter[0], "række 0")
 	// prints(firstSymReg.ArrImposter[16], "række 16")
 
 	firstSymReg.ArrImposter = DescribeNewFrameWithOldVariables(0, 1, firstSymReg)
-	
+
 	Bit_entry(firstSymReg)
 	res := firstSymReg.ArrImposter
 	// fmt.Printf("res er: \n%d \n", res)
