@@ -5,8 +5,11 @@ import (
 	// "reflect"
 	// "strconv"
 	// "strings"
+	_ "encoding/binary"
 	"fmt"
+	"math"
 	"reflect"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -569,4 +572,38 @@ func TestPutConstantBackInRes(t *testing.T) {
 	assert.Equal(t, arr[5], 0)
 	arr = putConstantBackInRes(arr, 5)
 	assert.Equal(t, arr[5], 1)
+
+	makeRegisters()
+	SymSetRegisters()
+
+	res := make([]int, 0, 19)
+
+	for i := 0; i < 15; i++ {
+		res = append(res, i)
+	}
+	for i := 16; i < 19; i++ {
+		res = append(res, i)
+	}
+	prints(res, "")
+	res = putConstantBackInRes(res, 15)
+	assert.Equal(t, []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 1, 16, 17, 18}, res)
+	prints(res, "")
+}
+
+func TestMakeR4Guess(t *testing.T) {
+
+	// number := 0
+
+	// for i := 0; i < int(math.Pow(2, 16)); i++ {
+	// 	r4 := MakeR4Guess(i)
+	// 	prints(r4, strconv.Itoa(i))
+	// }
+	r4 := MakeR4Guess(0)
+	prints(r4, strconv.Itoa(0))
+	prints(putConstantBackInRes(r4, 10), "with constant")
+
+	r4 = MakeR4Guess(int(math.Pow(2, 16)) - 1)
+	prints(r4, strconv.Itoa(0))
+	prints(putConstantBackInRes(r4, 10), "with constant")
+
 }

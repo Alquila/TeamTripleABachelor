@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"reflect"
 )
 
@@ -81,18 +82,18 @@ func DoTheKnownPlainTextHack() ([]int, []int, []int) {
 func MakeGaussResultToRegisters(res []int) ([]int, []int, []int) {
 	offset := 0
 
-	r1_res := make([]int, r1.Length)
+	r1_res := make([]int, r1.Length-1)
 	reg_range := r1.Length - 1
 	copy(r1_res, res[:reg_range])
 	offset = reg_range
-	fmt.Printf("r1 range: %d. len of r1_res: %d \n", reg_range, len(r1_res))
-
-	r2_res := make([]int, r2.Length)
+	// fmt.Printf("r1 range: %d. len of r1_res: %d \n", reg_range, len(r1_res))
+	// prints(r1_res, "r1_res")
+	r2_res := make([]int, r2.Length-1)
 	reg_range += r2.Length - 1
 	copy(r2_res, res[offset:reg_range])
 	offset = reg_range
 
-	r3_res := make([]int, r3.Length)
+	r3_res := make([]int, r3.Length-1)
 	reg_range += r3.Length - 1
 	copy(r3_res, res[offset:reg_range])
 	offset = reg_range
@@ -107,14 +108,13 @@ func MakeGaussResultToRegisters(res []int) ([]int, []int, []int) {
 
 func putConstantBackInRes(arr []int, constantIndex int) []int {
 	arr_size := len(arr)
-	newarr := make([]int, arr_size)
+	newarr := make([]int, arr_size+1)
 	copy(newarr, arr)
 
-	for i := (arr_size - 1); i > constantIndex-1; i-- {
+	for i := (arr_size); i > constantIndex-1; i-- {
 		newarr[i] = arr[i-1]
 	}
 	newarr[constantIndex] = 1
-	fmt.Printf("constantindex %d \n", constantIndex)
 
 	return newarr
 }
@@ -208,4 +208,83 @@ func DescribeNewFrameWithOldVariables(original_framenum int, current_framenum in
 	newReg[original_reg.set1][len(original_reg.ArrImposter[0])-1] = 1
 
 	return newReg
+}
+
+func TryAllReg4() {
+	r4_found := make([][]int, 0) // append results to this boi
+	r4_guess := make([]int, 17)
+	r4_guess[10] = 1
+
+	guesses := int(math.Pow(2, 16))
+
+	for i := 0; i < guesses; i++ {
+		MakeR4Guess(i)
+	}
+
+	if len(r4_found) > 1 {
+		// we have multiple plausible solutions
+		// somehow try them all and se what works ?
+		// 42
+	}
+
+	// 	for i := 0; i < 2; i++ {
+	// 		r4_guess[0] = i
+	// 		for i := 0; i < 2; i++ {
+	// 			r4_guess[1] = i
+	// 			for i := 0; i < 2; i++ {
+	// 				r4_guess[2] = i
+	// 				for i := 0; i < 2; i++ {
+	// 					r4_guess[3] = i
+	// 					for i := 0; i < 2; i++ {
+	// 						r4_guess[4] = i
+	// 						for i := 0; i < 2; i++ {
+	// 							r4_guess[5] = i
+	// 							for i := 0; i < 2; i++ {
+	// 								r4_guess[6] = i
+	// 								for i := 0; i < 2; i++ {
+	// 									r4_guess[7] = i
+	// 									for i := 0; i < 2; i++ {
+	// 										r4_guess[8] = i
+	// 										for i := 0; i < 2; i++ {
+	// 											r4_guess[9] = i
+	// 											for i := 0; i < 2; i++ {
+	// 												r4_guess[11] = i
+	// 												for i := 0; i < 2; i++ {
+	// 													r4_guess[12] = i
+	// 													for i := 0; i < 2; i++ {
+	// 														r4_guess[13] = i
+	// 														for i := 0; i < 2; i++ {
+	// 															r4_guess[14] = i
+	// 															for i := 0; i < 2; i++ {
+	// 																r4_guess[15] = i
+	// 																for i := 0; i < 2; i++ {
+	// 																	r4_guess[16] = i
+	// 																	//do the gauss or whatever
+	// 																}
+	// 															}
+	// 														}
+	// 													}
+	// 												}
+	// 											}
+	// 										}
+	// 									}
+	// 								}
+	// 							}
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+
+}
+
+func MakeR4Guess(number int) []int {
+	r4_bit := make([]int, 16)
+
+	for i := 0; i < 16; i++ {
+		r4_bit[i] = (number >> i) & 1 // index 0 becomes least significant bit
+	}
+
+	return r4_bit
 }
