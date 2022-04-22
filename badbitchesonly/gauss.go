@@ -118,6 +118,7 @@ type GaussRes struct {
 	ResType string
 	TempRes [][]int
 	ColNo   []int
+	DepVar  []int
 	Solved  []int
 }
 
@@ -148,8 +149,7 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 	// Initialize GaussStruct
 	res := GaussRes{
 		ResType: "Valid",
-		TempRes: make([][]int, 0),
-		ColNo:   make([]int, 0)}
+		TempRes: make([][]int, 0)}
 
 	noUnknownVars := len(augMa[0]) - 2 // n is number of unknowns
 	noEquations := len(augMa)
@@ -172,11 +172,36 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 					s = r
 					break
 				}
+
+				// To situations:
+				//		First: nulsøjle ergo fri variabel
+				//		Second: Der er to variabler afhængige af hinanden (counter positive)
 				if r == noEquations-1 {
-					// To situations:
-					//		First: nulsøjle ergo fri variabel
-					//		Second: Der er to variabler afhængige af hinanden (counter positive)
-					// TODO: Her skal der noteres at der nu er en tom søjle og noter søjlenummeret
+					allZero := true
+					dependent := make([]int, 0)
+					emptyCol := make([]int, 0)
+					for j := 0; j < i; j++ {
+						if augMa[j][i] == 1 {
+							allZero = false
+							dependent = append(dependent, j)
+							dependent = append(dependent, i)
+							if res.ResType == "EmptyCol" {
+								res.ResType = "Both"
+							} else {
+								res.ResType = "IDK"
+							}
+						}
+					}
+					if allZero {
+						if res.ResType == "IDK" {
+							res.ResType = "Both"
+						} else {
+							res.ResType = "EmptyCol"
+						}
+						emptyCol = append(emptyCol, i)
+					}
+					res.DepVar = dependent
+					res.ColNo = emptyCol
 				}
 
 			}

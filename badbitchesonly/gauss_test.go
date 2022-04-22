@@ -142,7 +142,7 @@ func TestGaussEliminationPart2(t *testing.T) {
 	augMa[3] = []int{0, 1, 1, 1, 0, 1}
 
 	res := gaussEliminationPart2(augMa)
-	fmt.Printf("This is the result of the Gauss elimination: %d \n", res)
+	fmt.Printf("This is the result of the Gauss elimination: %d \n", res.TempRes)
 
 	shouldBe := make([][]int, 4)
 	shouldBe[0] = []int{1, 1, 1, 0, 0, 1}
@@ -193,7 +193,6 @@ func TestBackSubstitutionBinary(t *testing.T) {
 
 	res = backSubstitution(augMatrix)
 	fmt.Printf("This is the second result of the backSubstitution: %d \n", res)
-
 	if !reflect.DeepEqual(res, shouldBe) {
 		t.Log("The second result of the backSubstitution is wrong \n")
 		t.Fail()
@@ -287,8 +286,7 @@ func TestGaussEliminationPart2_2(t *testing.T) {
 	}
 }
 
-func TestGaussElimOnSecondExample(t *testing.T) {
-	//FIXME this test is wrong as there is a 1=0 in shouldbe for bit entry
+func TestGaussEliminationReturnsError(t *testing.T) {
 	matrix := make([][]int, 6)
 
 	matrix[0] = []int{0, 1, 1, 1, 0, 1, 0}
@@ -308,9 +306,10 @@ func TestGaussElimOnSecondExample(t *testing.T) {
 	shouldBe[4] = []int{0, 0, 0, 0, 1, 0, 1}
 	shouldBe[5] = []int{0, 0, 0, 0, 0, 1, 0}
 
-	fmt.Printf("This is res:	   %d \n", res)
+	fmt.Printf("This is res:	   %d \n", res.TempRes)
 	fmt.Printf("This is should be: %d \n", shouldBe)
-	if !reflect.DeepEqual(res, shouldBe) {
+	fmt.Printf("This is restype: %v \n", res.ResType)
+	if !reflect.DeepEqual(res.ResType, "Error") {
 		t.Log("The result of the gauss elimination is wrong")
 		t.Fail()
 	}
@@ -318,17 +317,75 @@ func TestGaussElimOnSecondExample(t *testing.T) {
 	// TODO: check if backsub is working here also
 	// res should be [0,1,0,1,1,0]
 	//shouldBe := make([]int, 4)
-	regShouldBe := []int{1, 0, 0, 1, 0}
+	//regShouldBe := []int{1, 0, 0, 1, 0}
 
-	resBack := backSubstitution(res.Res)
-	fmt.Printf("This is the result of the backSubstitution: %d \n", resBack)
+	//resBack := backSubstitution(res.Res)
+	//fmt.Printf("This is the result of the backSubstitution: %d \n", resBack)
 
 	// gets a row with [0,0,0,0,0,1,0] might be caught by error-gauss-stuff
-	if !reflect.DeepEqual(resBack, regShouldBe) {
+	/*if !reflect.DeepEqual(resBack, regShouldBe) {
 		t.Log("The result of the backSubstitution is wrong")
+		t.Fail()
+	}*/
+
+}
+
+func TestGaussEliminationDep(t *testing.T) {
+	matrix := make([][]int, 4)
+
+	matrix[0] = []int{1, 0, 1, 0, 0, 1}
+	matrix[1] = []int{1, 1, 1, 0, 0, 1}
+	matrix[2] = []int{1, 0, 1, 0, 0, 1}
+	matrix[3] = []int{1, 0, 1, 1, 0, 1}
+
+	res := gaussEliminationPart2(matrix)
+
+	shouldBe := make([][]int, 4)
+	shouldBe[0] = []int{1, 0, 1, 0, 0, 1}
+	shouldBe[1] = []int{0, 1, 0, 0, 0, 0}
+	shouldBe[2] = []int{0, 0, 0, 0, 0, 0}
+	shouldBe[3] = []int{0, 0, 0, 1, 0, 0}
+
+	fmt.Printf("This is res:	   %d \n", res.TempRes)
+	fmt.Printf("This is should be: %d \n", shouldBe)
+	fmt.Printf("This is restype: %v \n", res.ResType)
+	if !reflect.DeepEqual(res.ResType, "IDK") {
+		t.Log("The result of the gauss elimination is wrong")
 		t.Fail()
 	}
 
+	shouldBeDepVar := []int{0, 2}
+
+	if !reflect.DeepEqual(res.DepVar, shouldBeDepVar) {
+		t.Log("The result of the gauss elimination is wrong")
+		t.Fail()
+	}
+}
+
+func TestGaussEliminationFreeVar(t *testing.T) {
+	matrix := make([][]int, 5)
+
+	matrix[0] = []int{1, 0, 1, 0, 0, 1}
+	matrix[1] = []int{0, 1, 1, 0, 0, 1}
+	matrix[2] = []int{0, 0, 1, 0, 0, 1}
+	matrix[3] = []int{0, 0, 0, 0, 0, 0}
+	matrix[4] = []int{0, 0, 0, 0, 0, 0}
+
+	res := gaussEliminationPart2(matrix)
+
+	fmt.Printf("This is res:	   %d \n", res.TempRes)
+	fmt.Printf("This is restype: %v \n", res.ResType)
+	if !reflect.DeepEqual(res.ResType, "EmptyCol") {
+		t.Log("The result of the gauss elimination is wrong")
+		t.Fail()
+	}
+
+	shouldBeDepVar := []int{3}
+	fmt.Printf("This is shouldBeFreeVar:	   %d \n", res.ColNo)
+	if !reflect.DeepEqual(res.ColNo, shouldBeDepVar) {
+		t.Log("The result of the gauss elimination is wrong")
+		t.Fail()
+	}
 }
 
 // func TestGaussElimination(t *testing.T) {
