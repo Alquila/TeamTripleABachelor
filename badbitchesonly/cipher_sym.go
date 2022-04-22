@@ -248,7 +248,7 @@ func SymMajorityMultiply(c []int, d []int) []int {
 	res := make([]int, leng+lenc+1) //REVIEW +1 fordi der bliver lagt bit ind til sidst
 	acc := 0
 	for i := 0; i < lenc; i++ { //REVIEW: SHOULD WE DO LENC -1 HERE ? - Amalie
-		res[i] = c[i]*d[i] ^ c[lenc] ^ d[lenc] //REVIEW d[lenc] er bit plads
+		res[i] = c[i]*d[i] ^ d[i]*c[lenc] ^ c[i]*d[lenc] //REVIEW d[lenc] er bit plads
 		for j := i + 1; j < lenc; j++ {
 			res[lenc+acc] = c[i]*d[j] ^ c[j]*d[i]
 			//Printf("res[%d] = %d*%d ^ %d*%d = %d \n", lenc+acc, c[i], d[j], c[j], d[i], res[lenc+acc])

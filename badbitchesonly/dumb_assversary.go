@@ -36,7 +36,7 @@ func doTheSimpleHack() {
 	}
 }
 
-func DoTheKnownPlainTextHack() ([]int, []int, []int, []int) {
+func DoTheKnownPlainTextHack() ([]int, []int, []int) {
 	// // Init all four Registers
 	// initializeRegisters()
 	// SymInitializeRegisters()
@@ -73,18 +73,19 @@ func DoTheKnownPlainTextHack() ([]int, []int, []int, []int) {
 	// on index set_1, set it to 1 and move rest of slice one
 	// do this or each of the registers ?
 
-	r1_solved, r2_solved, r3_solved, r4_solved := MakeGaussResultToRegisters(x)
+	r1_solved, r2_solved, r3_solved := MakeGaussResultToRegisters(x)
 
-	return r1_solved, r2_solved, r3_solved, r4_solved
+	return r1_solved, r2_solved, r3_solved
 }
 
-func MakeGaussResultToRegisters(res []int) ([]int, []int, []int, []int) {
+func MakeGaussResultToRegisters(res []int) ([]int, []int, []int) {
 	offset := 0
 
 	r1_res := make([]int, r1.Length)
 	reg_range := r1.Length - 1
 	copy(r1_res, res[:reg_range])
 	offset = reg_range
+	fmt.Printf("r1 range: %d. len of r1_res: %d \n", reg_range, len(r1_res))
 
 	r2_res := make([]int, r2.Length)
 	reg_range += r2.Length - 1
@@ -96,33 +97,24 @@ func MakeGaussResultToRegisters(res []int) ([]int, []int, []int, []int) {
 	copy(r3_res, res[offset:reg_range])
 	offset = reg_range
 
-	r4_res := make([]int, r4.Length)
-	reg_range += r4.Length - 1
-	copy(r4_res, res[offset:reg_range])
-	offset = reg_range
-
 	// Move r1
-	putConstantBackInRes(r1_res, sr1.set1)
-	putConstantBackInRes(r2_res, sr2.set1)
-	putConstantBackInRes(r3_res, sr3.set1)
-	putConstantBackInRes(r4_res, 10) // hardcoded for register 4 as this has no symbolic representation
+	r1_res = putConstantBackInRes(r1_res, sr1.set1)
+	r2_res = putConstantBackInRes(r2_res, sr2.set1)
+	r3_res = putConstantBackInRes(r3_res, sr3.set1)
 
-	return r1_res, r2_res, r3_res, r4_res
+	return r1_res, r2_res, r3_res
 }
 
 func putConstantBackInRes(arr []int, constantIndex int) []int {
 	arr_size := len(arr)
-	newarr := make([]int, arr_size+1)
+	newarr := make([]int, arr_size)
 	copy(newarr, arr)
 
 	for i := (arr_size - 1); i > constantIndex-1; i-- {
 		newarr[i] = arr[i-1]
 	}
 	newarr[constantIndex] = 1
-
-	// for i := constantIndex - 1; i >= 0; i-- {
-	// 	newarr[i] = arr[i]
-	// }
+	fmt.Printf("constantindex %d \n", constantIndex)
 
 	return newarr
 }

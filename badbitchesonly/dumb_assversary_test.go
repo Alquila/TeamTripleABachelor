@@ -86,11 +86,12 @@ func TestDoTheSimpleHackSecondVersion(t *testing.T) {
 
 	// init one register, in both OG and sym version
 	symReg := InitOneSymRegister()
-	Bit_entry(symReg)
+	// Bit_entry(symReg) REVIEW: I moved this - Am
 	reg := InitOneRegister()
 	// orgReg is init, has entry for each variable, including the one set to 1
 	orgReg := make([]int, 19)
 	copy(orgReg, reg.ArrImposter)
+	Bit_entry(symReg)
 
 	assert.Equal(t, orgReg, reg.ArrImposter, "orgReg and reg are not the same")
 
@@ -107,12 +108,14 @@ func TestDoTheSimpleHackSecondVersion(t *testing.T) {
 	// fmt.Printf("symKeyStream: \n%d\n", symKeyStream)
 	res := solveByGaussEliminationTryTwo(symKeyStream, keyStream)
 
+	r1_res := putConstantBackInRes(res[0:18], 15)
+
 	fmt.Printf("længden af res er: %d\n", len(res))
 
 	// compare if found res is equal to init registers
-	if !reflect.DeepEqual(res[0:19], orgReg) {
+	if !reflect.DeepEqual(r1_res, orgReg) {
 		t.Fail()
-		fmt.Printf("Res er: %d\n", res[0:19])
+		fmt.Printf("Res er: %d\n", r1_res)
 		fmt.Printf("reg er: %d\n", orgReg)
 		t.Log("The result is wrong :(")
 	}
@@ -135,18 +138,17 @@ func TestPlaintextAttack(t *testing.T) {
 	sr3.ArrImposter = make([][]int, r3.Length)
 	sr4.ArrImposter = make([]int, r4.Length)
 
-	res1, _, _, res4 := DoTheKnownPlainTextHack()
+	res1, _, _ := DoTheKnownPlainTextHack()
 
 	//fmt.Printf("len af res er: %d\n", len(res4)) // should be 656 as this is the number of unknown vars
 
 	// offset := r1.Length + r2.Length + r3.Length
 	// compare if found res is equal to init registers
-	if !reflect.DeepEqual(res4, sr4.ArrImposter) {
+	if !reflect.DeepEqual(res1, sr1.ArrImposter) {
 		t.Fail()
-		fmt.Printf("Res er: %d\n", res4)
-		fmt.Printf("reg1 er: %d\n", res1)
+		fmt.Printf("Res1 er   : %d\n", res1)
 		// fmt.Printf("reg er: %d\n", orgReg)
-		fmt.Printf("reg er: %d\n", sr4.ArrImposter)
+		fmt.Printf("sr1.Arr er: %d\n", sr1.ArrImposter)
 	}
 	// fmt.Printf("reg er: %d\n", orgReg)
 	// fmt.Printf("Res er: %d\n", res[offset:offset+17])
@@ -474,18 +476,34 @@ func TestMAKETEST(t *testing.T) {
 	b = append(b, keyStream3...)
 
 	x := solveByGaussEliminationTryTwo(A, b)
+	// prints(x[0:20], "res 20xx")
 
-	r1_solved, _, _, _ := MakeGaussResultToRegisters(x)
+	r1_solved, r2_solved, r3_solved := MakeGaussResultToRegisters(x)
 
 	after_init := []int{1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1}
 	assert.Equal(t, after_init, old_r1)
-
+	assert.Equal(t, r1_solved[15], 1)
+	assert.Equal(t, r2_solved[16], 1)
+	assert.Equal(t, r3_solved[18], 1)
 	if !reflect.DeepEqual(r1_solved, old_r1) {
 		t.Fail()
-		fmt.Printf("Res er: %d\n", r1_solved)
-		fmt.Printf("old er: %d\n", old_r1)
+		fmt.Printf("r1_solved er: %d\n", r1_solved)
+		fmt.Printf("old_r1 er   : %d\n", old_r1)
 		// fmt.Printf("x er: %d\n", x[0:19])
 	}
+
+	if !reflect.DeepEqual(r2_solved, old_r2) {
+		fmt.Printf("r2_solved er: %d\n", r2_solved)
+		fmt.Printf("old_r2 er   : %d\n", old_r2)
+		t.Fail()
+	}
+
+	if !reflect.DeepEqual(r3_solved, old_r3) {
+		fmt.Printf("r3_solved er: %d\n", r3_solved)
+		fmt.Printf("old_r3 er   : %d\n", old_r3)
+		t.Fail()
+	}
+
 }
 
 func TestDescribeSimpleSymWithFrame(t *testing.T) {
@@ -496,4 +514,59 @@ func TestDescribeSimpleSymWithFrame(t *testing.T) {
 		sreg.ArrImposter[i][i] = 1 // each entry in the diagonal set to 1 as x_i is only dependent on x_i when initialized
 	}
 
+}
+
+func TestMakeGaussResToRegisters(t *testing.T) {
+	makeRegisters()
+	SymSetRegisters()
+
+	res := make([]int, 0, 61)
+
+	for i := 0; i < 15; i++ {
+		res = append(res, i)
+	}
+	for i := 16; i < 19; i++ {
+		res = append(res, i)
+	}
+
+	for i := 0; i < sr2.set1; i++ {
+		res = append(res, i)
+	}
+	for i := sr2.set1 + 1; i < r2.Length; i++ {
+		res = append(res, i)
+	}
+
+	for i := 0; i < sr3.set1; i++ {
+		res = append(res, i)
+	}
+	for i := sr3.set1 + 1; i < r3.Length; i++ {
+		res = append(res, i)
+	}
+
+	for i := 0; i < 10; i++ {
+		res = append(res, i)
+	}
+	for i := 11; i < r4.Length; i++ {
+		res = append(res, i)
+	}
+
+	prints(res, "")
+	r1s, r2s, r3s := MakeGaussResultToRegisters(res)
+
+	prints(r1s, "")
+	prints(r2s, "")
+	prints(r3s, "")
+
+}
+
+func TestPutConstantBackInRes(t *testing.T) {
+	arr := make([]int, 10)
+
+	assert.Equal(t, arr[2], 0)
+	arr = putConstantBackInRes(arr, 2)
+	assert.Equal(t, arr[2], 1)
+
+	assert.Equal(t, arr[5], 0)
+	arr = putConstantBackInRes(arr, 5)
+	assert.Equal(t, arr[5], 1)
 }

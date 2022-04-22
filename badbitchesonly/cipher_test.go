@@ -471,7 +471,7 @@ func Symaaa(c []string, d []string) []string {
 	for i := 0; i < lenc; i++ {
 		res[i] = c[i] + d[i] + c[lenc] + d[lenc] //REVIEW d[lenc] er bit plads
 		for j := i + 1; j < lenc; j++ {
-			res[lenc+acc] = c[i] + d[j]
+			res[lenc+acc] = c[i] + d[j] //+ c[j] + d[i]
 			//Printf("res[%d] = %d*%d ^ %d*%d = %d \n", lenc+acc, c[i], d[j], c[j], d[i], res[lenc+acc])
 			acc++
 		}
@@ -482,8 +482,8 @@ func Symaaa(c []string, d []string) []string {
 }
 
 func TestSymaa(t *testing.T) {
-	c := []string{"0", "1", "2", "3", "4", "5", "a"}
-	d := []string{"0", "1", "2", "3", "4", "5", "b"}
+	c := []string{"0", "1", "2", "3", "a"}
+	d := []string{"0", "1", "2", "3", "b"}
 
 	res := Symaaa(c, d)
 	// print(res)
