@@ -104,7 +104,7 @@ func solveByGaussEliminationTryTwo(A [][]int, b []int) GaussRes {
 	if afterGauss.ResType == "Error" {
 		return afterGauss
 	} else if afterGauss.ResType == "Valid" {
-		afterGauss.Solved = backSubstitution(afterGauss.Res)
+		afterGauss.Solved = backSubstitution(afterGauss.TempRes)
 		return afterGauss
 	}
 	// fmt.Printf("Gauss: %d\n", solution)
@@ -116,7 +116,7 @@ func solveByGaussEliminationTryTwo(A [][]int, b []int) GaussRes {
 
 type GaussRes struct {
 	ResType string
-	Res     [][]int
+	TempRes [][]int
 	ColNo   []int
 	Solved  []int
 }
@@ -148,7 +148,7 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 	// Initialize GaussStruct
 	res := GaussRes{
 		ResType: "Valid",
-		Res:     make([][]int, 0),
+		TempRes: make([][]int, 0),
 		ColNo:   make([]int, 0)}
 
 	noUnknownVars := len(augMa[0]) - 2 // n is number of unknowns
@@ -216,7 +216,7 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 		}
 	}
 
-	res.Res = augMa
+	res.TempRes = augMa
 
 	return res
 }
