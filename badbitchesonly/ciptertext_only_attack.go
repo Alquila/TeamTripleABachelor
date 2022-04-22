@@ -2,6 +2,9 @@ package main
 
 import "fmt"
 
+// CreateGMatrix
+// Creates a matrix with ones in the diagonal
+//
 func CreateGMatrix() [][]int {
 	// Make first slice: 184 columns
 	G := make([][]int, 456)
@@ -21,6 +24,9 @@ func CreateGMatrix() [][]int {
 	return G
 }
 
+// CreateKgMatrix
+// Creates a matrix that multiplied with G returns 0
+//
 func CreateKgMatrix() [][]int {
 	// Make first slice: 184 columns
 	KG := make([][]int, 272)
@@ -40,6 +46,10 @@ func CreateKgMatrix() [][]int {
 	return KG
 }
 
+// MultiplyMatrix
+// Takes a matrix A and a matrix B and multiplies them.
+// Matrix A and B must have dimensions q x n and n x p.
+//
 func MultiplyMatrix(A [][]int, B [][]int) [][]int {
 	noRows := len(A) // m
 	fmt.Printf("Number of rows in first matrix: %d\n", noRows)

@@ -503,6 +503,7 @@ func TestSymMajorityMultiply(t *testing.T) {
 
 }
 
+// TODO
 func TestSymMajorityOutput(t *testing.T) {
 	c := []int{0, 1, 0, 1}
 	d := []int{0, 1, 1, 0}
