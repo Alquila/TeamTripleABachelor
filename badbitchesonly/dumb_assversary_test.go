@@ -7,9 +7,9 @@ import (
 	// "strings"
 	_ "encoding/binary"
 	"fmt"
-	"math"
 	"reflect"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -70,9 +70,9 @@ func TestDoTheSimpleHack1(t *testing.T) {
 	//res := solveByGaussElimination(symKeyStream, keyStream)
 	res := solveByGaussEliminationTryTwo(symKeyStream, keyStream)
 
-	r1_res := putConstantBackInRes(res, 15)
+	r1_res := putConstantBackInRes(res.Solved, 15)
 
-	fmt.Printf("length of res is: %d\n", len(res))
+	fmt.Printf("length of res is: %d\n", len(res.Solved))
 	// fmt.Printf("length of sym")
 	// fmt.Printf("Res er: %d\n", res)
 	// fmt.Printf("reg er: %d\n", orgReg)
@@ -111,9 +111,9 @@ func TestDoTheSimpleHackSecondVersion(t *testing.T) {
 	// fmt.Printf("symKeyStream: \n%d\n", symKeyStream)
 	res := solveByGaussEliminationTryTwo(symKeyStream, keyStream)
 
-	r1_res := putConstantBackInRes(res[0:18], 15)
+	r1_res := putConstantBackInRes(res.Solved[0:18], 15)
 
-	fmt.Printf("længden af res er: %d\n", len(res))
+	fmt.Printf("længden af res er: %d\n", len(res.Solved))
 
 	// compare if found res is equal to init registers
 	if !reflect.DeepEqual(r1_res, orgReg) {
@@ -481,7 +481,7 @@ func TestMAKETEST(t *testing.T) {
 	x := solveByGaussEliminationTryTwo(A, b)
 	// prints(x[0:20], "res 20xx")
 
-	r1_solved, r2_solved, r3_solved := MakeGaussResultToRegisters(x)
+	r1_solved, r2_solved, r3_solved := MakeGaussResultToRegisters(x.Solved)
 
 	after_init := []int{1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1}
 	assert.Equal(t, after_init, old_r1)
@@ -552,13 +552,27 @@ func TestMakeGaussResToRegisters(t *testing.T) {
 	for i := 11; i < r4.Length; i++ {
 		res = append(res, i)
 	}
-
-	prints(res, "")
+	// prints(res, "")
 	r1s, r2s, r3s := MakeGaussResultToRegisters(res)
-
-	prints(r1s, "")
-	prints(r2s, "")
-	prints(r3s, "")
+	// prints(r1s, "")	// prints(r2s, "")	// prints(r3s, "")
+	r1shouldbe := stringToIntArray("0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 1 16 17 18")
+	r2shouldbe := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 1, 17, 18, 19, 20, 21}
+	r3shouldbe := stringToIntArray("0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 1 19 20 21 22")
+	if !reflect.DeepEqual(r2s, r2shouldbe) {
+		t.Fail()
+		fmt.Printf("r2s er   : %d\n", r2s)
+		fmt.Printf("shouldbe: %d\n", r2shouldbe)
+	}
+	if !reflect.DeepEqual(r1s, r1shouldbe) {
+		t.Fail()
+		fmt.Printf("r1s er   : %d\n", r1s)
+		fmt.Printf("shouldbe: %d\n", r1shouldbe)
+	}
+	if !reflect.DeepEqual(r3s, r3shouldbe) {
+		t.Fail()
+		fmt.Printf("r2s er   : %d\n", r3s)
+		fmt.Printf("shouldbe: %d\n", r3shouldbe)
+	}
 
 }
 
@@ -584,26 +598,35 @@ func TestPutConstantBackInRes(t *testing.T) {
 	for i := 16; i < 19; i++ {
 		res = append(res, i)
 	}
-	prints(res, "")
+	// prints(res, "")
 	res = putConstantBackInRes(res, 15)
 	assert.Equal(t, []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 1, 16, 17, 18}, res)
-	prints(res, "")
+	// prints(res, "")
 }
 
-func TestMakeR4Guess(t *testing.T) {
+// func TestMakeR4Guess(t *testing.T) { //outcommented becuase it doesn't really test anything, just to look in terminal
 
-	// number := 0
+// 	// number := 0
 
-	// for i := 0; i < int(math.Pow(2, 16)); i++ {
-	// 	r4 := MakeR4Guess(i)
-	// 	prints(r4, strconv.Itoa(i))
-	// }
-	r4 := MakeR4Guess(0)
-	prints(r4, strconv.Itoa(0))
-	prints(putConstantBackInRes(r4, 10), "with constant")
+// 	// for i := 0; i < int(math.Pow(2, 16)); i++ {
+// 	// 	r4 := MakeR4Guess(i)
+// 	// 	prints(r4, strconv.Itoa(i))
+// 	// }
+// 	r4 := MakeR4Guess(0)
+// 	prints(r4, strconv.Itoa(0))
+// 	prints(putConstantBackInRes(r4, 10), "with constant")
 
-	r4 = MakeR4Guess(int(math.Pow(2, 16)) - 1)
-	prints(r4, strconv.Itoa(0))
-	prints(putConstantBackInRes(r4, 10), "with constant")
+// 	r4 = MakeR4Guess(int(math.Pow(2, 16)) - 1)
+// 	prints(r4, strconv.Itoa(0))
+// 	prints(putConstantBackInRes(r4, 10), "with constant")
 
+// }
+
+func stringToIntArray(s string) []int {
+	strs := strings.Split(s, " ")
+	ary := make([]int, len(strs))
+	for i := range ary {
+		ary[i], _ = strconv.Atoi(strs[i])
+	}
+	return ary
 }

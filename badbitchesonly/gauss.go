@@ -98,14 +98,27 @@ func GaussPartial(a0 [][]int, b0 []int) ([]int, error) {
 	return x, nil
 }
 
-func solveByGaussEliminationTryTwo(A [][]int, b []int) []int {
+func solveByGaussEliminationTryTwo(A [][]int, b []int) GaussRes {
 	augmentMatrix := makeAugmentedMatrix(A, b)
 	afterGauss := gaussEliminationPart2(augmentMatrix)
-	solution := backSubstitution(afterGauss)
+	if afterGauss.ResType == "Error" {
+		return afterGauss
+	} else if afterGauss.ResType == "Valid" {
+		afterGauss.Solved = backSubstitution(afterGauss.Res)
+		return afterGauss
+	}
 	// fmt.Printf("Gauss: %d\n", solution)
 	// fmt.Printf("Gauss lenght: %d\n", len(solution))
 
-	return solution
+	// TODO: Handle more than one solution
+	return afterGauss
+}
+
+type GaussRes struct {
+	ResType string
+	Res     [][]int
+	ColNo   []int
+	Solved  []int
 }
 
 func makeAugmentedMatrix(A [][]int, b []int) [][]int {
@@ -131,12 +144,17 @@ func makeAugmentedMatrix(A [][]int, b []int) [][]int {
 }
 
 // https://stackoverflow.com/questions/11483925/how-to-implementing-gaussian-elimination-for-binary-equations
-func gaussEliminationPart2(augMa [][]int) [][]int {
+func gaussEliminationPart2(augMa [][]int) GaussRes {
+	// Initialize GaussStruct
+	res := GaussRes{
+		ResType: "Valid",
+		Res:     make([][]int, 0),
+		ColNo:   make([]int, 0)}
+
 	noUnknownVars := len(augMa[0]) - 2 // n is number of unknowns
 	noEquations := len(augMa)
 	fmt.Printf("len of unknown variable %d \n", noUnknownVars)
 	fmt.Printf("len of equations %d \n", noEquations)
-	// temp := make([][]float64, len(augMa))
 
 	for i := 0; i < noUnknownVars; i++ {
 		s := i
@@ -154,11 +172,17 @@ func gaussEliminationPart2(augMa [][]int) [][]int {
 					s = r
 					break
 				}
+				if r == noEquations-1 {
+					// To situations:
+					//		First: nulsøjle ergo fri variabel
+					//		Second: Der er to variabler afhængige af hinanden (counter positive)
+					// TODO: Her skal der noteres at der nu er en tom søjle og noter søjlenummeret
+				}
+
 			}
 		}
 
 		// xor alle ræker efter r, hvor der står 1
-		// TODO: tjek om der skal laves check for at vi ikke er i sidste række når vi starter forloppet
 		sliceCopy := make([]int, len(augMa[i]))
 		copy(sliceCopy, augMa[i])
 		//fmt.Printf("Row %d, should be 1 in index %d: \n %d \n", s, i, sliceCopy)
@@ -176,9 +200,25 @@ func gaussEliminationPart2(augMa [][]int) [][]int {
 			}
 		}
 
+		// Check if entry in bit column or result column is 1 and return error
+		bitIndex := noUnknownVars
+		resIndex := bitIndex + 1
+		for q := noUnknownVars; q < noEquations; q++ {
+			if augMa[q][bitIndex] == 1 {
+				if augMa[q][resIndex] != 1 {
+					res.ResType = "Error"
+					return res
+				}
+			} else if augMa[q][resIndex] == 1 {
+				res.ResType = "Error"
+				return res
+			}
+		}
 	}
 
-	return augMa
+	res.Res = augMa
+
+	return res
 }
 
 // https://www.codegrepper.com/code-examples/python/gauss+elimination+python+numpy

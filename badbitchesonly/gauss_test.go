@@ -320,7 +320,7 @@ func TestGaussElimOnSecondExample(t *testing.T) {
 	//shouldBe := make([]int, 4)
 	regShouldBe := []int{1, 0, 0, 1, 0}
 
-	resBack := backSubstitution(res)
+	resBack := backSubstitution(res.Res)
 	fmt.Printf("This is the result of the backSubstitution: %d \n", resBack)
 
 	// gets a row with [0,0,0,0,0,1,0] might be caught by error-gauss-stuff

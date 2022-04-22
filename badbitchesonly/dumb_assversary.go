@@ -30,9 +30,9 @@ func doTheSimpleHack() {
 	res := solveByGaussEliminationTryTwo(symKeyStream, keyStream)
 
 	// compare if found res is equal to init registers
-	if !reflect.DeepEqual(res, orgReg) {
+	if !reflect.DeepEqual(res.Solved, orgReg) {
 		fmt.Printf("This is fucking wrong\n")
-		fmt.Printf("Res er: %d\n", res)
+		fmt.Printf("Res er: %d\n", res.Solved)
 		fmt.Printf("reg er: %d\n", reg.ArrImposter)
 	}
 }
@@ -74,7 +74,7 @@ func DoTheKnownPlainTextHack() ([]int, []int, []int) {
 	// on index set_1, set it to 1 and move rest of slice one
 	// do this or each of the registers ?
 
-	r1_solved, r2_solved, r3_solved := MakeGaussResultToRegisters(x)
+	r1_solved, r2_solved, r3_solved := MakeGaussResultToRegisters(x.Solved)
 
 	return r1_solved, r2_solved, r3_solved
 }
@@ -223,8 +223,19 @@ func TryAllReg4() {
 
 	if len(r4_found) > 1 {
 		// we have multiple plausible solutions
-		// somehow try them all and se what works ?
-		// 42
+		// somehow try them all and se what works
+		for i := 0; i > len(r4_found); i++ {
+			r4.ArrImposter = r4_found[i]
+
+			// do makeKeyStream change r4 ???? I sure hope not :))
+			// ks := makeKeyStream()
+			messageToEncrypt := make([]int, 184)
+			messageToEncrypt[5] = 42
+			messageToEncrypt[75] = 42
+			messageToEncrypt[150] = 42
+			messageToEncrypt[129] = 42
+
+		}
 	}
 
 	// 	for i := 0; i < 2; i++ {
