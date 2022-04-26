@@ -12,6 +12,10 @@ var r2 Register
 var r3 Register
 var r4 Register
 
+//sat in makeKeyStream() after init and setIndicesToOne()
+var r4_after_init Register
+
+//Lives in cipher.go Has to be manually updated
 var current_frame_number int
 var session_key []int
 
@@ -255,6 +259,7 @@ func makeKeyStream() []int {
 
 	/* Force bits R1[15], R2[16], R3[18], R4[10] to be 1 */
 	setIndicesToOne()
+	r4_after_init = r4
 
 	/* Run A5/2 for 99 clocks and ignore output */
 	for i := 0; i < 99; i++ {

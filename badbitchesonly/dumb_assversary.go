@@ -214,6 +214,21 @@ func DescribeNewFrameWithOldVariables(original_framenum int, current_framenum in
 	return newReg
 }
 
+func MakeRealKeyStreamThreeFrames(frame int) ([]int, []int) {
+	original_frame_number = frame
+	current_frame_number = frame
+	key1 := makeKeyStream()
+	r4_real := r4_after_init.ArrImposter
+	current_frame_number++
+	key2 := makeKeyStream()
+	current_frame_number++
+	key3 := makeKeyStream()
+
+	key := append(key1, key2...)
+	key = append(key, key3...)
+	return r4_real, key
+}
+
 func TryAllReg4() {
 	/*
 		"For all possible 2^16 values of R4 solve the linearized system of equations that describe the output.
@@ -224,19 +239,57 @@ func TryAllReg4() {
 
 	r4_found := make([][]int, 0) // append results to this boi
 	r4_guess := make([]int, 17)
-	r4_guess[10] = 1
 
-	// r4_real := make([]int, 17) //make an r4 that we want to guess
-	// for i := 0; i < 17; i++ { r4_real[i] = rand.Intn(2)	}
-	// MakeRealKeyStream()		 //make the actual keystream based on this r4 value
+	makeSessionKey() //Make a random session key
+	original_frame_number = 42
+	r4_real, real_key := MakeRealKeyStreamThreeFrames(original_frame_number)
+	prints(r4_real, "r4 after first init")
+	prints(real_key[:1], "r4 after first init")
 
 	guesses := int(math.Pow(2, 16))
 
 	for i := 0; i < guesses; i++ {
+		original_frame_number = 42 //reset the framenumber for the symbolic version
+		current_frame_number = 42
+
 		r4_guess = MakeR4Guess(i) //for all possible value of r4 we need three frames
 		r4_guess = putConstantBackInRes(r4_guess, 10)
-		//init sr1 sr2 sr3
 
+		//do this such that r4 guess can be copied into sr4 in SymSetRegisters()
+		makeR4()
+		r4.ArrImposter = r4_guess
+
+		key1 := makeSymKeyStream()
+		current_frame_number++
+
+		//update r4_guess with new frame value
+		diff := FindDifferenceOfFrameNumbers(original_frame_number, current_frame_number)
+		for i := 0; i < 22; i++ {
+			Clock(r4)
+			r4.ArrImposter[0] = r4.ArrImposter[0] ^ diff[i]
+		}
+
+		key2 := makeSymKeyStream()
+		current_frame_number++
+		key3 := makeSymKeyStream()
+		current_frame_number++
+
+		key := append(key1, key2...)
+		key = append(key, key3...)
+
+		//init sr1 sr2 sr3
+		//make first sym-keystream based on r4 guess and symbol registers
+		//key1 := makeSymKeyStream()
+		//framenumber ++
+		//init sr1 sr2 sr3 again with the new framenumber
+		//init r4_guess with the new frame number
+		//key2 := makeSymKeyStream()
+		//framenumber ++
+		//init sr1 sr2 sr3 again with the new framenumber
+		//init r4_guess with the new frame number
+		//key3 := makeSymKeyStream()
+
+		// gauss: based on response add to found
 	}
 
 	if len(r4_found) > 1 {

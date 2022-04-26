@@ -102,12 +102,12 @@ func solveByGaussEliminationTryTwo(A [][]int, b []int) GaussRes {
 	augmentMatrix := makeAugmentedMatrix(A, b)
 	afterGauss := gaussEliminationPart2(augmentMatrix)
 	if afterGauss.ResType == "Error" {
-		afterGauss.Solved = backSubstitution(afterGauss.TempRes)
-		return afterGauss
-
+		// backSubstitution(afterGauss)
+		//return afterGauss
+		// Do nothing
 	} else if afterGauss.ResType == "Valid" {
-		afterGauss.Solved = backSubstitution(afterGauss.TempRes)
-		return afterGauss
+		GaussResAfterBack := backSubstitution(afterGauss)
+		return GaussResAfterBack
 	}
 	// fmt.Printf("Gauss: %d\n", solution)
 	// fmt.Printf("Gauss lenght: %d\n", len(solution))
@@ -251,26 +251,28 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 }
 
 // https://www.codegrepper.com/code-examples/python/gauss+elimination+python+numpy
-func backSubstitution(augMatrix [][]int) []int {
+func backSubstitution(gaussRes GaussRes) GaussRes {
+	augMatrix := gaussRes.TempRes
 	lenghty := len(augMatrix[0])
 	noUnknownVars := lenghty - 2 // n is number of unknowns
 	lastCol := lenghty - 1
 	bitCol := lenghty - 2
-	fmt.Printf("lenghty of augma: %d, noOfUnknownvars: %d, last col at: augMa[%d], bit entry at: augMa[%d] \n", lenghty, noUnknownVars, lastCol, bitCol)
 	res := make([]int, noUnknownVars)
+	//fmt.Printf("lenghty of augma: %d, noOfUnknownvars: %d, last col at: augMa[%d], bit entry at: augMa[%d] \n", lenghty, noUnknownVars, lastCol, bitCol)
 
 	// printmatrix(augMatrix[:21])
 	// prints(augMatrix[noUnknownVars-1], "augma[-1]")
-	//start from the last variable = aug[x_n][k_n]
-	res[noUnknownVars-1] = augMatrix[noUnknownVars-1][lastCol] ^ augMatrix[noUnknownVars-1][bitCol] //FIXME what coll do we want
+
+	// start from the last variable = aug[x_n][k_n]
+	res[noUnknownVars-1] = augMatrix[noUnknownVars-1][lastCol] ^ augMatrix[noUnknownVars-1][bitCol]
 
 	for i := noUnknownVars - 2; i >= 0; i-- { // looks at every row not all zero
 		res[i] = augMatrix[i][lastCol]
 		// prints(augMatrix[i], "")
 		// fmt.Printf("res[i] is %d", res[i])
-		//prints(res, "res")
+		// prints(res, "res")
 		for j := i + 1; j < noUnknownVars; j++ {
-			//fmt.Printf("i is %d, j is %d \n", i, j)
+			// fmt.Printf("i is %d, j is %d \n", i, j)
 			if augMatrix[i][j] == 1 {
 				res[i] = res[i] ^ res[j]
 			}
@@ -279,5 +281,7 @@ func backSubstitution(augMatrix [][]int) []int {
 		// fmt.Printf("res[i] is %d", res[i])
 	}
 
-	return res
+	gaussRes.Solved = res
+
+	return gaussRes
 }
