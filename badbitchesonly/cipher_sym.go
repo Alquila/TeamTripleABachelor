@@ -267,7 +267,6 @@ func makeSymKeyStream() [][]int {
 
 	// Clock the register 99 times
 	for i := 0; i < 99; i++ {
-
 		SymClockingUnit(sr4)
 		Clock(sr4)
 	}
