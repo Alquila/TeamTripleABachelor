@@ -119,9 +119,12 @@ func putConstantBackInRes(arr []int, constantIndex int) []int {
 	return newarr
 }
 
-/** TRYING TO USE THE DIFFERENCE IN FRAMENUMBER TO
+/**
+FindDifferenceOfFrameNumbers
+TRYING TO USE THE DIFFERENCE IN FRAMENUMBER TO
 SEE WETHER THE INDEX IN REGISTER SHOULD BE THE
-SAME OR DIFFERENT WHEN INITIALIZING IT		   */
+SAME OR DIFFERENT WHEN INITIALIZING IT
+*/
 func FindDifferenceOfFrameNumbers(f1 int, f2 int) []int {
 
 	f1_bits := MakeFrameNumberToBits(f1)
@@ -135,11 +138,12 @@ func FindDifferenceOfFrameNumbers(f1 int, f2 int) []int {
 }
 
 /**
+DescribeNewFrameWithOldVariable
 *	Describes the register after initialisation with framenumber 'f2' with the
 *	variables used in framenumber 'f1'.
 *	Also takes a register with 1 in diagonal ?
 *	The provided 'original_reg' should have the last entry as 'compliment' entry in the innermost slice
- */
+*/
 func DescribeNewFrameWithOldVariables(original_framenum int, current_framenum int, original_reg SymRegister) [][]int {
 
 	// gives os bitwise difference of frame numbers

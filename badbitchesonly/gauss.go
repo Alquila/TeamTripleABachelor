@@ -227,21 +227,21 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 			}
 		}
 
-		// Check if entry in bit column or result column is 1 and return error
-		bitIndex := noUnknownVars
-		resIndex := bitIndex + 1
-		for q := noUnknownVars; q < noEquations; q++ {
-			if augMa[q][bitIndex] == 1 {
-				if augMa[q][resIndex] != 1 {
-					res.ResType = "Error"
-					res.TempRes = augMa
-					return res
-				}
-			} else if augMa[q][resIndex] == 1 {
+	}
+
+	// Check if entry in bit column or result column is 1 and return error
+	bitIndex := noUnknownVars
+	resIndex := bitIndex + 1
+	for q := noUnknownVars; q < noEquations; q++ {
+		if augMa[q][bitIndex] == 1 {
+			if augMa[q][resIndex] != 1 {
 				res.ResType = "Error"
 				res.TempRes = augMa
 				return res
 			}
+		} else if augMa[q][resIndex] == 1 {
+			res.ResType = "Error"
+			return res
 		}
 	}
 
@@ -256,7 +256,7 @@ func backSubstitution(augMatrix [][]int) []int {
 	noUnknownVars := lenghty - 2 // n is number of unknowns
 	lastCol := lenghty - 1
 	bitCol := lenghty - 2
-	fmt.Printf("len of augma: %d, noOfUnknownvars: %d, last col at: augMa[%d], bit entry at: augMa[%d] \n", lenghty, noUnknownVars, lastCol, bitCol)
+	fmt.Printf("lenghty of augma: %d, noOfUnknownvars: %d, last col at: augMa[%d], bit entry at: augMa[%d] \n", lenghty, noUnknownVars, lastCol, bitCol)
 	res := make([]int, noUnknownVars)
 
 	// printmatrix(augMatrix[:21])

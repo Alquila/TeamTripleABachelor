@@ -260,8 +260,11 @@ func TestGaussEliminationPart2_2(t *testing.T) {
 	shouldBe1[3] = []int{0, 0, 0, 1, 1}
 
 	res := gaussEliminationPart2(a)
+	fmt.Printf("res1 is:      %d \n", res.TempRes)
+	fmt.Printf("shouldBe1 is: %d \n", shouldBe1)
+	fmt.Printf("Res Type is:  %v \n", res.ResType)
 
-	if !reflect.DeepEqual(res, shouldBe1) {
+	if !reflect.DeepEqual(res.TempRes, shouldBe1) {
 		t.Log("Not correct :(")
 		t.Fail()
 	}
@@ -279,8 +282,11 @@ func TestGaussEliminationPart2_2(t *testing.T) {
 	shouldBe2[3] = []int{0, 0, 0, 1, 1}
 
 	res2 := gaussEliminationPart2(b)
+	fmt.Printf("res2 is:      %d \n", res2.TempRes)
+	fmt.Printf("shouldBe2 is: %d \n", shouldBe2)
+	fmt.Printf("Res Type is:  %v \n", res2.ResType)
 
-	if !reflect.DeepEqual(res2, shouldBe2) {
+	if !reflect.DeepEqual(res2.TempRes, shouldBe2) {
 		t.Log("Not correct :(")
 		t.Fail()
 	}
