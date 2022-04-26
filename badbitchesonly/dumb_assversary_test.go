@@ -69,7 +69,7 @@ func TestDoTheSimpleHack1(t *testing.T) {
 	// use gauss to solve equations
 	//res := solveByGaussElimination(symKeyStream, keyStream)
 	res := solveByGaussEliminationTryTwo(symKeyStream, keyStream)
-
+	print("Type is: " + res.ResType + "\n")
 	r1_res := putConstantBackInRes(res.Solved, 15)
 
 	fmt.Printf("length of res is: %d\n", len(res.Solved))
@@ -629,4 +629,8 @@ func stringToIntArray(s string) []int {
 		ary[i], _ = strconv.Atoi(strs[i])
 	}
 	return ary
+}
+
+func TestFullAttack(t *testing.T) {
+
 }

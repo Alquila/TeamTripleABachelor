@@ -175,7 +175,7 @@ func TestCompliance(t *testing.T) {
 	prints(reg2[:20], "res")
 
 	res := solveByGaussEliminationTryTwo(reg1, reg2)
-	prints(res.Solved, "gauss") //What you want here?
+	prints(res.Solved, "gauss")
 	prints(orgReg, "Original reg")
 
 }

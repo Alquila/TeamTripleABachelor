@@ -211,14 +211,28 @@ func DescribeNewFrameWithOldVariables(original_framenum int, current_framenum in
 }
 
 func TryAllReg4() {
+	/*
+		"For all possible 2^16 values of R4 solve the linearized system of equations that describe the output.
+		Most of the 2^16-1 wrong solutions will be found by inconsistensies in Gauss Elimination.
+		The solution of the equations will suggest the internal state of R1, R2, and R3.
+		If more than one consistent internal state exists then do trial encryptions."
+	*/
+
 	r4_found := make([][]int, 0) // append results to this boi
 	r4_guess := make([]int, 17)
 	r4_guess[10] = 1
 
+	// r4_real := make([]int, 17) //make an r4 that we want to guess
+	// for i := 0; i < 17; i++ { r4_real[i] = rand.Intn(2)	}
+	// MakeRealKeyStream()		 //make the actual keystream based on this r4 value
+
 	guesses := int(math.Pow(2, 16))
 
 	for i := 0; i < guesses; i++ {
-		MakeR4Guess(i)
+		r4_guess = MakeR4Guess(i) //for all possible value of r4 we need three frames
+		r4_guess = putConstantBackInRes(r4_guess, 10)
+		//init sr1 sr2 sr3
+
 	}
 
 	if len(r4_found) > 1 {

@@ -102,7 +102,9 @@ func solveByGaussEliminationTryTwo(A [][]int, b []int) GaussRes {
 	augmentMatrix := makeAugmentedMatrix(A, b)
 	afterGauss := gaussEliminationPart2(augmentMatrix)
 	if afterGauss.ResType == "Error" {
+		afterGauss.Solved = backSubstitution(afterGauss.TempRes)
 		return afterGauss
+
 	} else if afterGauss.ResType == "Valid" {
 		afterGauss.Solved = backSubstitution(afterGauss.TempRes)
 		return afterGauss
@@ -149,7 +151,7 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 	// Initialize GaussStruct
 	res := GaussRes{
 		ResType: "Valid",
-		TempRes: make([][]int, 0)}
+		TempRes: make([][]int, len(augMa))}
 
 	noUnknownVars := len(augMa[0]) - 2 // n is number of unknowns
 	noEquations := len(augMa)
@@ -232,10 +234,12 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 			if augMa[q][bitIndex] == 1 {
 				if augMa[q][resIndex] != 1 {
 					res.ResType = "Error"
+					res.TempRes = augMa
 					return res
 				}
 			} else if augMa[q][resIndex] == 1 {
 				res.ResType = "Error"
+				res.TempRes = augMa
 				return res
 			}
 		}
@@ -248,11 +252,11 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 
 // https://www.codegrepper.com/code-examples/python/gauss+elimination+python+numpy
 func backSubstitution(augMatrix [][]int) []int {
-	len := len(augMatrix[0])
-	noUnknownVars := len - 2 // n is number of unknowns
-	lastCol := len - 1
-	bitCol := len - 2
-	fmt.Printf("len of augma: %d, noOfUnknownvars: %d, last col at: augMa[%d], bit entry at: augMa[%d] \n", len, noUnknownVars, lastCol, bitCol)
+	lenghty := len(augMatrix[0])
+	noUnknownVars := lenghty - 2 // n is number of unknowns
+	lastCol := lenghty - 1
+	bitCol := lenghty - 2
+	fmt.Printf("len of augma: %d, noOfUnknownvars: %d, last col at: augMa[%d], bit entry at: augMa[%d] \n", lenghty, noUnknownVars, lastCol, bitCol)
 	res := make([]int, noUnknownVars)
 
 	// printmatrix(augMatrix[:21])
