@@ -244,7 +244,7 @@ func TryAllReg4() {
 	original_frame_number = 42
 	r4_real, real_key := MakeRealKeyStreamThreeFrames(original_frame_number)
 	prints(r4_real, "r4 after first init")
-	prints(real_key[:1], "r4 after first init")
+	prints(real_key[:1], "keystream after first init")
 
 	guesses := int(math.Pow(2, 16))
 
@@ -262,20 +262,45 @@ func TryAllReg4() {
 		key1 := makeSymKeyStream()
 		current_frame_number++
 
-		//update r4_guess with new frame value
+		//update r4_guess with new frame value //we want it to be clean right..??
+		makeR4()
+		r4.ArrImposter = r4_guess
 		diff := FindDifferenceOfFrameNumbers(original_frame_number, current_frame_number)
 		for i := 0; i < 22; i++ {
 			Clock(r4)
 			r4.ArrImposter[0] = r4.ArrImposter[0] ^ diff[i]
-		}
+		} //someone check this
 
-		key2 := makeSymKeyStream()
+		key2 := makeSymKeyStream() //this will now copy the updated r4_guess into sr4
 		current_frame_number++
+
+		makeR4()
+		r4.ArrImposter = r4_guess
+		diff = FindDifferenceOfFrameNumbers(original_frame_number, current_frame_number)
+		for i := 0; i < 22; i++ {
+			Clock(r4)
+			r4.ArrImposter[0] = r4.ArrImposter[0] ^ diff[i]
+		} //someone check this
+
 		key3 := makeSymKeyStream()
 		current_frame_number++
 
 		key := append(key1, key2...)
 		key = append(key, key3...)
+
+		// this returns a gauss struct
+		gauss := solveByGaussEliminationTryTwo(key, real_key)
+
+		if gauss.ResType == Error {
+			continue
+		} else if gauss.ResType == Multi {
+			for i := 0; i < len(gauss.Multi); i++ {
+				r4_found = append(r4_found, gauss.Multi[i])
+			}
+		} else if gauss.ResType == Valid {
+			// handle normally
+			r4_found = append(r4_found, gauss.Solved)
+		}
 
 		//init sr1 sr2 sr3
 		//make first sym-keystream based on r4 guess and symbol registers
@@ -306,6 +331,17 @@ func TryAllReg4() {
 			messageToEncrypt[150] = 42
 			messageToEncrypt[129] = 42
 
+		}
+	}
+
+	fmt.Printf("This is original r4: %d\n", r4_real)
+	for i := range r4_found {
+		fmt.Printf("This is %d'th found r4:    %d\n", i, r4_found)
+	}
+	fmt.Println("Have we found the right r4?")
+	for i := range r4_found {
+		if reflect.DeepEqual(r4_found[i], r4_real) {
+			fmt.Printf("Fuck yes we found it gutterne")
 		}
 	}
 
