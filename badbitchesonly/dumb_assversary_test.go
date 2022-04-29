@@ -636,5 +636,10 @@ func TestFullAttack(t *testing.T) {
 }
 
 func TestVerifyKeyStream(t *testing.T) {
+	key := MakeLongIntSlice()
+	// prints(key, "key")
+	// fmt.Printf("len of key: %d \n", len(key))
+
+	VerifyKeyStream(key)
 
 }

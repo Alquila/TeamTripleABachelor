@@ -490,6 +490,16 @@ func TestSymaa(t *testing.T) {
 	Printf("lenght: %d \n", len(res))
 }
 
+func TestSymaa19(t *testing.T) {
+	c := []string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "19", "20", "21", "22", "a"}
+	d := []string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "19", "20", "21", "22", "b"}
+	res := Symaaa(c, d)
+	// print(res)
+	Printf("%+v \n", res)
+	Printf("lenght: %d \n", len(res))
+
+}
+
 func TestSymMajorityMultiply(t *testing.T) {
 
 	c := []int{0, 1, 0, 1, 1}

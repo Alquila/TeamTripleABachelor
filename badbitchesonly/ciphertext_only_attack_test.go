@@ -68,3 +68,19 @@ func TestMultiplyMatrix2(t *testing.T) {
 	}
 
 }
+
+func TestCiphertextOnlyAttack(t *testing.T) {
+
+	// create message to encrypt
+	// msg := createRandomMessage(184)
+
+	// use error-correction on message
+	// G := CreateGMatrix()
+
+	// make keystream for 8(?) frames
+
+	// krypter error-corrected message med keystream
+
+	// kør 'doTheAttack'(?) fra dumb_assversry
+
+}

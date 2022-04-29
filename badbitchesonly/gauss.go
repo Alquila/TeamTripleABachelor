@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 )
 
 type testCase struct {
@@ -119,7 +120,7 @@ func solveByGaussEliminationTryTwo(A [][]int, b []int) GaussRes {
 // type ResType string
 
 type GaussRes struct {
-	ResType string //Can be "Error" , "EmptyCol", "Idk", "Both", "Multi"
+	ResType string //Can be "Error" , "EmptyCol", "Multi"
 	TempRes [][]int
 	ColNo   []int   //index of empty columns
 	Solved  []int   //After backsubstitution
@@ -130,7 +131,6 @@ const (
 	Request  string = ""
 	Error    string = "Error"
 	EmptyCol string = "EmptyCol"
-	Both     string = "Both"
 	Multi    string = "Multi"
 	Valid    string = "Valid"
 )
@@ -293,7 +293,7 @@ func backSubstitution(gaussRes GaussRes) GaussRes {
 	res[noUnknownVars-1] = augMatrix[noUnknownVars-1][lastCol] ^ augMatrix[noUnknownVars-1][bitCol]
 
 	for i := noUnknownVars - 2; i >= 0; i-- { // looks at every row not all zero
-		if gaussRes.ResType == EmptyCol || gaussRes.ResType == Both {
+		if gaussRes.ResType == EmptyCol {
 			if contains(gaussRes.ColNo, i) {
 				continue //if we are in an free collum then we skip iteration
 				//i.e. we need to have a res with both 0 and 1 for this variable
@@ -313,9 +313,32 @@ func backSubstitution(gaussRes GaussRes) GaussRes {
 		// fmt.Printf("res[i] is %d", res[i])
 	}
 
-	// TODO Make helping function to handle empty columns
 	gaussRes.Solved = res
+	if gaussRes.ResType == EmptyCol {
+		// TODO Make helping function to handle empty columns
+		gaussRes = HandleEmptyCol(gaussRes)
+	}
 
+	return gaussRes
+}
+
+func HandleEmptyCol(gauss GaussRes) GaussRes {
+	gaussRes := gauss
+	gaussRes.Multi = make([][]int, 0)
+	noEmptyCol := len(gauss.ColNo)
+	if noEmptyCol > 1 {
+		// do something
+	} else {
+		index := gauss.ColNo[0]
+		for i := 0; i < 2; i++ {
+			res := make([]int, len(gauss.Solved))
+			copy(res, gauss.Solved)
+			res[index] = i
+			gaussRes.Multi = append(gaussRes.Multi, res)
+		}
+	}
+
+	gaussRes.ResType = Multi
 	return gaussRes
 }
 
@@ -330,4 +353,14 @@ func contains(s []int, e int) bool {
 		}
 	}
 	return false
+}
+
+func MakeBitSlice(number int) {
+	bit := make([]int, number)
+	number2 := int(math.Pow(2, float64(number)))
+	for j := 0; j < number; j++ {
+		for i := 0; i < number2; i++ {
+			bit[i] = (j >> i) & 1 // index 0 becomes least significant bit
+		}
+	}
 }

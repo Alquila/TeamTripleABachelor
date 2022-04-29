@@ -313,9 +313,9 @@ func TestGaussEliminationFreeVar_2(t *testing.T) {
 		t.Fail()
 	}
 
-	shouldBeDepVar := []int{2}
+	shouldBeFreeVar := []int{2}
 	fmt.Printf("This is shouldBeFreeVar:	   %d \n", res.ColNo)
-	if !reflect.DeepEqual(res.ColNo, shouldBeDepVar) {
+	if !reflect.DeepEqual(res.ColNo, shouldBeFreeVar) {
 		t.Log("The correct FreeVar is not sat")
 		t.Fail()
 	}
@@ -346,6 +346,43 @@ func TestGaussEliminationFreeVar_3(t *testing.T) {
 
 	if !reflect.DeepEqual(res.ResType, Error) {
 		t.Log("The ResType does not match")
+		t.Fail()
+	}
+}
+
+func TestHandleEmptyCol(t *testing.T) {
+	matrix := make([][]int, 6)
+
+	matrix[0] = []int{1, 0, 0, 0, 0, 0, 0, 1}
+	matrix[1] = []int{0, 1, 0, 0, 0, 0, 0, 0}
+	matrix[2] = []int{0, 0, 1, 0, 0, 0, 0, 1}
+	matrix[3] = []int{0, 0, 0, 0, 0, 0, 0, 0}
+	matrix[4] = []int{0, 0, 0, 0, 1, 0, 0, 0}
+	matrix[5] = []int{0, 0, 0, 0, 0, 1, 0, 1}
+
+	res := gaussEliminationPart2(matrix)
+	res = backSubstitution(res)
+
+	fmt.Printf("This is restype: %v \n", res.ResType)
+	if !reflect.DeepEqual(res.ResType, Multi) {
+		t.Log("The ResType does not match")
+		t.Fail()
+	}
+
+	shouldBe := make([][]int, 2)
+	shouldBe[0] = []int{1, 0, 1, 0, 0, 1}
+	shouldBe[1] = []int{1, 0, 1, 1, 0, 1}
+
+	fmt.Printf("This is Multi[0]:	   %d \n", res.Multi[0])
+	fmt.Printf("This is Multi[1]:	   %d \n", res.Multi[1])
+
+	if !reflect.DeepEqual(res.Multi[0], shouldBe[0]) {
+		t.Log("Should be [0] does not match the result")
+		t.Fail()
+	}
+
+	if !reflect.DeepEqual(res.Multi[1], shouldBe[1]) {
+		t.Log("Should be [1] does not match the result")
 		t.Fail()
 	}
 }

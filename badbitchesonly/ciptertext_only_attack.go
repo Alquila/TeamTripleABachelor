@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math/rand"
+)
 
 // CreateGMatrix
 // Creates a matrix with ones in the diagonal
@@ -85,4 +88,13 @@ func MultiplyMatrix(A [][]int, B [][]int) [][]int {
 	}
 
 	return res
+}
+
+func createRandomMessage(length int) []int {
+	msg := make([]int, length)
+	for i := 0; i < length; i++ {
+		msg[i] = rand.Intn(2) // returns int in [0,2)
+	}
+
+	return msg
 }

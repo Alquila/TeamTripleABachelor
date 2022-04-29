@@ -408,7 +408,33 @@ func MakeR4Guess(number int) []int {
 }
 
 //VerifyKeyStream compares the found vars with the products that involves them and check that they match up.
-func VerifyKeyStream(key []int) {
+func VerifyKeyStream(key []int) bool {
 	//[vars1 | vars2 | vars3 | prod1 | prod2 | prod3 | b ]
+	vars1_len := r1.Length - 1
+	vars2_len := r2.Length - 1
+	vars3_len := r3.Length - 1
+
+	prod1_len := vars1_len * (vars1_len - 1) / 2
+	prod2_len := vars2_len * (vars2_len - 1) / 2
+	prod3_len := vars3_len * (vars3_len - 1) / 2
+	fmt.Printf("vars1_len : %d  vars2_len %d, vars3_len: %d, prod1_len: %d, prod2: %d, prod3: %d \n", vars1_len, vars2_len, vars3_len, prod1_len, prod2_len, prod3_len)
+	prod1 := key[vars1_len+vars2_len+vars3_len : vars1_len+vars2_len+vars3_len+prod1_len]
+	prod2 := key[vars1_len+vars2_len+vars3_len+prod1_len : vars1_len+vars2_len+vars3_len+prod1_len+prod2_len]
+	prod3 := key[vars1_len+vars2_len+vars3_len+prod1_len+prod2_len : vars1_len+vars2_len+vars3_len+prod1_len+prod2_len+prod3_len]
+	prints(prod1, "prod1")
+	print("\n")
+	prints(prod2, "prod2")
+	print("\n")
+	prints(prod3, "prod3")
+
+	// acc := 0
+	for i := 0; i < vars1_len; i++ {
+
+		for j := i; j < vars1_len; j++ {
+			// aaa := prod1[j+i]
+		}
+	}
+
+	return true
 
 }
