@@ -464,15 +464,14 @@ func mean(a []int) float64 {
 }
 
 func Symaaa(c []string, d []string) []string {
-	lenc := len(c) - 1 //REVIEW -1 fordi vi ikke vil loop over den konkrete bit til sidst
+	lenc := len(c) - 1
 	leng := lenc * (lenc - 1) / 2
-	res := make([]string, leng+lenc+1) //REVIEW +1 fordi der bliver lagt bit ind til sidst
+	res := make([]string, leng+lenc+1)
 	acc := 0
 	for i := 0; i < lenc; i++ {
-		res[i] = c[i] + d[i] + c[lenc] + d[lenc] //REVIEW d[lenc] er bit plads
+		res[i] = c[i] + d[i] + c[lenc] + d[lenc]
 		for j := i + 1; j < lenc; j++ {
 			res[lenc+acc] = c[i] + d[j] //+ c[j] + d[i]
-			//Printf("res[%d] = %d*%d ^ %d*%d = %d \n", lenc+acc, c[i], d[j], c[j], d[i], res[lenc+acc])
 			acc++
 		}
 	}

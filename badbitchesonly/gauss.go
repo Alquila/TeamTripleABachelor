@@ -116,25 +116,23 @@ func solveByGaussEliminationTryTwo(A [][]int, b []int) GaussRes {
 	return afterGauss
 }
 
-type ResType string
+// type ResType string
 
 type GaussRes struct {
-	ResType ResType //Can be "Error" , "EmptyCol", "Idk", "Both", "Multi"
+	ResType string //Can be "Error" , "EmptyCol", "Idk", "Both", "Multi"
 	TempRes [][]int
 	ColNo   []int   //index of empty columns
-	DepVar  []int   //index of two dependent variables
 	Solved  []int   //After backsubstitution
 	Multi   [][]int //Multiple solutions
 }
 
 const (
-	Request ResType = ""
-	Error
-	EmptyCol
-	IDK
-	Both
-	Multi
-	Valid
+	Request  string = ""
+	Error    string = "Error"
+	EmptyCol string = "EmptyCol"
+	Both     string = "Both"
+	Multi    string = "Multi"
+	Valid    string = "Valid"
 )
 
 func makeAugmentedMatrix(A [][]int, b []int) [][]int {
@@ -166,11 +164,11 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 		ResType: Valid,
 		TempRes: make([][]int, len(augMa)),
 		ColNo:   make([]int, 0),
-		DepVar:  make([]int, 0),
 	}
 
 	noUnknownVars := len(augMa[0]) - 2 // n is number of unknowns
 	noEquations := len(augMa)
+	FreeVar := make([]int, 0)
 	fmt.Printf("len of unknown variable %d \n", noUnknownVars)
 	fmt.Printf("len of equations %d \n", noEquations)
 
@@ -194,34 +192,20 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 				// To situations:
 				//		First: nulsøjle ergo fri variabel
 				//		Second: Der er to variabler afhængige af hinanden (counter positive)
+				FreeVar = append(FreeVar, i)
 				if r == noEquations-1 {
 					allZero := true
-					dependent := make([]int, 0)
-					emptyCol := make([]int, 0)
 					for j := 0; j < i; j++ {
 						if augMa[j][i] == 1 {
 							allZero = false
-							dependent = append(dependent, j)
-							dependent = append(dependent, i)
-							if res.ResType == EmptyCol {
-								res.ResType = Both
-							} else {
-								res.ResType = IDK
-							}
+							res.ResType = Error
 						}
 					}
 					if allZero {
-						if res.ResType == IDK {
-							res.ResType = Both
-						} else {
-							res.ResType = EmptyCol
-						}
-						emptyCol = append(emptyCol, i)
+						res.ResType = EmptyCol
+						res.ColNo = append(res.ColNo, i)
 					}
-					res.DepVar = append(res.DepVar, dependent...)
-					res.ColNo = append(res.ColNo, emptyCol...)
 				}
-
 			}
 		}
 
@@ -242,6 +226,18 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 				augMa[p] = augAfterxor
 			}
 		}
+		if len(FreeVar) > 0 {
+			for _, index := range FreeVar {
+				if augMa[index][i] == 1 {
+					augAfterxor := make([]int, len(augMa[index]))
+					for j := 0; j < noCol; j++ {
+						// fmt.Printf("j is %d, ", j)
+						augAfterxor[j] = augMa[index][j] ^ sliceCopy[j]
+					}
+					augMa[index] = augAfterxor
+				}
+			}
+		}
 
 	}
 
@@ -258,6 +254,20 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 		} else if augMa[q][resIndex] == 1 {
 			res.ResType = Error
 			return res
+		}
+	}
+	if len(FreeVar) > 0 {
+		for _, index := range FreeVar {
+			if augMa[index][bitIndex] == 1 {
+				if augMa[index][resIndex] != 1 {
+					res.ResType = Error
+					res.TempRes = augMa
+					return res
+				}
+			} else if augMa[index][resIndex] == 1 {
+				res.ResType = Error
+				return res
+			}
 		}
 	}
 
@@ -289,12 +299,6 @@ func backSubstitution(gaussRes GaussRes) GaussRes {
 				//i.e. we need to have a res with both 0 and 1 for this variable
 			}
 		}
-		if gaussRes.ResType == IDK || gaussRes.ResType == Both {
-			if contains(gaussRes.DepVar, i) { //dependent vars
-				// TODO make helping function
-				continue
-			}
-		}
 		res[i] = augMatrix[i][lastCol]
 		// prints(augMatrix[i], "")
 		// fmt.Printf("res[i] is %d", res[i])
@@ -316,6 +320,9 @@ func backSubstitution(gaussRes GaussRes) GaussRes {
 }
 
 // Taken from https://stackoverflow.com/questions/10485743/contains-method-for-a-slice
+/** contains
+Takes a list an an integer returns bool
+*/
 func contains(s []int, e int) bool {
 	for _, a := range s {
 		if a == e {

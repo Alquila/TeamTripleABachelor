@@ -406,3 +406,9 @@ func MakeR4Guess(number int) []int {
 
 	return r4_bit
 }
+
+//VerifyKeyStream compares the found vars with the products that involves them and check that they match up.
+func VerifyKeyStream(key []int) {
+	//[vars1 | vars2 | vars3 | prod1 | prod2 | prod3 | b ]
+
+}

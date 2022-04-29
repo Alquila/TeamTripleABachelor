@@ -237,7 +237,7 @@ func TestGaussEliminationReturnsError(t *testing.T) {
 	fmt.Printf("This is res:	   %d \n", res.TempRes)
 	fmt.Printf("This is should be: %d \n", shouldBe)
 	fmt.Printf("This is restype: %v \n", res.ResType)
-	if !reflect.DeepEqual(res.ResType, "Error") {
+	if !reflect.DeepEqual(res.ResType, Error) {
 		t.Log("The result of the gauss elimination is wrong")
 		t.Fail()
 	}
@@ -263,14 +263,7 @@ func TestGaussEliminationDep(t *testing.T) {
 	fmt.Printf("This is res:	   %d \n", res.TempRes)
 	fmt.Printf("This is should be: %d \n", shouldBe)
 	fmt.Printf("This is restype: %v \n", res.ResType)
-	if !reflect.DeepEqual(res.ResType, "IDK") {
-		t.Log("The result of the gauss elimination is wrong")
-		t.Fail()
-	}
-
-	shouldBeDepVar := []int{0, 2}
-
-	if !reflect.DeepEqual(res.DepVar, shouldBeDepVar) {
+	if !reflect.DeepEqual(res.ResType, Error) {
 		t.Log("The result of the gauss elimination is wrong")
 		t.Fail()
 	}
@@ -289,8 +282,8 @@ func TestGaussEliminationFreeVar(t *testing.T) {
 
 	fmt.Printf("This is res:	   %d \n", res.TempRes)
 	fmt.Printf("This is restype: %v \n", res.ResType)
-	if !reflect.DeepEqual(res.ResType, "EmptyCol") {
-		t.Log("The result of the gauss elimination is wrong")
+	if !reflect.DeepEqual(res.ResType, EmptyCol) {
+		t.Log("The result of the gauss elimination is wrong 1")
 		t.Fail()
 	}
 
@@ -298,6 +291,61 @@ func TestGaussEliminationFreeVar(t *testing.T) {
 	fmt.Printf("This is shouldBeFreeVar:	   %d \n", res.ColNo)
 	if !reflect.DeepEqual(res.ColNo, shouldBeDepVar) {
 		t.Log("The result of the gauss elimination is wrong")
+		t.Fail()
+	}
+}
+
+func TestGaussEliminationFreeVar_2(t *testing.T) {
+	matrix := make([][]int, 5)
+
+	matrix[0] = []int{1, 0, 0, 0, 0, 1}
+	matrix[1] = []int{0, 1, 0, 0, 0, 1}
+	matrix[2] = []int{0, 0, 0, 1, 0, 1}
+	matrix[3] = []int{0, 0, 0, 1, 0, 1}
+	matrix[4] = []int{0, 1, 0, 1, 0, 0}
+
+	res := gaussEliminationPart2(matrix)
+
+	fmt.Printf("This is res:	   %d \n", res.TempRes)
+	fmt.Printf("This is restype: %v \n", res.ResType)
+	if !reflect.DeepEqual(res.ResType, "EmptyCol") {
+		t.Log("The ResType does not match")
+		t.Fail()
+	}
+
+	shouldBeDepVar := []int{2}
+	fmt.Printf("This is shouldBeFreeVar:	   %d \n", res.ColNo)
+	if !reflect.DeepEqual(res.ColNo, shouldBeDepVar) {
+		t.Log("The correct FreeVar is not sat")
+		t.Fail()
+	}
+
+	shouldBe := make([][]int, 5)
+	shouldBe[0] = []int{1, 0, 0, 0, 0, 1}
+	shouldBe[1] = []int{0, 1, 0, 0, 0, 1}
+	shouldBe[2] = []int{0, 0, 0, 0, 0, 0}
+	shouldBe[3] = []int{0, 0, 0, 1, 0, 1}
+	shouldBe[4] = []int{0, 0, 0, 0, 0, 0}
+
+	if !reflect.DeepEqual(res.TempRes, shouldBe) {
+		t.Log("Should be does not match the result")
+		t.Fail()
+	}
+}
+
+func TestGaussEliminationFreeVar_3(t *testing.T) {
+	matrix := make([][]int, 5)
+
+	matrix[0] = []int{1, 0, 0, 0, 0, 1}
+	matrix[1] = []int{0, 1, 0, 0, 0, 1}
+	matrix[2] = []int{0, 0, 0, 1, 0, 1}
+	matrix[3] = []int{0, 0, 0, 1, 0, 0}
+	matrix[4] = []int{0, 1, 0, 1, 0, 0}
+
+	res := gaussEliminationPart2(matrix)
+
+	if !reflect.DeepEqual(res.ResType, Error) {
+		t.Log("The ResType does not match")
 		t.Fail()
 	}
 }

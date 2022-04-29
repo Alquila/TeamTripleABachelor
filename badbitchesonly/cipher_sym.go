@@ -180,7 +180,7 @@ func SymMakeFinalXOR(r1 SymRegister, r2 SymRegister, r3 SymRegister) []int {
 	final_bit := maj_r1[bit_entry1] ^ maj_r2[bit_entry2] ^ maj_r3[bit_entry3]
 
 	start = append(start, []int{final_bit}...)
-	//now [vars1 | vars2 | vars3 | prod1 | prod2 prod3 | b ]
+	//now [vars1 | vars2 | vars3 | prod1 | prod2 | prod3 | b ]
 
 	return start
 }

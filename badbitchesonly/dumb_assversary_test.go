@@ -634,3 +634,7 @@ func stringToIntArray(s string) []int {
 func TestFullAttack(t *testing.T) {
 
 }
+
+func TestVerifyKeyStream(t *testing.T) {
+
+}
