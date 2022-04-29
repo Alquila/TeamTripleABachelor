@@ -387,6 +387,128 @@ func TestHandleEmptyCol(t *testing.T) {
 	}
 }
 
+func TestHandleEmptyCol_2(t *testing.T) {
+	matrix := make([][]int, 6)
+
+	matrix[0] = []int{1, 0, 0, 0, 0, 0, 0, 1}
+	matrix[1] = []int{0, 0, 0, 0, 0, 0, 0, 0}
+	matrix[2] = []int{0, 0, 1, 0, 0, 0, 0, 1}
+	matrix[3] = []int{0, 0, 0, 0, 0, 0, 0, 0}
+	matrix[4] = []int{0, 0, 0, 0, 1, 0, 0, 0}
+	matrix[5] = []int{0, 0, 0, 0, 0, 1, 0, 1}
+
+	res := gaussEliminationPart2(matrix)
+	res = backSubstitution(res)
+
+	fmt.Printf("This is restype: %v \n", res.ResType)
+	if !reflect.DeepEqual(res.ResType, Multi) {
+		t.Log("The ResType does not match")
+		t.Fail()
+	}
+
+	shouldBe := make([][]int, 4)
+	shouldBe[0] = []int{1, 0, 1, 0, 0, 1}
+	shouldBe[1] = []int{1, 1, 1, 0, 0, 1}
+	shouldBe[2] = []int{1, 0, 1, 1, 0, 1}
+	shouldBe[3] = []int{1, 1, 1, 1, 0, 1}
+
+	if !reflect.DeepEqual(res.Multi[0], shouldBe[0]) {
+		t.Log("Should be [0] does not match the result")
+		t.Fail()
+	}
+
+	if !reflect.DeepEqual(res.Multi[1], shouldBe[1]) {
+		t.Log("Should be [1] does not match the result")
+		t.Fail()
+	}
+
+	if !reflect.DeepEqual(res.Multi[2], shouldBe[2]) {
+		t.Log("Should be [2] does not match the result")
+		t.Fail()
+	}
+
+	if !reflect.DeepEqual(res.Multi[3], shouldBe[3]) {
+		t.Log("Should be [3] does not match the result")
+		t.Fail()
+	}
+}
+
+func TestHandleEmptyCol_3(t *testing.T) {
+	matrix := make([][]int, 6)
+
+	matrix[0] = []int{1, 0, 0, 0, 0, 0, 0, 1}
+	matrix[1] = []int{0, 0, 0, 0, 0, 0, 0, 0}
+	matrix[2] = []int{0, 0, 1, 0, 0, 0, 0, 1}
+	matrix[3] = []int{0, 0, 0, 0, 0, 0, 0, 0}
+	matrix[4] = []int{0, 0, 0, 0, 0, 0, 0, 0}
+	matrix[5] = []int{0, 0, 0, 0, 0, 1, 0, 1}
+
+	res := gaussEliminationPart2(matrix)
+	res = backSubstitution(res)
+
+	fmt.Printf("This is restype: %v \n", res.ResType)
+	if !reflect.DeepEqual(res.ResType, Multi) {
+		t.Log("The ResType does not match")
+		t.Fail()
+	}
+
+	shouldBe := make([][]int, 8)
+	shouldBe[0] = []int{1, 0, 1, 0, 0, 1}
+	shouldBe[1] = []int{1, 1, 1, 0, 0, 1}
+	shouldBe[2] = []int{1, 0, 1, 1, 0, 1}
+	shouldBe[3] = []int{1, 1, 1, 1, 0, 1}
+	shouldBe[4] = []int{1, 0, 1, 0, 1, 1}
+	shouldBe[5] = []int{1, 1, 1, 0, 1, 1}
+	shouldBe[6] = []int{1, 0, 1, 1, 1, 1}
+	shouldBe[7] = []int{1, 1, 1, 1, 1, 1}
+
+	if !reflect.DeepEqual(res.Multi[0], shouldBe[0]) {
+		t.Log("Should be [0] does not match the result")
+		t.Fail()
+	}
+
+	if !reflect.DeepEqual(res.Multi[1], shouldBe[1]) {
+		t.Log("Should be [1] does not match the result")
+		t.Fail()
+	}
+
+	if !reflect.DeepEqual(res.Multi[2], shouldBe[2]) {
+		t.Log("Should be [2] does not match the result")
+		t.Fail()
+	}
+
+	if !reflect.DeepEqual(res.Multi[3], shouldBe[3]) {
+		t.Log("Should be [3] does not match the result")
+		t.Fail()
+	}
+	if !reflect.DeepEqual(res.Multi[4], shouldBe[4]) {
+		t.Log("Should be [0] does not match the result")
+		t.Fail()
+	}
+
+	if !reflect.DeepEqual(res.Multi[5], shouldBe[5]) {
+		t.Log("Should be [1] does not match the result")
+		t.Fail()
+	}
+
+	if !reflect.DeepEqual(res.Multi[6], shouldBe[6]) {
+		t.Log("Should be [2] does not match the result")
+		t.Fail()
+	}
+
+	if !reflect.DeepEqual(res.Multi[7], shouldBe[7]) {
+		t.Log("Should be [3] does not match the result")
+		t.Fail()
+	}
+}
+
+func TestHandleFreeVar(t *testing.T) {
+	bit := MakeBitSlice(3)
+	for i, _ := range bit {
+		fmt.Printf("Bit string: %d \n", bit[i])
+	}
+}
+
 // OLD Tests
 
 // func TestBackSubstitution(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 	_ "reflect"
 	"testing"
 
-	_ "github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCreate_G_matrix(t *testing.T) {
@@ -72,15 +72,67 @@ func TestMultiplyMatrix2(t *testing.T) {
 func TestCiphertextOnlyAttack(t *testing.T) {
 
 	// create message to encrypt
-	// msg := createRandomMessage(184)
+	msg := createRandomMessage(184)
+
+	// make the message longer, such that we can multiply it with large matrix
+	longer_msg := make([][]int, 456)
+	for i := 0; i < 184; i++ {
+		longer_msg[i][0] = msg[i]
+	}
 
 	// use error-correction on message
-	// G := CreateGMatrix()
+	G := CreateGMatrix()
+	error_corrected_msg := MultiplyMatrix(G, longer_msg)
 
-	// make keystream for 8(?) frames
+	KG := CreateKgMatrix()
+
+	probertyOfInverseTransformation := MultiplyMatrix(KG, error_corrected_msg)
+	assert.Equal(t, probertyOfInverseTransformation, 0)
+
+	/**
+	Does the same as TestMAKETEST from dumb_assversary
+	*/
+
+	// init r1, r2, r3, r4
+	// makeRegisters() REVIEW: happens in makeKeyStream
+	// set frame number
+	current_frame_number, original_frame_number = 42, 42
+
+	// session_key is now all 0's
+	session_key = make([]int, 64)
+
+	// init registers with sesion key and frame number
+	// initializeRegisters() REVIEW: happens in makeKeyStream
+	// setIndicesToOne() REVIEW: happens in makeKeyStream
+
+	// init sr1, sr2, sr3
+	SymInitializeRegisters()
+
+	keyStream := make([]int, 0)      // append to this, assert that the length is rigth
+	symKeyStream := make([][]int, 0) // same here <3
+
+	for i := 0; i < 2; i++ {
+		newKeyStream := makeKeyStream()
+		newSymKeyStream := makeSymKeyStream()
+		keyStream = append(keyStream, newKeyStream...)
+		symKeyStream = append(symKeyStream, newSymKeyStream...)
+		current_frame_number++
+	}
+
+	/* Does new stuff not included in TestMAKETEST */
 
 	// krypter error-corrected message med keystream
 
+	// cipher text
+	c := make([]int, 456)
+	for i := 0; i < 456; i++ {
+		c[i] = error_corrected_msg[i][i] ^ keyStream[i]
+	}
+
 	// kør 'doTheAttack'(?) fra dumb_assversry
+
+	//x := solveByGaussEliminationTryTwo(symKeyStream, keyStream)
+
+	//r1_solved, r2_solved, r3_solved := MakeGaussResultToRegisters(x.Solved)
 
 }

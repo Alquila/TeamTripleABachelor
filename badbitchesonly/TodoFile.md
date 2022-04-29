@@ -25,7 +25,7 @@ In the symbolic version the slices in the register will also have lenght r.lengh
 This mean that when indexing over a slice we will typically only index over r.Lenght-1 and handle slice[len(r)-1] - the last index - sepperately
 When xoring two slices however the last bits are just xored together so there we can loop over len(r)
 When clocking we only loop over r.Lenght
-
+ 
 vi sætter sr4 via r4 i cipher.go. Det betyder at man først skal initialisere de reelle registre og derefter initialisere de symbolske, inklusiv at r4[10] = 1 
 
 # TODO 

@@ -103,17 +103,13 @@ func solveByGaussEliminationTryTwo(A [][]int, b []int) GaussRes {
 	augmentMatrix := makeAugmentedMatrix(A, b)
 	afterGauss := gaussEliminationPart2(augmentMatrix)
 	if afterGauss.ResType == "Error" {
-		// backSubstitution(afterGauss)
-		//return afterGauss
 		// Do nothing
-	} else if afterGauss.ResType == "Valid" {
+	} else {
 		GaussResAfterBack := backSubstitution(afterGauss)
 		return GaussResAfterBack
 	}
 	// fmt.Printf("Gauss: %d\n", solution)
 	// fmt.Printf("Gauss lenght: %d\n", len(solution))
-
-	// TODO: Handle more than one solution
 	return afterGauss
 }
 
@@ -139,9 +135,9 @@ func makeAugmentedMatrix(A [][]int, b []int) [][]int {
 	amountOfRows := len(A)    // this is row
 	amountOfVars := len(A[0]) // this is column
 	augMa := make([][]int, amountOfRows)
-	fmt.Printf("Amount of rows of A %d\n", amountOfRows)
-	fmt.Printf("Amount of vars of A: %d\n", amountOfVars)
-	fmt.Printf("length of b: %d \n", len(b))
+	//fmt.Printf("Amount of rows of A %d\n", amountOfRows)
+	//fmt.Printf("Amount of vars of A: %d\n", amountOfVars)
+	//fmt.Printf("length of b: %d \n", len(b))
 
 	for i := 0; i < amountOfRows; i++ {
 		augMa[i] = make([]int, amountOfVars+1) //@Amalie hvor lange skal de være
@@ -169,8 +165,8 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 	noUnknownVars := len(augMa[0]) - 2 // n is number of unknowns
 	noEquations := len(augMa)
 	FreeVar := make([]int, 0)
-	fmt.Printf("len of unknown variable %d \n", noUnknownVars)
-	fmt.Printf("len of equations %d \n", noEquations)
+	// fmt.Printf("len of unknown variable %d \n", noUnknownVars)
+	// fmt.Printf("len of equations %d \n", noEquations)
 
 	for i := 0; i < noUnknownVars; i++ {
 		s := i
@@ -315,7 +311,6 @@ func backSubstitution(gaussRes GaussRes) GaussRes {
 
 	gaussRes.Solved = res
 	if gaussRes.ResType == EmptyCol {
-		// TODO Make helping function to handle empty columns
 		gaussRes = HandleEmptyCol(gaussRes)
 	}
 
@@ -326,16 +321,27 @@ func HandleEmptyCol(gauss GaussRes) GaussRes {
 	gaussRes := gauss
 	gaussRes.Multi = make([][]int, 0)
 	noEmptyCol := len(gauss.ColNo)
-	if noEmptyCol > 1 {
+	if noEmptyCol >= 1 {
 		// do something
-	} else {
-		index := gauss.ColNo[0]
-		for i := 0; i < 2; i++ {
+		bitSlice := MakeBitSlice(noEmptyCol)
+		for i := 0; i < len(bitSlice); i++ {
 			res := make([]int, len(gauss.Solved))
 			copy(res, gauss.Solved)
-			res[index] = i
+			for j := 0; j < noEmptyCol; j++ {
+				index := gauss.ColNo[j]
+				res[index] = bitSlice[i][j]
+			}
 			gaussRes.Multi = append(gaussRes.Multi, res)
 		}
+		// else {
+		// 	index := gauss.ColNo[0]
+		// 	for i := 0; i < 2; i++ {
+		// 		res := make([]int, len(gauss.Solved))
+		// 		copy(res, gauss.Solved)
+		// 		res[index] = i
+		// 		gaussRes.Multi = append(gaussRes.Multi, res)
+		// 	}
+		// }
 	}
 
 	gaussRes.ResType = Multi
@@ -355,12 +361,19 @@ func contains(s []int, e int) bool {
 	return false
 }
 
-func MakeBitSlice(number int) {
-	bit := make([]int, number)
-	number2 := int(math.Pow(2, float64(number)))
-	for j := 0; j < number; j++ {
-		for i := 0; i < number2; i++ {
+/** MakeBitSlice
+Takes an integer and outputs a slice of slices with all possible compinations
+*/
+func MakeBitSlice(number int) [][]int {
+	bitSlice := make([][]int, 0)
+	noOfDiffComb := int(math.Pow(2, float64(number)))
+	for j := 0; j < noOfDiffComb; j++ {
+		bit := make([]int, number)
+		for i := 0; i < number; i++ {
 			bit[i] = (j >> i) & 1 // index 0 becomes least significant bit
 		}
+		bitSlice = append(bitSlice, bit)
 	}
+
+	return bitSlice
 }

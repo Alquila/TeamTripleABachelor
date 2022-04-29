@@ -640,6 +640,48 @@ func TestVerifyKeyStream(t *testing.T) {
 	// prints(key, "key")
 	// fmt.Printf("len of key: %d \n", len(key))
 
-	VerifyKeyStream(key)
+	// VerifyKeyStream(key)
+	fmt.Printf("%d \n", key[16])
+	fmt.Printf("%d \n", key[17])
+	fmt.Printf("%d \n", key[18+19])
+	fmt.Printf("%d \n", key[18+20])
+	// print(key[18+22+21+152+209])
+	fmt.Printf("%d \n", key[18+21+22+153+209])
 
+	//The above was for printing purpose only
+
+	vars := []int{0, 1, 1, 0, 1, 0}
+	prods := []int{0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0}
+	res := helper(vars, prods)
+	if !res {
+		t.Fail()
+		t.Log("The products did not macth the vars")
+
+	}
+
+	makeRegisters()
+	key = make([]int, 655)
+	key[16] = 1           //x17 = 1
+	key[17] = 1           //x18 = 1
+	key[18+21+22+152] = 1 //the place for x17*x18
+
+	key[18+19] = 1            //y20
+	key[18+20] = 1            //y21
+	key[18+21+22+153+209] = 1 //the place for y20*y21
+
+	key[18+21+20] = 1
+	key[18+21+21] = 1
+	key[18+21+22+153+210+230] = 1
+
+	res = VerifyKeyStream(key)
+	if !res {
+		t.Fail()
+		t.Log("The products did not macth the vars")
+
+	}
+
+}
+
+func TestTryAllReg4(t *testing.T) {
+	TryAllReg4()
 }

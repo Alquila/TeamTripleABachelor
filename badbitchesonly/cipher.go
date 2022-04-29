@@ -250,15 +250,15 @@ func makeFinalXOR() int { // REVIEW: Skal tilføjes til flowdiagram
 func makeKeyStream() []int {
 
 	// all registers contain 0s
-	makeRegisters()
+	makeRegisters() // REVIEW: Amalie commented this, as we do it in out tests
 
 	keyStream := make([]int, 228)
 
 	/* Initialize internal state with K_c and frame number */
-	initializeRegisters() // TODO: Test me
+	initializeRegisters() // REVIEW: Amalie commented this, as we do it in out tests
 
 	/* Force bits R1[15], R2[16], R3[18], R4[10] to be 1 */
-	setIndicesToOne()
+	setIndicesToOne() // REVIEW: Amalie commented this, as we do it in out tests
 	r4_after_init = r4
 
 	/* Run A5/2 for 99 clocks and ignore output */

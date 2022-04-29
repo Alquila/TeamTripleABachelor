@@ -243,12 +243,17 @@ func TryAllReg4() {
 	makeSessionKey() //Make a random session key
 	original_frame_number = 42
 	r4_real, real_key := MakeRealKeyStreamThreeFrames(original_frame_number)
+
+	current_frame_number++
+	// fourth_frame := makeKeyStream()
+
 	prints(r4_real, "r4 after first init")
 	prints(real_key[:1], "keystream after first init")
 
 	guesses := int(math.Pow(2, 16))
 
 	for i := 0; i < guesses; i++ {
+		fmt.Printf("iteration %d \n", i)
 		original_frame_number = 42 //reset the framenumber for the symbolic version
 		current_frame_number = 42
 
@@ -295,11 +300,15 @@ func TryAllReg4() {
 			continue
 		} else if gauss.ResType == Multi {
 			for i := 0; i < len(gauss.Multi); i++ {
-				r4_found = append(r4_found, gauss.Multi[i])
+				if VerifyKeyStream(gauss.Multi[i]) {
+					r4_found = append(r4_found, gauss.Multi[i])
+				}
 			}
 		} else if gauss.ResType == Valid {
 			// handle normally
-			r4_found = append(r4_found, gauss.Solved)
+			if VerifyKeyStream(gauss.Solved) {
+				r4_found = append(r4_found, gauss.Solved)
+			}
 		}
 
 		//init sr1 sr2 sr3
@@ -317,6 +326,7 @@ func TryAllReg4() {
 		// gauss: based on response add to found
 	}
 
+	/**
 	if len(r4_found) > 1 {
 		// we have multiple plausible solutions
 		// somehow try them all and se what works
@@ -333,6 +343,7 @@ func TryAllReg4() {
 
 		}
 	}
+	*/
 
 	fmt.Printf("This is original r4: %d\n", r4_real)
 	for i := range r4_found {
@@ -417,24 +428,38 @@ func VerifyKeyStream(key []int) bool {
 	prod1_len := vars1_len * (vars1_len - 1) / 2
 	prod2_len := vars2_len * (vars2_len - 1) / 2
 	prod3_len := vars3_len * (vars3_len - 1) / 2
-	fmt.Printf("vars1_len : %d  vars2_len %d, vars3_len: %d, prod1_len: %d, prod2: %d, prod3: %d \n", vars1_len, vars2_len, vars3_len, prod1_len, prod2_len, prod3_len)
+	// fmt.Printf("vars1_len : %d  vars2_len %d, vars3_len: %d, prod1_len: %d, prod2: %d, prod3: %d \n", vars1_len, vars2_len, vars3_len, prod1_len, prod2_len, prod3_len)
 	prod1 := key[vars1_len+vars2_len+vars3_len : vars1_len+vars2_len+vars3_len+prod1_len]
 	prod2 := key[vars1_len+vars2_len+vars3_len+prod1_len : vars1_len+vars2_len+vars3_len+prod1_len+prod2_len]
 	prod3 := key[vars1_len+vars2_len+vars3_len+prod1_len+prod2_len : vars1_len+vars2_len+vars3_len+prod1_len+prod2_len+prod3_len]
-	prints(prod1, "prod1")
-	print("\n")
-	prints(prod2, "prod2")
-	print("\n")
-	prints(prod3, "prod3")
+	// prints(prod1, "prod1")
+	// print("\n")
+	// prints(prod2, "prod2")
+	// print("\n")
+	// prints(prod3, "prod3")
 
-	// acc := 0
-	for i := 0; i < vars1_len; i++ {
+	helper(key[0:vars1_len], prod1)
+	helper(key[vars1_len:vars1_len+vars2_len], prod2)
+	helper(key[vars1_len+vars2_len:vars1_len+vars2_len+vars3_len], prod3)
 
-		for j := i; j < vars1_len; j++ {
-			// aaa := prod1[j+i]
+	return true
+
+}
+
+func helper(vars []int, prods []int) bool {
+	acc := 0
+	for i := 0; i < len(vars); i++ {
+		var_1 := vars[i]
+		for j := i + 1; j < len(vars); j++ {
+			var_2 := vars[j] // i and j runs over the vars variables
+			if var_2*var_1 != prods[acc] {
+				return false
+			}
+			// fmt.Printf("var1: %d * var2: %d = prod1[%d]: %d \n", var_1, var_2, acc, prods[acc])
+			// fmt.Printf(" %d * %d = %d \n", var_1, var_2, prods[acc])
+			acc++ //acc runs over the index in prod1
 		}
 	}
 
 	return true
-
 }
