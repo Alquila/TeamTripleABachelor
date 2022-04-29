@@ -57,12 +57,12 @@ func TestGaussEliminationPart2(t *testing.T) {
 	shouldBe[2] = []int{0, 0, 1, 1, 0, 0}
 	shouldBe[3] = []int{0, 0, 0, 1, 0, 0}
 
-	if !reflect.DeepEqual(res, shouldBe) {
+	if !reflect.DeepEqual(res.TempRes, shouldBe) {
 		t.Log("The result of the Gauss elimination wrong")
 		t.Fail()
 	}
 
-	if reflect.DeepEqual(res, shouldBe) {
+	if reflect.DeepEqual(res.TempRes, shouldBe) {
 		fmt.Print("The result of the Gauss elimination was correct")
 	}
 }

@@ -81,7 +81,7 @@ func TestDoTheSimpleHack1(t *testing.T) {
 	if !reflect.DeepEqual(r1_res, orgReg) {
 		t.Fail()
 		fmt.Printf("r1_res er: %d\n", r1_res)
-		fmt.Printf("reg er: %d\n", orgReg)
+		fmt.Printf("reg er:    %d\n", orgReg)
 	}
 }
 
@@ -110,6 +110,7 @@ func TestDoTheSimpleHackSecondVersion(t *testing.T) {
 	//res := solveByGaussElimination(symKeyStream, keyStream)
 	// fmt.Printf("symKeyStream: \n%d\n", symKeyStream)
 	res := solveByGaussEliminationTryTwo(symKeyStream, keyStream)
+	fmt.Printf("Res Type: %v \n", res.ResType)
 
 	r1_res := putConstantBackInRes(res.Solved[0:18], 15)
 

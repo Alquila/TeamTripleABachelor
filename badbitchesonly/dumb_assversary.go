@@ -253,7 +253,9 @@ func TryAllReg4() {
 	guesses := int(math.Pow(2, 16))
 
 	for i := 0; i < guesses; i++ {
-		fmt.Printf("iteration %d \n", i)
+		if i%1000 == 0 {
+			fmt.Printf("iteration %d \n", i)
+		}
 		original_frame_number = 42 //reset the framenumber for the symbolic version
 		current_frame_number = 42
 
@@ -300,15 +302,13 @@ func TryAllReg4() {
 			continue
 		} else if gauss.ResType == Multi {
 			for i := 0; i < len(gauss.Multi); i++ {
-				if VerifyKeyStream(gauss.Multi[i]) {
-					r4_found = append(r4_found, gauss.Multi[i])
-				}
+				r4_found = append(r4_found, gauss.Multi[i])
+				//if VerifyKeyStream(gauss.Multi[i]) {}
 			}
 		} else if gauss.ResType == Valid {
 			// handle normally
-			if VerifyKeyStream(gauss.Solved) {
-				r4_found = append(r4_found, gauss.Solved)
-			}
+			//if VerifyKeyStream(gauss.Solved) {}
+			r4_found = append(r4_found, gauss.Solved)
 		}
 
 		//init sr1 sr2 sr3

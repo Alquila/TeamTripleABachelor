@@ -512,7 +512,6 @@ func TestSymMajorityMultiply(t *testing.T) {
 
 }
 
-// TODO
 func TestSymMajorityOutput(t *testing.T) {
 	c := []int{0, 1, 0, 1}
 	d := []int{0, 1, 1, 0}
@@ -532,7 +531,7 @@ func TestSymMajorityOutput(t *testing.T) {
 	Printf("de  %+v \n", SymMajorityMultiply(d, e))
 	Printf("ce  %+v \n", SymMajorityMultiply(c, e))
 
-	shouldBe := []int{0, 1, 0, 1, 0, 1, 1, 1, 1, 0} //see notes
+	shouldBe := []int{1, 0, 0, 0, 1, 1, 1} //see notes
 	res := SymMajorityOutput(r0)
 	if !reflect.DeepEqual(res, shouldBe) {
 		t.Logf("res is wrong %+v \n", res)

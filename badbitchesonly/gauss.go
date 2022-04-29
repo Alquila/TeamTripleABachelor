@@ -164,7 +164,7 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 
 	noUnknownVars := len(augMa[0]) - 2 // n is number of unknowns
 	noEquations := len(augMa)
-	FreeVar := make([]int, 0)
+	freeVar := make([]int, 0)
 	// fmt.Printf("len of unknown variable %d \n", noUnknownVars)
 	// fmt.Printf("len of equations %d \n", noEquations)
 
@@ -188,17 +188,19 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 				// To situations:
 				//		First: nulsøjle ergo fri variabel
 				//		Second: Der er to variabler afhængige af hinanden (counter positive)
-				FreeVar = append(FreeVar, i)
 				if r == noEquations-1 {
 					allZero := true
 					for j := 0; j < i; j++ {
 						if augMa[j][i] == 1 {
 							allZero = false
 							res.ResType = Error
+							return res
 						}
 					}
 					if allZero {
+						fmt.Printf("There is a free var")
 						res.ResType = EmptyCol
+						freeVar = append(freeVar, i)
 						res.ColNo = append(res.ColNo, i)
 					}
 				}
@@ -222,8 +224,8 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 				augMa[p] = augAfterxor
 			}
 		}
-		if len(FreeVar) > 0 {
-			for _, index := range FreeVar {
+		if len(freeVar) > 0 {
+			for _, index := range freeVar {
 				if augMa[index][i] == 1 {
 					augAfterxor := make([]int, len(augMa[index]))
 					for j := 0; j < noCol; j++ {
@@ -252,8 +254,8 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 			return res
 		}
 	}
-	if len(FreeVar) > 0 {
-		for _, index := range FreeVar {
+	if len(freeVar) > 0 {
+		for _, index := range freeVar {
 			if augMa[index][bitIndex] == 1 {
 				if augMa[index][resIndex] != 1 {
 					res.ResType = Error
@@ -275,12 +277,12 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 // https://www.codegrepper.com/code-examples/python/gauss+elimination+python+numpy
 func backSubstitution(gaussRes GaussRes) GaussRes {
 	augMatrix := gaussRes.TempRes
-	lenghty := len(augMatrix[0])
-	noUnknownVars := lenghty - 2 // n is number of unknowns
-	lastCol := lenghty - 1
-	bitCol := lenghty - 2
+	lengthy := len(augMatrix[0])
+	noUnknownVars := lengthy - 2 // n is number of unknowns
+	lastCol := lengthy - 1
+	bitCol := lengthy - 2
 	res := make([]int, noUnknownVars)
-	//fmt.Printf("lenghty of augma: %d, noOfUnknownvars: %d, last col at: augMa[%d], bit entry at: augMa[%d] \n", lenghty, noUnknownVars, lastCol, bitCol)
+	//fmt.Printf("lengthy of augma: %d, noOfUnknownvars: %d, last col at: augMa[%d], bit entry at: augMa[%d] \n", lengthy, noUnknownVars, lastCol, bitCol)
 
 	// printmatrix(augMatrix[:21])
 	// prints(augMatrix[noUnknownVars-1], "augma[-1]")
