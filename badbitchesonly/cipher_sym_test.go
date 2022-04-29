@@ -220,3 +220,64 @@ func MakeLongIntSlice() []int {
 
 	return res
 }
+
+// func TestTest(*testing.T) {
+// 	p := []int{1, 2, 3, 4}
+
+// 	w, err := os.Create("output.txt")
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	defer w.Close()
+
+// 	wri := bufio.NewWriter(w)
+
+// 	encoder := gob.NewEncoder(wri)
+// 	err = encoder.Encode(p)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	fi, err := os.Open("output.txt")
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	// close fi on exit and check for its returned error
+// 	defer func() {
+// 		if err := fi.Close(); err != nil {
+// 			panic(err)
+// 		}
+// 	}()
+
+// 	// rea := bufio.NewReader(fi)
+
+// 	// decoder := gob.NewDecoder(rea)
+// 	// p = []int{}
+
+// 	// err = decoder.Decode(&p)
+// 	// if err != nil {
+// 	// 	panic(err)
+// 	// }
+// 	// prints(p, "")
+// }
+
+// func TestTest2(t *testing.T) {
+// 	file, _ := os.Create("user.gob")
+
+// 	p := []int{1, 2, 3, 4}
+
+// 	defer file.Close()
+
+// 	encoder := gob.NewEncoder(file)
+
+// 	encoder.Encode(p)
+
+// 	decoder := gob.NewDecoder(file)
+// 	q := []int{}
+
+// 	err := decoder.Decode(&q)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	prints(p, "")
+// }
