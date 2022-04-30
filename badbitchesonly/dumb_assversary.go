@@ -246,15 +246,23 @@ func TryAllReg4() {
 
 	current_frame_number++
 	// fourth_frame := makeKeyStream()
-
+	//[0 0 1 0 1 1 0 1 1 1 1 1 0 1 0 1 1] <- dette er R4 som vi skal frem til når der ikke er noget random
+	//[0 0 1 0 1 1 0 1 1 1 1 1 0 1 0 1 1] <- 55220 omgang
+	//
 	prints(r4_real, "r4 after first init")
 	prints(real_key[:1], "keystream after first init")
 
 	// guesses := int(math.Pow(2, 16))
-
-	for i := 0; i < 2; i++ {
-		if i%1000 == 0 {
+	for i := 55100; i < 55500; i++ {
+		// for i := 0; i < 2; i++ { //FIXME ind og udkommenter de to headers her for at skifte -AK
+		if i%100 == 0 {
 			fmt.Printf("iteration %d \n", i)
+		}
+		if i == 55220 {
+			print("iteration 55220")
+		}
+		if i == 55221 {
+			print("iteration 55221")
 		}
 		original_frame_number = 42 //reset the framenumber for the symbolic version
 		current_frame_number = 42
