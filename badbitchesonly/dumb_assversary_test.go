@@ -480,6 +480,7 @@ func TestMAKETEST(t *testing.T) {
 	b = append(b, keyStream3...)
 
 	x := solveByGaussEliminationTryTwo(A, b)
+	print(x.ResType)
 	// prints(x[0:20], "res 20xx")
 
 	r1_solved, r2_solved, r3_solved := MakeGaussResultToRegisters(x.Solved)

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math"
 	"reflect"
 )
 
@@ -240,7 +239,8 @@ func TryAllReg4() {
 	r4_found := make([][]int, 0) // append results to this boi
 	r4_guess := make([]int, 17)
 
-	makeSessionKey() //Make a random session key
+	// makeSessionKey() //Make a random session key
+	session_key = make([]int, 64) //all zero session key
 	original_frame_number = 42
 	r4_real, real_key := MakeRealKeyStreamThreeFrames(original_frame_number)
 
@@ -250,9 +250,9 @@ func TryAllReg4() {
 	prints(r4_real, "r4 after first init")
 	prints(real_key[:1], "keystream after first init")
 
-	guesses := int(math.Pow(2, 16))
+	// guesses := int(math.Pow(2, 16))
 
-	for i := 0; i < guesses; i++ {
+	for i := 0; i < 2; i++ {
 		if i%1000 == 0 {
 			fmt.Printf("iteration %d \n", i)
 		}
