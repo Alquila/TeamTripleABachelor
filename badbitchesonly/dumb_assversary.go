@@ -119,16 +119,18 @@ func putConstantBackInRes(arr []int, constantIndex int) []int {
 }
 
 /*
-	Simulates how the frame difference influences the entries of a
+	Simulates how the frame difference influences the entries of a register.
 
+	@diff_arr is the frame difference slice
+	@register is the register
 */
-func simulateClockingWithFrameDifference(diff_arr []int, tabs []int, length int) []int {
-	he := make([]int, length)
+func simulateClockingWithFrameDifference(diff_arr []int, register Register) []int {
+	he := make([]int, register.Length)
 
 	for i := 0; i < 22; i++ {
 		yas := 0
-		for j := 0; j < len(tabs); j++ {
-			yas = he[tabs[i]] ^ yas
+		for j := 0; j < len(register.Tabs); j++ {
+			yas = he[register.Tabs[i]] ^ yas
 		}
 
 		he[0] = diff_arr[i] ^ yas
@@ -267,7 +269,7 @@ func TryAllReg4() {
 	// makeSessionKey() //Make a random session key
 	session_key = make([]int, 64) //all zero session key
 	original_frame_number = 42
-	r4_real, real_key, r4_second := MakeRealKeyStreamThreeFrames(original_frame_number)
+	r4_real, real_key, _ := MakeRealKeyStreamThreeFrames(original_frame_number)
 
 	current_frame_number++
 	// fourth_frame := makeKeyStream()
@@ -278,9 +280,9 @@ func TryAllReg4() {
 	// prints(real_key[:1], "keystream after first init")
 
 	// guesses := int(math.Pow(2, 16))
-	for i := 33100; i < 33120; i++ {
+	for i := 33000; i < 34000; i++ {
 		// for i := 0; i < 2; i++ { //FIXME ind og udkommenter de to headers her for at skifte -AK
-		if i%1000 == 0 {
+		if i%100 == 0 {
 			fmt.Printf("iteration %d \n", i)
 		}
 		if i == 33114 {
@@ -301,7 +303,7 @@ func TryAllReg4() {
 		copy(r4.ArrImposter, r4_guess)
 		// prints(r4.ArrImposter, "r4_guess1 ")
 		key1 := makeSymKeyStream() //this clocks sr4 which has r4_guess as its array
-		prints(sr4.ArrImposter, "sr4 after makeSymkey  						")
+		// prints(sr4.ArrImposter, "sr4 after makeSymkey  						")
 
 		current_frame_number++
 
@@ -318,10 +320,10 @@ func TryAllReg4() {
 		r4.ArrImposter = XorSlice(fake_r4.ArrImposter, r4.ArrImposter)
 		// fake_r4.ArrImposter[10] = 1 //FIXME
 		//we want this -> [0 1 0 1 0 0 1 0 1 1 1 0 0 0 0 0 1]
-		prints(r4.ArrImposter, "sr4_guess init ")
+		// prints(r4.ArrImposter, "sr4_guess init ")
 		key2 := makeSymKeyStream() //this will now copy the updated r4_arrimposter into sr4
-		prints(r4_second, "r4_second ")
-		prints(sr4.ArrImposter, "sr4_after2")
+		// prints(r4_second, "r4_second ")
+		// prints(sr4.ArrImposter, "sr4_after2")
 
 		current_frame_number++
 		r4 = makeR4()
@@ -333,7 +335,7 @@ func TryAllReg4() {
 			fake_r4.ArrImposter[0] = fake_r4.ArrImposter[0] ^ diff[i]
 		} //fake_r4.ArrImposter er nu clocked således at det er [...1..] de steder hvor diff påvirker indgangene
 		r4.ArrImposter = XorSlice(fake_r4.ArrImposter, r4.ArrImposter)
-		prints(r4.ArrImposter, " sr4 after third")
+		//prints(r4.ArrImposter, " sr4 after third")
 		key3 := makeSymKeyStream()
 		current_frame_number++
 
@@ -393,7 +395,7 @@ func TryAllReg4() {
 
 	fmt.Printf("This is original r4:       %d\n", r4_real)
 	for i := range r4_found {
-		fmt.Printf("This is %d'th found r4:    %d\n", i, r4_found)
+		fmt.Printf("This is %d'th found r4:    %d\n", i, r4_found[i])
 	}
 	fmt.Println("Have we found the right r4?")
 	for i := range r4_found {
