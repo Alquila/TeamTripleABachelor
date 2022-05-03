@@ -696,11 +696,25 @@ func TestTryAllReg4(t *testing.T) {
 func TestWhy(t *testing.T) {
 	r4_sec_real := stringToIntArray("0 1 0 1 0 0 1 0 1 1 1 0 0 0 0 0 1")
 	r4_sec_fake := stringToIntArray("0 1 1 0 1 0 0 0 0 1 1 0 0 0 1 1 1")
+	r4_first_real := stringToIntArray("0 1 0 1 1 0 1 0 1 0 1 0 0 0 0 0 1")
 
 	acc := make([]int, len(r4_sec_real))
 	for i := 0; i < len(r4_sec_fake); i++ {
-		acc[i] = r4_sec_fake[i] ^ r4_sec_real[i]
+		acc[i] = r4_first_real[i] ^ r4_sec_real[i]
 	}
-	prints(acc, "diff") //[0 0 1 1 1 0 1 0 1 0 0 0 0 0 1 1 0]
+	// diff between fake and real sec [0 0 1 1 1 0 1 0 1 0 0 0 0 0 1 1 0]
+	prints(acc, "diff")
 
+	original_frame_number = 42
+	current_frame_number = 43
+	diff := FindDifferenceOfFrameNumbers(original_frame_number, current_frame_number)
+	prints(diff, "diff")
+	iiii := makeR4()
+	for i := 0; i < 22; i++ {
+		Clock(iiii)
+		iiii.ArrImposter[0] = iiii.ArrImposter[0] ^ diff[i]
+		// prints(iiii.ArrImposter, strconv.Itoa(i))
+	}
+	prints(iiii.ArrImposter, "will this work ")
+	prints(XorSlice(r4_first_real, iiii.ArrImposter), "?")
 }

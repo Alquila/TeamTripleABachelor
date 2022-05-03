@@ -118,6 +118,25 @@ func putConstantBackInRes(arr []int, constantIndex int) []int {
 	return newarr
 }
 
+/*
+	Simulates how the frame difference influences the entries of a
+
+*/
+func simulateClockingWithFrameDifference(diff_arr []int, tabs []int, length int) []int {
+	he := make([]int, length)
+
+	for i := 0; i < 22; i++ {
+		yas := 0
+		for j := 0; j < len(tabs); j++ {
+			yas = he[tabs[i]] ^ yas
+		}
+
+		he[0] = diff_arr[i] ^ yas
+	}
+
+	return he
+}
+
 /**
 FindDifferenceOfFrameNumbers
 TRYING TO USE THE DIFFERENCE IN FRAMENUMBER TO
@@ -227,6 +246,7 @@ func MakeRealKeyStreamThreeFrames(frame int) ([]int, []int, []int) {
 	prints(r4_after_init.ArrImposter, "r4 after second init:       ") //[0 1 0 1 0 0 1 0 1 1 1 0 0 0 0 0 1]
 	current_frame_number++
 	key3 := makeKeyStream()
+	prints(r4_after_init.ArrImposter, "r4 after third init:       ")
 
 	key := append(key1, key2...)
 	key = append(key, key3...)
@@ -247,7 +267,7 @@ func TryAllReg4() {
 	// makeSessionKey() //Make a random session key
 	session_key = make([]int, 64) //all zero session key
 	original_frame_number = 42
-	r4_real, real_key, _ := MakeRealKeyStreamThreeFrames(original_frame_number)
+	r4_real, real_key, r4_second := MakeRealKeyStreamThreeFrames(original_frame_number)
 
 	current_frame_number++
 	// fourth_frame := makeKeyStream()
@@ -258,16 +278,16 @@ func TryAllReg4() {
 	// prints(real_key[:1], "keystream after first init")
 
 	// guesses := int(math.Pow(2, 16))
-	for i := 33114; i < 33115; i++ {
+	for i := 33100; i < 33120; i++ {
 		// for i := 0; i < 2; i++ { //FIXME ind og udkommenter de to headers her for at skifte -AK
-		if i%100 == 0 {
+		if i%1000 == 0 {
 			fmt.Printf("iteration %d \n", i)
 		}
-		if i == 55220 {
-			print("iteration 55220\n")
+		if i == 33114 {
+			print("iteration 33114\n")
 		}
-		if i == 55221 {
-			print("iteration 55221\n")
+		if i == 33115 {
+			print("iteration 33115\n")
 		}
 		original_frame_number = 42 //reset the framenumber for the symbolic version
 		current_frame_number = 42
@@ -288,34 +308,32 @@ func TryAllReg4() {
 		//update r4_guess with new frame value //we want it to be clean right..??
 		// prints(r4_guess, "r4_guess")
 		r4 = makeR4()
+		fake_r4 := makeR4()
 		copy(r4.ArrImposter, r4_guess)
-		// prints(r4.ArrImposter, "r4_guess")
-		// r4.ArrImposter = r4_guess
 		diff := FindDifferenceOfFrameNumbers(original_frame_number, current_frame_number)
-		// prints(r4.ArrImposter, "This is r4.Arr ")
-		// prints(diff, "This is diff ")
 		for i := 0; i < 22; i++ {
-			Clock(r4)
-			r4.ArrImposter[0] = r4.ArrImposter[0] ^ diff[i]
-			// prints(r4.ArrImposter, strconv.Itoa(i))
-		} //someone check this
-		r4.ArrImposter[10] = 1
+			Clock(fake_r4)
+			fake_r4.ArrImposter[0] = fake_r4.ArrImposter[0] ^ diff[i]
+		} //fake_r4.ArrImposter er nu clocked således at det er [...1..] de steder hvor diff påvirker indgangene
+		r4.ArrImposter = XorSlice(fake_r4.ArrImposter, r4.ArrImposter)
+		// fake_r4.ArrImposter[10] = 1 //FIXME
 		//we want this -> [0 1 0 1 0 0 1 0 1 1 1 0 0 0 0 0 1]
 		prints(r4.ArrImposter, "sr4_guess init ")
 		key2 := makeSymKeyStream() //this will now copy the updated r4_arrimposter into sr4
-		// prints(r4_second, "r4_second ")
-		// prints(sr4.ArrImposter, "sr4_after2")
+		prints(r4_second, "r4_second ")
+		prints(sr4.ArrImposter, "sr4_after2")
 
 		current_frame_number++
-
-		makeR4()
-		r4.ArrImposter = r4_guess
+		r4 = makeR4()
+		fake_r4 = makeR4()
+		copy(r4.ArrImposter, r4_guess)
 		diff = FindDifferenceOfFrameNumbers(original_frame_number, current_frame_number)
 		for i := 0; i < 22; i++ {
-			Clock(r4)
-			r4.ArrImposter[0] = r4.ArrImposter[0] ^ diff[i]
-		} //someone check this
-
+			Clock(fake_r4)
+			fake_r4.ArrImposter[0] = fake_r4.ArrImposter[0] ^ diff[i]
+		} //fake_r4.ArrImposter er nu clocked således at det er [...1..] de steder hvor diff påvirker indgangene
+		r4.ArrImposter = XorSlice(fake_r4.ArrImposter, r4.ArrImposter)
+		prints(r4.ArrImposter, " sr4 after third")
 		key3 := makeSymKeyStream()
 		current_frame_number++
 
@@ -334,8 +352,9 @@ func TryAllReg4() {
 			}
 		} else if gauss.ResType == Valid {
 			// handle normally
-			//if VerifyKeyStream(gauss.Solved) {}
-			r4_found = append(r4_found, gauss.Solved)
+			if VerifyKeyStream(gauss.Solved) {
+				r4_found = append(r4_found, r4_guess)
+			}
 		}
 
 		//init sr1 sr2 sr3
@@ -372,14 +391,14 @@ func TryAllReg4() {
 	}
 	*/
 
-	fmt.Printf("This is original r4: %d\n", r4_real)
+	fmt.Printf("This is original r4:       %d\n", r4_real)
 	for i := range r4_found {
 		fmt.Printf("This is %d'th found r4:    %d\n", i, r4_found)
 	}
 	fmt.Println("Have we found the right r4?")
 	for i := range r4_found {
 		if reflect.DeepEqual(r4_found[i], r4_real) {
-			fmt.Printf("Fuck yes we found it gutterne")
+			fmt.Println("Fuck yes we found it gutterne")
 		}
 	}
 
