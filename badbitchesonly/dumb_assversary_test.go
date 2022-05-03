@@ -358,8 +358,8 @@ func TestMAKETEST(t *testing.T) {
 	current_frame_number = 42
 	original_frame_number = 42
 
-	key := make([]int, 64)
-	session_key = key
+	// key := make([]int, 64)
+	makeSessionKey()
 
 	/* init registers with key and framenumber*/
 	initializeRegisters()
@@ -480,13 +480,15 @@ func TestMAKETEST(t *testing.T) {
 	b = append(b, keyStream3...)
 
 	x := solveByGaussEliminationTryTwo(A, b)
-	print(x.ResType)
+	// print(x.ResType)
 	// prints(x[0:20], "res 20xx")
+
+	assert.Equal(t, true, VerifyKeyStream(x.Solved), "VerifyKeyStream returned false")
 
 	r1_solved, r2_solved, r3_solved := MakeGaussResultToRegisters(x.Solved)
 
-	after_init := []int{1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1}
-	assert.Equal(t, after_init, old_r1)
+	// after_init := []int{1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1}
+	// assert.Equal(t, after_init, old_r1)
 	assert.Equal(t, r1_solved[15], 1)
 	assert.Equal(t, r2_solved[16], 1)
 	assert.Equal(t, r3_solved[18], 1)
@@ -686,6 +688,7 @@ func TestVerifyKeyStream(t *testing.T) {
 
 func TestTryAllReg4(t *testing.T) {
 	TryAllReg4()
-	// prints(MakeR4Guess(55220), "")
-	// prints(putConstantBackInRes(MakeR4Guess(55220), 10), "")
+	// x := 33114
+	// prints(MakeR4Guess(x), "")
+	// prints(putConstantBackInRes(MakeR4Guess(x), 10), "")
 }

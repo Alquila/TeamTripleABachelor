@@ -165,9 +165,11 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 	noUnknownVars := len(augMa[0]) - 2 // n is number of unknowns
 	noEquations := len(augMa)
 	freeVar := make([]int, 0)
-	// fmt.Printf("len of unknown variable %d \n", noUnknownVars)
-	// fmt.Printf("len of equations %d \n", noEquations)
-
+	fmt.Printf("len of unknown variable %d \n", noUnknownVars)
+	fmt.Printf("len of equations %d \n", noEquations)
+	// for i := noUnknownVars; i < noEquations; i++ {
+	// 	prints(augMa[i], strconv.Itoa(i))
+	// }
 	for i := 0; i < noUnknownVars; i++ {
 		s := i
 		if augMa[i][i] == 0 {
@@ -247,13 +249,17 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 	for q := noUnknownVars; q < noEquations; q++ {
 		if augMa[q][bitIndex] == 1 {
 			if augMa[q][resIndex] != 1 {
-				fmt.Printf("augma[%d][%d] = 1 but augma[%d][res] = %d \n", q, bitIndex, q, 0)
-				res.ResType = Error
-				res.TempRes = augMa
-				return res
+				// fmt.Printf("augma[%d][%d] = 1 but augma[%d][res] = %d \n", q, bitIndex, q, 0)
+				// // res.ResType = Error
+				// res.TempRes = augMa
+				// return res
 			}
 		} else if augMa[q][resIndex] == 1 {
 			fmt.Printf("augma[%d][res] == 1, \n", q)
+			// prints(augMa[q], "stupid")
+			// for i := noUnknownVars; i < noEquations; i++ {
+			// 	prints(augMa[i], strconv.Itoa(i))
+			// }
 			res.ResType = Error
 			return res
 		}

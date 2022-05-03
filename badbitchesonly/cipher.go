@@ -113,7 +113,6 @@ func clockingUnit(r4 Register) {
 	}
 }
 
-//TODO Majority function
 //Move all the bits to the right, rightmost bit is discarded!!!, input bit is specified by the taps of the register
 func Clock(r Register) {
 	arr := r.ArrImposter
@@ -243,7 +242,8 @@ func makeFinalXOR() int { // REVIEW: Skal tilføjes til flowdiagram
 }
 
 /* Should we give frame number as a param ? */
-/*Initializes the registers, increments frame number,
+
+/*Initializes the registers,
   sets indices to one's,
   runs for 99 clocks,
   then runs for 228 clocks and returns the key stream */
@@ -259,7 +259,8 @@ func makeKeyStream() []int {
 
 	/* Force bits R1[15], R2[16], R3[18], R4[10] to be 1 */
 	setIndicesToOne() // REVIEW: Amalie commented this, as we do it in out tests
-	r4_after_init = r4
+	r4_after_init = makeR4()
+	copy(r4_after_init.ArrImposter, r4.ArrImposter)
 
 	/* Run A5/2 for 99 clocks and ignore output */
 	for i := 0; i < 99; i++ {

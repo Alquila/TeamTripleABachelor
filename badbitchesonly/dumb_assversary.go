@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 )
 
 //"fmt"
@@ -213,19 +214,24 @@ func DescribeNewFrameWithOldVariables(original_framenum int, current_framenum in
 	return newReg
 }
 
-func MakeRealKeyStreamThreeFrames(frame int) ([]int, []int) {
+func MakeRealKeyStreamThreeFrames(frame int) ([]int, []int, []int) {
 	original_frame_number = frame
 	current_frame_number = frame
 	key1 := makeKeyStream()
-	r4_real := r4_after_init.ArrImposter
+	prints(r4.ArrImposter, "r4 after makeKeyStream")
+	r4_real := make([]int, 17)
+	copy(r4_real, r4_after_init.ArrImposter)
+
 	current_frame_number++
 	key2 := makeKeyStream()
+	r4_second := r4.ArrImposter
+	prints(r4_after_init.ArrImposter, "r4 after second init")
 	current_frame_number++
 	key3 := makeKeyStream()
 
 	key := append(key1, key2...)
 	key = append(key, key3...)
-	return r4_real, key
+	return r4_real, key, r4_second
 }
 
 func TryAllReg4() {
@@ -242,51 +248,62 @@ func TryAllReg4() {
 	// makeSessionKey() //Make a random session key
 	session_key = make([]int, 64) //all zero session key
 	original_frame_number = 42
-	r4_real, real_key := MakeRealKeyStreamThreeFrames(original_frame_number)
+	r4_real, real_key, r4_second := MakeRealKeyStreamThreeFrames(original_frame_number)
 
 	current_frame_number++
 	// fourth_frame := makeKeyStream()
 	//[0 0 1 0 1 1 0 1 1 1 1 1 0 1 0 1 1] <- dette er R4 som vi skal frem til når der ikke er noget random
-	//[0 0 1 0 1 1 0 1 1 1 1 1 0 1 0 1 1] <- 55220 omgang
+	//[0 0 1 0 1 1 0 1 1 1 1 1 0 1 0 1 1] <- 55220 omgang NOOOOOO
 	//
-	prints(r4_real, "r4 after first init")
-	prints(real_key[:1], "keystream after first init")
+	// prints(r4_real, "r4 after first init   ")
+	// prints(real_key[:1], "keystream after first init")
 
 	// guesses := int(math.Pow(2, 16))
-	for i := 55100; i < 55500; i++ {
+	for i := 33114; i < 33115; i++ {
 		// for i := 0; i < 2; i++ { //FIXME ind og udkommenter de to headers her for at skifte -AK
 		if i%100 == 0 {
 			fmt.Printf("iteration %d \n", i)
 		}
 		if i == 55220 {
-			print("iteration 55220")
+			print("iteration 55220\n")
 		}
 		if i == 55221 {
-			print("iteration 55221")
+			print("iteration 55221\n")
 		}
 		original_frame_number = 42 //reset the framenumber for the symbolic version
 		current_frame_number = 42
 
 		r4_guess = MakeR4Guess(i) //for all possible value of r4 we need three frames
 		r4_guess = putConstantBackInRes(r4_guess, 10)
+		// prints(r4_guess, "r4_guess")
 
 		//do this such that r4 guess can be copied into sr4 in SymSetRegisters()
 		makeR4()
-		r4.ArrImposter = r4_guess
+		copy(r4.ArrImposter, r4_guess)
+		// prints(r4.ArrImposter, "r4_guess1 ")
+		key1 := makeSymKeyStream() //this clocks sr4 which has r4_guess as its array
+		prints(sr4.ArrImposter, "sr4 after makeSymkey  ")
 
-		key1 := makeSymKeyStream()
 		current_frame_number++
 
 		//update r4_guess with new frame value //we want it to be clean right..??
+		// prints(r4_guess, "r4_guess")
 		makeR4()
-		r4.ArrImposter = r4_guess
+		copy(r4.ArrImposter, r4_guess)
+		// prints(r4.ArrImposter, "r4_guess")
+		// r4.ArrImposter = r4_guess
 		diff := FindDifferenceOfFrameNumbers(original_frame_number, current_frame_number)
 		for i := 0; i < 22; i++ {
 			Clock(r4)
 			r4.ArrImposter[0] = r4.ArrImposter[0] ^ diff[i]
+			prints(r4.ArrImposter, strconv.Itoa(i))
 		} //someone check this
+		r4.ArrImposter[10] = 1
+		prints(r4.ArrImposter, "sr4_guess init ")
+		key2 := makeSymKeyStream() //this will now copy the updated r4_arrimposter into sr4
+		prints(r4_second, "r4_second ")
+		prints(sr4.ArrImposter, "sr4_after2")
 
-		key2 := makeSymKeyStream() //this will now copy the updated r4_guess into sr4
 		current_frame_number++
 
 		makeR4()

@@ -40,7 +40,7 @@ func SymMakeRegister(length int, tabs []int, major_idx []int, compliment_idx int
 	return reg
 }
 
-// This does what
+//Make weird I matrix
 func Bit_entry(reg SymRegister) {
 	// reg.ArrImposter[reg.bit_entry] = make([]int, reg.Length)
 	// reg.ArrImposter[reg.bit_entry][reg.Length-1] = 1
@@ -260,24 +260,33 @@ func SymMajorityMultiply(c []int, d []int) []int {
 	return res
 }
 
+/*
+Calls symInitRegisters which clocks with key and frame. Calls ClockForKey with sr4 to get the 228-bit keystream
+*/
 func makeSymKeyStream() [][]int {
 	SymInitializeRegisters()
 
+	return ClockForKey(sr4)
+}
+
+//Does the 99 + 228 clocking rounds based on the given register. Returns the 228 bit keystream
+func ClockForKey(r Register) [][]int {
 	keyStream := make([][]int, 228)
 
 	// Clock the register 99 times
 	for i := 0; i < 99; i++ {
-		SymClockingUnit(sr4)
-		Clock(sr4)
+		SymClockingUnit(r)
+		Clock(r)
 	}
 
 	// clock 228 times and save keystream
 	for i := 0; i < 228; i++ {
-		SymClockingUnit(sr4)
-		Clock(sr4)
+		SymClockingUnit(r)
+		Clock(r)
 		keyStream[i] = SymMakeFinalXOR(sr1, sr2, sr3)
 	}
 	return keyStream
+
 }
 
 func MakeTwoKeyStream() ([]int, [][]int) {

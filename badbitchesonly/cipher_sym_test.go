@@ -24,9 +24,10 @@ func TestConstPrettyPrint(t *testing.T) {
 }
 
 func TestHowFrames(t *testing.T) {
-	reg1 := SymMakeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14, 15)
+	// reg1 := SymMakeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14, 15)
+	reg1 := SymMakeRegister(17, []int{16, 11}, []int{12, 15}, 14, 10)
 	// ree := make([][]int, 19)
-	for i := 0; i < 19; i++ {
+	for i := 0; i < 17; i++ {
 		reg1.ArrImposter[i] = make([]int, 22)
 		// ree[i][i] = 1
 	}
@@ -34,7 +35,7 @@ func TestHowFrames(t *testing.T) {
 
 	for i := 0; i < 22; i++ {
 		SymClock(reg1)
-		reg1.ArrImposter[0][i] = 1
+		reg1.ArrImposter[0][i] = 1 //should this be xor?
 		// ree[i][i] = 1
 	}
 
