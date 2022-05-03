@@ -196,7 +196,7 @@ func initializeRegisters() { // used to have session_key and frame_number as par
 
 	// makes frame_number from int -> bits in array
 	frame_bits := MakeFrameNumberToBits(current_frame_number)
-	prints(r4.ArrImposter, "r4 before clocking with frame")
+	//prints(r4.ArrImposter, "r4 before clocking with frame ")
 	for i := 0; i < 22; i++ {
 		Clock(r1)
 		Clock(r2)

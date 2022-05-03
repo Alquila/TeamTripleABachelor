@@ -692,3 +692,15 @@ func TestTryAllReg4(t *testing.T) {
 	// prints(MakeR4Guess(x), "")
 	// prints(putConstantBackInRes(MakeR4Guess(x), 10), "")
 }
+
+func TestWhy(t *testing.T) {
+	r4_sec_real := stringToIntArray("0 1 0 1 0 0 1 0 1 1 1 0 0 0 0 0 1")
+	r4_sec_fake := stringToIntArray("0 1 1 0 1 0 0 0 0 1 1 0 0 0 1 1 1")
+
+	acc := make([]int, len(r4_sec_real))
+	for i := 0; i < len(r4_sec_fake); i++ {
+		acc[i] = r4_sec_fake[i] ^ r4_sec_real[i]
+	}
+	prints(acc, "diff") //[0 0 1 1 1 0 1 0 1 0 0 0 0 0 1 1 0]
+
+}
