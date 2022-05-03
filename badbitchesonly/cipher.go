@@ -196,7 +196,7 @@ func initializeRegisters() { // used to have session_key and frame_number as par
 
 	// makes frame_number from int -> bits in array
 	frame_bits := MakeFrameNumberToBits(current_frame_number)
-
+	prints(r4.ArrImposter, "r4 before clocking with frame")
 	for i := 0; i < 22; i++ {
 		Clock(r1)
 		Clock(r2)
@@ -261,6 +261,7 @@ func makeKeyStream() []int {
 	setIndicesToOne() // REVIEW: Amalie commented this, as we do it in out tests
 	r4_after_init = makeR4()
 	copy(r4_after_init.ArrImposter, r4.ArrImposter)
+	prints(r4.ArrImposter, "r4 after clocking with frame")
 
 	/* Run A5/2 for 99 clocks and ignore output */
 	for i := 0; i < 99; i++ {

@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"reflect"
-	"strconv"
 )
 
 //"fmt"
@@ -278,7 +277,7 @@ func TryAllReg4() {
 		// prints(r4_guess, "r4_guess")
 
 		//do this such that r4 guess can be copied into sr4 in SymSetRegisters()
-		makeR4()
+		r4 = makeR4()
 		copy(r4.ArrImposter, r4_guess)
 		// prints(r4.ArrImposter, "r4_guess1 ")
 		key1 := makeSymKeyStream() //this clocks sr4 which has r4_guess as its array
@@ -288,7 +287,7 @@ func TryAllReg4() {
 
 		//update r4_guess with new frame value //we want it to be clean right..??
 		// prints(r4_guess, "r4_guess")
-		makeR4()
+		r4 = makeR4()
 		copy(r4.ArrImposter, r4_guess)
 		// prints(r4.ArrImposter, "r4_guess")
 		// r4.ArrImposter = r4_guess
@@ -296,7 +295,7 @@ func TryAllReg4() {
 		for i := 0; i < 22; i++ {
 			Clock(r4)
 			r4.ArrImposter[0] = r4.ArrImposter[0] ^ diff[i]
-			prints(r4.ArrImposter, strconv.Itoa(i))
+			// prints(r4.ArrImposter, strconv.Itoa(i))
 		} //someone check this
 		r4.ArrImposter[10] = 1
 		prints(r4.ArrImposter, "sr4_guess init ")
