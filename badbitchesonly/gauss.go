@@ -194,7 +194,7 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 					allZero := true
 					for j := 0; j < i; j++ {
 						if augMa[j][i] == 1 {
-							// allZero = false
+							allZero = false
 							//fmt.Printf("dependent var at [%d][%d] \n", j, i)
 							//prints(augMa[j], "")
 							// res.ResType = Error
@@ -268,13 +268,13 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 		for _, index := range freeVar {
 			if augMa[index][bitIndex] == 1 {
 				if augMa[index][resIndex] != 1 {
-					fmt.Printf("augma[%d][%d] = 1 but augma[%d][res] = %d in freevar\n", index, bitIndex, index, 0)
+					// fmt.Printf("augma[%d][%d] = 1 but augma[%d][res] = %d in freevar\n", index, bitIndex, index, 0)
 					res.ResType = Error
 					res.TempRes = augMa
 					return res
 				}
 			} else if augMa[index][resIndex] == 1 {
-				fmt.Printf("augma[%d][res] == 1 in freevar \n", index)
+				// fmt.Printf("augma[%d][res] == 1 in freevar \n", index)
 				res.ResType = Error
 				return res
 			}

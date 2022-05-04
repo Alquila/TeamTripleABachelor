@@ -238,17 +238,17 @@ func MakeRealKeyStreamThreeFrames(frame int) ([]int, []int, []int) {
 	original_frame_number = frame
 	current_frame_number = frame
 	key1 := makeKeyStream()
-	prints(r4.ArrImposter, "r4 after makeKeyStream:     					")
+	// prints(r4.ArrImposter, "r4 after makeKeyStream:     					")
 	r4_real := make([]int, 17)
 	copy(r4_real, r4_after_init.ArrImposter)
 
 	current_frame_number++
 	key2 := makeKeyStream()
 	r4_second := r4.ArrImposter
-	prints(r4_after_init.ArrImposter, "r4 after second init:       ") //[0 1 0 1 0 0 1 0 1 1 1 0 0 0 0 0 1]
+	// prints(r4_after_init.ArrImposter, "r4 after second init:       ") //[0 1 0 1 0 0 1 0 1 1 1 0 0 0 0 0 1]
 	current_frame_number++
 	key3 := makeKeyStream()
-	prints(r4_after_init.ArrImposter, "r4 after third init:       ")
+	// prints(r4_after_init.ArrImposter, "r4 after third init:       ")
 
 	key := append(key1, key2...)
 	key = append(key, key3...)
@@ -264,6 +264,7 @@ func TryAllReg4() {
 	*/
 
 	r4_found := make([][]int, 0) // append results to this boi
+	// solved := make([][]int, 0)
 	r4_guess := make([]int, 17)
 
 	// makeSessionKey() //Make a random session key
@@ -280,8 +281,8 @@ func TryAllReg4() {
 	// prints(real_key[:1], "keystream after first init")
 
 	// guesses := int(math.Pow(2, 16))
-	for i := 33000; i < 34000; i++ {
-		// for i := 0; i < 2; i++ { //FIXME ind og udkommenter de to headers her for at skifte -AK
+	for i := 30000; i < 35000; i++ {
+		// for i := 0; i < guesses; i++ { //FIXME ind og udkommenter de to headers her for at skifte -AK
 		if i%100 == 0 {
 			fmt.Printf("iteration %d \n", i)
 		}
@@ -318,7 +319,11 @@ func TryAllReg4() {
 			fake_r4.ArrImposter[0] = fake_r4.ArrImposter[0] ^ diff[i]
 		} //fake_r4.ArrImposter er nu clocked således at det er [...1..] de steder hvor diff påvirker indgangene
 		r4.ArrImposter = XorSlice(fake_r4.ArrImposter, r4.ArrImposter)
-		// fake_r4.ArrImposter[10] = 1 //FIXME
+		fake_r4.ArrImposter[10] = 1 //FIXME
+		//FIXME
+		//FIXME
+		//FIXME
+
 		//we want this -> [0 1 0 1 0 0 1 0 1 1 1 0 0 0 0 0 1]
 		// prints(r4.ArrImposter, "sr4_guess init ")
 		key2 := makeSymKeyStream() //this will now copy the updated r4_arrimposter into sr4
@@ -335,6 +340,7 @@ func TryAllReg4() {
 			fake_r4.ArrImposter[0] = fake_r4.ArrImposter[0] ^ diff[i]
 		} //fake_r4.ArrImposter er nu clocked således at det er [...1..] de steder hvor diff påvirker indgangene
 		r4.ArrImposter = XorSlice(fake_r4.ArrImposter, r4.ArrImposter)
+		r4.ArrImposter[10] = 1
 		//prints(r4.ArrImposter, " sr4 after third")
 		key3 := makeSymKeyStream()
 		current_frame_number++
@@ -348,14 +354,23 @@ func TryAllReg4() {
 		if gauss.ResType == Error {
 			continue
 		} else if gauss.ResType == Multi {
+			fmt.Printf("found multi in %d of lenght %d \n", i, len(gauss.Multi))
 			for i := 0; i < len(gauss.Multi); i++ {
-				r4_found = append(r4_found, gauss.Multi[i])
-				//if VerifyKeyStream(gauss.Multi[i]) {}
+				if VerifyKeyStream(gauss.Multi[i]) { ///what do we do here
+					r4_found = append(r4_found, r4_guess)
+					// fmt.Printf("found in ")
+					// solved = append(solved, gauss.Multi[i])
+					// solved = append(solved, []int{42})
+
+				}
 			}
 		} else if gauss.ResType == Valid {
 			// handle normally
 			if VerifyKeyStream(gauss.Solved) {
+				fmt.Printf("Found in iteration %d \n", i)
 				r4_found = append(r4_found, r4_guess)
+				// solved = append(solved, gauss.Solved)
+				// solved = append(solved, []int{42})
 			}
 		}
 
@@ -396,6 +411,7 @@ func TryAllReg4() {
 	fmt.Printf("This is original r4:       %d\n", r4_real)
 	for i := range r4_found {
 		fmt.Printf("This is %d'th found r4:    %d\n", i, r4_found[i])
+		// fmt.Printf("This is %d'th found solved:  %d \n", i, solved[i])
 	}
 	fmt.Println("Have we found the right r4?")
 	for i := range r4_found {

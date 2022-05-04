@@ -262,6 +262,7 @@ func makeKeyStream() []int {
 	r4_after_init = makeR4()
 	copy(r4_after_init.ArrImposter, r4.ArrImposter)
 	prints(r4.ArrImposter, "r4 after clocking with frame")
+	// Print()
 
 	/* Run A5/2 for 99 clocks and ignore output */
 	for i := 0; i < 99; i++ {

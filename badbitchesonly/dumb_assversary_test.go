@@ -687,10 +687,10 @@ func TestVerifyKeyStream(t *testing.T) {
 }
 
 func TestTryAllReg4(t *testing.T) {
+	x := 33114
+	prints(MakeR4Guess(x), "")
+	prints(putConstantBackInRes(MakeR4Guess(x), 10), "")
 	TryAllReg4()
-	// x := 33114
-	// prints(MakeR4Guess(x), "")
-	// prints(putConstantBackInRes(MakeR4Guess(x), 10), "")
 }
 
 func TestWhy(t *testing.T) {
