@@ -93,6 +93,7 @@ func TestCiphertextOnlyAttack(t *testing.T) {
 	current_frame_number, original_frame_number = 42, 42
 	// session_key is now all 0's
 	session_key = make([]int, 64)
+	makeSessionKey()
 	keyStream := make([]int, 0)      // append to this, assert that the length is rigth
 	symKeyStream := make([][]int, 0) // same here <3
 
@@ -102,8 +103,11 @@ func TestCiphertextOnlyAttack(t *testing.T) {
 		newKeyStream := makeKeyStream()
 		SymInitializeRegisters()
 		copy(sr4.ArrImposter, r4_after_init.ArrImposter)
+		sr4.ArrImposter[5] = 1
+		sr4.ArrImposter[6] = 1
+		sr4.ArrImposter[7] = 1
 		newSymKeyStream := ClockForKey(sr4)
-		assert.Equal(t, sr4.ArrImposter, r4.ArrImposter)
+		// assert.Equal(t, sr4.ArrImposter, r4.ArrImposter)
 		keyStream = append(keyStream, newKeyStream...)
 		symKeyStream = append(symKeyStream, newSymKeyStream...)
 		current_frame_number++
@@ -139,10 +143,10 @@ func TestCiphertextOnlyAttack(t *testing.T) {
 	full_KGC := append(KG_C, KG_C2...)
 	full_KGC = append(full_KGC, KG_C3...)
 
-	rii := SliceToMatrix(c)
-	fmt.Printf("c %d x %d\n", len(rii), len(rii[0]))
-	hmmm := MultiplyMatrix(append(append(KG, KG...), KG...), rii)
-	assert.Equal(t, full_KGC, hmmm)
+	// rii := SliceToMatrix(c)
+	// fmt.Printf("c %d x %d\n", len(rii), len(rii[0]))
+	// hmmm := MultiplyMatrix(append(append(KG, KG...), KG...), rii)
+	// assert.Equal(t, full_KGC, hmmm)
 
 	/* Multiply KG with the SymbolicKeyStream to make KGK */
 	KGk := CalculateKgTimesSymKeyStream(KG, symKeyStream[:456])
@@ -157,6 +161,8 @@ func TestCiphertextOnlyAttack(t *testing.T) {
 
 	/* Try to solve KG*k = KG*C for V_f*/
 	x := solveByGaussEliminationTryTwo(full_KGk, full_KGC)
+	// prints(full_KGC[:60], "")
+	// printmatrix(full_KGk[:60][:60])
 	println(x.ResType)
 	fmt.Printf("Size of multi %d\n", len(x.Multi))
 	fmt.Printf("Verifykeystream: %v\n", VerifyKeyStream(x.Multi[0]))

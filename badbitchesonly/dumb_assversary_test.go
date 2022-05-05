@@ -441,7 +441,7 @@ func TestMAKETEST(t *testing.T) {
 		keyStream2[i] = makeFinalXOR()
 		keyStreamSym2[i] = SymMakeFinalXOR(sr1, sr2, sr3)
 	}
-
+	fmt.Printf("keystreamsym %d \n", len(keyStreamSym2[0]))
 	//Do it all again
 	current_frame_number++
 	initializeRegisters()
