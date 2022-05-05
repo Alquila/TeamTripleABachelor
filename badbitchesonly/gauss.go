@@ -321,7 +321,7 @@ func backSubstitution(gaussRes GaussRes) GaussRes {
 				//i.e. we need to have a res with both 0 and 1 for this variable
 			}
 			if contains(gaussRes.DepCol, i) {
-				continue //if we are in an free collum then we skip iteration
+				continue //if we are in an Dependent collum then we skip iteration
 				//i.e. we need to have a res with both 0 and 1 for this variable
 			}
 
@@ -344,18 +344,20 @@ func backSubstitution(gaussRes GaussRes) GaussRes {
 func HandleMulti(gauss GaussRes) GaussRes {
 	gaussRes := gauss
 	gaussRes.Multi = make([][]int, 0)
+	noMulti := len(gaussRes.Multi)
 
 	//fmt.Printf("ResType: %v \n", gaussRes.ResType)
 	if gaussRes.ResType == Both || gaussRes.ResType == EmptyCol {
 		gaussRes = HandleEmptyCol(gaussRes)
-
+		noMulti = len(gaussRes.Multi)
 	}
+
 	if gaussRes.ResType == Both || gaussRes.ResType == DepVar {
 		gaussRes = HandleDepVar(gaussRes)
+		noMulti = len(gaussRes.Multi)
+
 	}
 
-	noMulti := len(gaussRes.Multi)
-	//fmt.Printf("Length of Multi in HandleMulti %d, \n", noMulti)
 	if noMulti < 1 {
 		res := make([]int, (len(gaussRes.TempRes[0]) - 2))
 		gaussRes.Multi = append(gaussRes.Multi, res)

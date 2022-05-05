@@ -66,7 +66,7 @@ func MultiplyMatrix(A [][]int, B [][]int) [][]int {
 
 	if noCol != secNoRows {
 		fmt.Println("Error: The matrix cannot be multiplied")
-		fmt.Printf("Dimensions are %d x %d * %d x %d\n", noRows, noCol, secNoRows, secNoRows)
+		fmt.Printf("Dimensions are %d x %d * %d x %d\n", noRows, noCol, secNoRows, secNoCol)
 	}
 
 	// Create result matrix after multiplication

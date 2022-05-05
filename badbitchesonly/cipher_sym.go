@@ -3,6 +3,7 @@ package main
 import (
 	. "fmt"
 	"strconv"
+	"strings"
 )
 
 var original_frame_number int
@@ -451,6 +452,23 @@ func PrettySymPrintSlice(slice [][]int) {
 			}
 		}
 		accString += strconv.Itoa(slice[i][len(slice[0])-1]) + "]  \n"
+		print(accString)
+	}
+	Println()
+
+}
+
+func PrettySymPrintFrame(slice [][]int) {
+	for i := 0; i < len(slice); i++ { //19
+		accString := "["
+		for j := 0; j < len(slice[0]); j++ { //19
+			if slice[i][j] == 1 {
+				str := strconv.Itoa(j)
+				accString += "k" + (str) + " ⨁ "
+			}
+		}
+		accString = strings.TrimRight(accString, "⨁ ")
+		accString += "]  \n"
 		print(accString)
 	}
 	Println()

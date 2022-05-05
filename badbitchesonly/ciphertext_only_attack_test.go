@@ -139,6 +139,11 @@ func TestCiphertextOnlyAttack(t *testing.T) {
 	full_KGC := append(KG_C, KG_C2...)
 	full_KGC = append(full_KGC, KG_C3...)
 
+	rii := SliceToMatrix(c)
+	fmt.Printf("c %d x %d\n", len(rii), len(rii[0]))
+	hmmm := MultiplyMatrix(append(append(KG, KG...), KG...), rii)
+	assert.Equal(t, full_KGC, hmmm)
+
 	/* Multiply KG with the SymbolicKeyStream to make KGK */
 	KGk := CalculateKgTimesSymKeyStream(KG, symKeyStream[:456])
 	KGk2 := CalculateKgTimesSymKeyStream(KG, symKeyStream[456:912]) //

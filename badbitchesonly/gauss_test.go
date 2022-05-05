@@ -533,6 +533,33 @@ func TestDependentVar(t *testing.T) {
 
 }
 
+func TestBothDepVarEmptyCol(t *testing.T) {
+	A := make([][]int, 5)
+	A[0] = []int{1, 0, 0, 1, 0, 0, 1}
+	A[1] = []int{0, 1, 0, 0, 0, 0, 0}
+	A[2] = []int{0, 0, 0, 0, 0, 1, 1}
+	A[3] = []int{0, 0, 0, 0, 0, 0, 0}
+	A[4] = []int{0, 0, 0, 0, 1, 0, 1}
+
+	gaussRes := GaussRes{ResType: Both, TempRes: A, DepCol: []int{3}, ColNo: []int{2}} // DepCol i,i
+	res := backSubstitution(gaussRes)
+
+	shouldBe := make([][]int, 4)
+	shouldBe[0] = []int{1, 0, 0, 0, 1}
+	shouldBe[1] = []int{0, 0, 0, 1, 1}
+	shouldBe[2] = []int{1, 0, 1, 0, 1}
+	shouldBe[3] = []int{0, 0, 1, 1, 1}
+
+	fmt.Printf("res er: %v \n", res)
+	fmt.Printf("res.Multi er: %v \n", res.Multi)
+	fmt.Printf("size of multi: %v \n", len(res.Multi))
+	if !reflect.DeepEqual(res.Multi, shouldBe) {
+		t.Fail()
+		t.Log("wrong")
+	}
+
+}
+
 // OLD Tests
 
 // func TestBackSubstitution(t *testing.T) {
