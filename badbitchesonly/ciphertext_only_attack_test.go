@@ -5,7 +5,6 @@ import (
 	_ "fmt"
 	"reflect"
 	_ "reflect"
-	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -74,53 +73,31 @@ func TestCiphertextOnlyAttack(t *testing.T) {
 
 	// create message to encrypt
 	msg := createRandomMessage(184)
+	// make the message a slice slice/matrix
+	msgM := SliceToMatrix(msg)
 
-	// make the message a slice slice
-	longer_msg := make([][]int, 184)
-	for i := 0; i < 184; i++ {
-		longer_msg[i] = make([]int, 1)
-		longer_msg[i][0] = msg[i]
-	}
+	// create matrix used for error correction
+	G := CreateGMatrix()
 
 	// use error-correction on message
-	G := CreateGMatrix()
-	// correspons to M in text
-	error_corrected_msg := MultiplyMatrix(G, longer_msg)
+	// 'error_corrected_msg' correspons to M in text
+	error_corrected_msg := MultiplyMatrix(G, msgM)                                     //456 x 1
+	error_corrected_msg2 := MultiplyMatrix(G, SliceToMatrix(createRandomMessage(184))) //456 x 1
+	error_corrected_msg3 := MultiplyMatrix(G, SliceToMatrix(createRandomMessage(184))) //456 x 1
+	full_msg := append(error_corrected_msg, error_corrected_msg2...)
+	full_msg = append(full_msg, error_corrected_msg3...)
 
-	KG := CreateKgMatrix()
+	/**	Does the same as TestMAKETEST from dumb_assversary */
 
-	probertyOfInverseTransformation := MultiplyMatrix(KG, error_corrected_msg)
-	//fmt.Printf("InvTrans: %d \n", probertyOfInverseTransformation)
-	shouldBe := make([][]int, 272)
-	for i := 0; i < 272; i++ {
-		shouldBe[i] = make([]int, 1)
-	}
-	assert.Equal(t, probertyOfInverseTransformation, shouldBe)
-
-	/**
-	Does the same as TestMAKETEST from dumb_assversary
-	*/
-
-	// init r1, r2, r3, r4
-	// makeRegisters() REVIEW: happens in makeKeyStream
 	// set frame number
 	current_frame_number, original_frame_number = 42, 42
-
 	// session_key is now all 0's
 	session_key = make([]int, 64)
-
-	// init registers with sesion key and frame number
-	// initializeRegisters() REVIEW: happens in makeKeyStream
-	// setIndicesToOne() REVIEW: happens in makeKeyStream
-
-	// init sr1, sr2, sr3
-	//SymInitializeRegisters()
-
 	keyStream := make([]int, 0)      // append to this, assert that the length is rigth
 	symKeyStream := make([][]int, 0) // same here <3
 
 	// how many frames do we need ?
-	for i := 0; i < 4; i++ {
+	for i := 0; i < 6; i++ {
 		// handle new frame variables ?
 		newKeyStream := makeKeyStream()
 		SymInitializeRegisters()
@@ -132,46 +109,61 @@ func TestCiphertextOnlyAttack(t *testing.T) {
 		current_frame_number++
 	}
 
-	/* Does new stuff not included in TestMAKETEST */
+	fmt.Printf("dims of msg:    %d x 1\n", len(full_msg))
+	fmt.Printf("dims of Symkey: %d x %d\n", len(symKeyStream), len(symKeyStream[0]))
+	fmt.Printf("dims of key	%d x 1\n", len(keyStream))
 
-	// krypter error-corrected message med keystream
-
-	// cipher text
-	c := make([]int, 456)
-	acc := "["
-	for i := 0; i < 456; i++ {
-		c[i] = error_corrected_msg[i][0] ^ keyStream[i]
-		acc = acc + " " + strconv.Itoa(error_corrected_msg[i][0])
+	c := make([]int, len(full_msg)) // cipher text = key xor msg
+	for i := 0; i < len(c); i++ {
+		c[i] = full_msg[i][0] ^ keyStream[i]
 	}
-	acc += "]"
 
-	cipher_matrix := SliceToMatrix(c)
-	KG_times_cipher := MultiplyMatrix(KG, cipher_matrix)
-	//Vores konkrete bitvektor som skal gives som second argument til Gauss
-	KG_C := MatrixToSlice(KG_times_cipher)
-	printmatrix(KG_times_cipher)
-	prints(KG_C, "KgC")
-
-	// aaa := CalculateKgTimesSymKeyStream(KG, symKeyStream[:456]) //FIXME hvor meget af symKey skal vi have med
-
-	// set up system
-	// A := makeAugmentedMatrix(symKeyStream, keyStream)
-
-	// K_gC := MultiplyMatrix(KG)
-	// fmt.Printf("this is error corrected: \n%v\n ", acc)
-	// fmt.Printf("this is k: \n%d\n", keyStream[:456])
-	// fmt.Printf("this is c: \n%d\n", c)
-
-	// kør 'doTheAttack'(?) fra dumb_assversry
-
-	x := solveByGaussEliminationTryTwo(symKeyStream, keyStream)
-
-	r1_solved, r2_solved, _ := MakeGaussResultToRegisters(x.Solved)
-
-	if reflect.DeepEqual(r1_solved, r2_solved) {
-		// t.Fails
-
+	/* Create KG and multiply it with C */
+	KG := CreateKgMatrix()
+	probertyOfInverseTransformation := MultiplyMatrix(KG, error_corrected_msg) // sanity check
+	shouldBe := make([][]int, 272)
+	for i := 0; i < 272; i++ {
+		shouldBe[i] = make([]int, 1)
 	}
+	assert.Equal(t, probertyOfInverseTransformation, shouldBe)
+	assert.Equal(t, MultiplyMatrix(KG, error_corrected_msg2), shouldBe)
+	assert.Equal(t, MultiplyMatrix(KG, error_corrected_msg3), shouldBe)
+	fmt.Printf("dims of C	%d x 1\n", len(c))                //1368
+	fmt.Printf("dims of KG	%d x %d\n", len(KG), len(KG[0])) //272 x 456
+
+	/* Vores konkrete bitvektor som skal gives som second argument til Gauss */
+	KG_C := MatrixToSlice(MultiplyMatrix(KG, SliceToMatrix(c[:456])))
+	fmt.Printf("dims of K_G*C:  %d x 1 \n", len(KG_C)) //272 x 1
+	KG_C2 := MatrixToSlice(MultiplyMatrix(KG, SliceToMatrix(c[456:912])))
+	KG_C3 := MatrixToSlice(MultiplyMatrix(KG, SliceToMatrix(c[912:])))
+	full_KGC := append(KG_C, KG_C2...)
+	full_KGC = append(full_KGC, KG_C3...)
+
+	/* Multiply KG with the SymbolicKeyStream to make KGK */
+	KGk := CalculateKgTimesSymKeyStream(KG, symKeyStream[:456])
+	KGk2 := CalculateKgTimesSymKeyStream(KG, symKeyStream[456:912]) //
+	KGk3 := CalculateKgTimesSymKeyStream(KG, symKeyStream[912:])    //
+	fmt.Printf("dims of K_g*k:  %d x %d \n", len(KGk), len(KGk[0])) //272 x 657
+	// fmt.Printf("dims of K_g*k2: %d x %d \n", len(KGk2), len(KGk2[0])) //272 x 657
+	full_KGk := append(KGk, KGk2...)
+	full_KGk = append(full_KGk, KGk3...)
+	fmt.Printf("dims of K_g*k4: %d x %d \n", len(full_KGk), len(full_KGk[0])) //816 x 657
+	fmt.Printf("dims of full K_G*C:  %d x 1 \n", len(full_KGC))               //816 x1
+
+	/* Try to solve KG*k = KG*C for V_f*/
+	x := solveByGaussEliminationTryTwo(full_KGk, full_KGC)
+	println(x.ResType)
+	fmt.Printf("Size of multi %d\n", len(x.Multi))
+	fmt.Printf("Verifykeystream: %v\n", VerifyKeyStream(x.Multi[0]))
+	r1_solved, r2_solved, r3_solved := MakeGaussResultToRegisters(x.Multi[0])
+	prints(r1_solved, "r1")
+	prints(r2_solved, "r2")
+	prints(r3_solved, "r3")
+
+	// if reflect.DeepEqual(r1_solved, r2_solved) {
+	// t.Fails
+
+	// }
 
 }
 
@@ -209,4 +201,19 @@ func TestMatrixToSlice(t *testing.T) {
 	matrix := SliceToMatrix(slice)
 	backToSlice := MatrixToSlice(matrix)
 	assert.Equal(t, slice, backToSlice)
+}
+
+func TestTryAllCombinationsOfR4(t *testing.T) {
+	r4_found := make([][]int, 0)
+	r4_guess := make([]int, 17)
+
+	session_key = make([]int, 64) // FIXME: session_keyis all zeros now
+	original_frame_number, current_frame_number = 42, 42
+	r4_bin, bin_key, r4_for_test := MakeRealKeyStreamFourFrames(original_frame_number)
+
+	fmt.Printf("This is r4_found: %d\n", r4_found)
+	fmt.Printf("This is r4_guess: %d\n", r4_guess)
+	fmt.Printf("This is r4_bin: %d\n", r4_bin)
+	fmt.Printf("This is bin_key: %d\n", bin_key)
+	fmt.Printf("This is r4_for_test: %d\n", r4_for_test)
 }

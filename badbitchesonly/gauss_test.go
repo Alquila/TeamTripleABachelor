@@ -83,9 +83,9 @@ func TestBackSubstitutionBinary(t *testing.T) {
 		TempRes: augMatrix}
 
 	res = backSubstitution(res)
-	fmt.Printf("This is the result of the backSubstitution: %d \n", res.Solved)
+	fmt.Printf("This is the result of the backSubstitution: %d \n", res.Multi[0])
 
-	if !reflect.DeepEqual(res.Solved, shouldBe) {
+	if !reflect.DeepEqual(res.Multi[0], shouldBe) {
 		t.Log("The result of the backSubstitution is wrong\n")
 		t.Fail()
 	} else {
@@ -102,12 +102,12 @@ func TestBackSubstitutionBinary(t *testing.T) {
 	shouldBe = []int{1, 1, 1, 0}
 
 	res = GaussRes{
-		ResType: "Valid",
+		ResType: "Multi",
 		TempRes: augMatrix}
 
 	res = backSubstitution(res)
-	fmt.Printf("This is the second result of the backSubstitution: %d \n", res.Solved)
-	if !reflect.DeepEqual(res.Solved, shouldBe) {
+	fmt.Printf("This is the second result of the backSubstitution: %d \n", res.Multi[0])
+	if !reflect.DeepEqual(res.Multi[0], shouldBe) {
 		t.Log("The second result of the backSubstitution is wrong \n")
 		t.Fail()
 	} else {
@@ -127,18 +127,18 @@ func TestBackSubstitutionConstant(t *testing.T) {
 	shouldBe := []int{1, 1, 1, 0}
 
 	res := GaussRes{
-		ResType: "Valid",
+		ResType: "Multi",
 		TempRes: augMatrix}
 
 	res = backSubstitution(res)
-	fmt.Printf("This is the result of the backSubstitution: %d \n", res.Solved)
+	fmt.Printf("This is the result of the backSubstitution: %d \n", res.Multi[0])
 
-	if !reflect.DeepEqual(res.Solved, shouldBe) {
+	if !reflect.DeepEqual(res.Multi[0], shouldBe) {
 		t.Log("The result of the backSubstitution is wrong")
 		t.Fail()
 	}
 
-	if reflect.DeepEqual(res.Solved, shouldBe) {
+	if reflect.DeepEqual(res.Multi[0], shouldBe) {
 		t.Log("The result of the backSubstitution was correct")
 
 	}
@@ -155,13 +155,13 @@ func TestBackSubstitution2(t *testing.T) {
 	shouldBe := []int{0, 1, 0, 1}
 
 	res := GaussRes{
-		ResType: "Valid",
+		ResType: "Multi",
 		TempRes: a}
 
 	res = backSubstitution(res)
-	fmt.Printf("res is: %d \n", res.Solved)
+	fmt.Printf("res is: %d \n", res.Multi[0])
 
-	if !reflect.DeepEqual(res.Solved, shouldBe) {
+	if !reflect.DeepEqual(res.Multi[0], shouldBe) {
 		t.Log("Not correct :(")
 		t.Fail()
 	}
@@ -263,7 +263,7 @@ func TestGaussEliminationDep(t *testing.T) {
 	fmt.Printf("This is res:	   %d \n", res.TempRes)
 	fmt.Printf("This is should be: %d \n", shouldBe)
 	fmt.Printf("This is restype: %v \n", res.ResType)
-	if !reflect.DeepEqual(res.ResType, Error) {
+	if !reflect.DeepEqual(res.ResType, DepVar) {
 		t.Log("The result of the gauss elimination is wrong")
 		t.Fail()
 	}
@@ -507,6 +507,30 @@ func TestHandleFreeVar(t *testing.T) {
 	for i, _ := range bit {
 		fmt.Printf("Bit string: %d \n", bit[i])
 	}
+}
+
+func TestDependentVar(t *testing.T) {
+	A := make([][]int, 4)
+	A[0] = []int{1, 0, 0, 1, 0, 1}
+	A[1] = []int{0, 1, 1, 0, 0, 1}
+	A[2] = []int{0, 0, 0, 0, 0, 0}
+	A[3] = []int{0, 0, 0, 1, 0, 1}
+
+	gaussRes := GaussRes{ResType: DepVar, TempRes: A, DepCol: []int{2}} // DepCol i,i
+	res := backSubstitution(gaussRes)
+
+	shouldBe := make([][]int, 2)
+	shouldBe[0] = []int{0, 1, 0, 1}
+	shouldBe[1] = []int{0, 0, 1, 1}
+
+	fmt.Printf("res er: %v \n", res)
+	fmt.Printf("res.Multi er: %v \n", res.Multi)
+	fmt.Printf("size of multi: %v \n", len(res.Multi))
+	if !reflect.DeepEqual(res.Multi, shouldBe) {
+		t.Fail()
+		t.Log("wrong")
+	}
+
 }
 
 // OLD Tests

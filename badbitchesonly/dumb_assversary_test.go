@@ -480,12 +480,12 @@ func TestMAKETEST(t *testing.T) {
 	b = append(b, keyStream3...)
 
 	x := solveByGaussEliminationTryTwo(A, b)
-	// print(x.ResType)
+	println(x.ResType)
 	// prints(x[0:20], "res 20xx")
-
-	assert.Equal(t, true, VerifyKeyStream(x.Solved), "VerifyKeyStream returned false")
-
-	r1_solved, r2_solved, r3_solved := MakeGaussResultToRegisters(x.Solved)
+	println(len(x.Multi))
+	assert.Equal(t, true, VerifyKeyStream(x.Multi[0]), "VerifyKeyStream returned false")
+	// println(x.Multi[0])
+	r1_solved, r2_solved, r3_solved := MakeGaussResultToRegisters(x.Multi[0])
 
 	// after_init := []int{1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1}
 	// assert.Equal(t, after_init, old_r1)
@@ -717,4 +717,28 @@ func TestWhy(t *testing.T) {
 	}
 	prints(iiii.ArrImposter, "will this work ")
 	prints(XorSlice(r4_first_real, iiii.ArrImposter), "?")
+}
+
+func TestBinaryConverter(t *testing.T) {
+	x := 33114
+	slice := (MakeR4Guess(x))
+	intt := convertBinaryToDecimal(slice)
+	assert.Equal(t, x, intt)
+
+	slice = MakeR4Guess(10)
+	intt = convertBinaryToDecimal(slice)
+	assert.Equal(t, 10, intt)
+
+	slice = MakeR4Guess(15)
+	intt = convertBinaryToDecimal(slice)
+	assert.Equal(t, 15, intt)
+
+}
+
+func TestDeep(t *testing.T) {
+	slice := SliceToMatrix(MakeR4Guess(200))
+	slice2 := SliceToMatrix(MakeR4Guess(200))
+	if !reflect.DeepEqual(slice, slice2) {
+		t.Fail()
+	}
 }

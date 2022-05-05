@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 )
 
 //"fmt"
@@ -234,7 +235,8 @@ func DescribeNewFrameWithOldVariables(original_framenum int, current_framenum in
 	return newReg
 }
 
-func MakeRealKeyStreamThreeFrames(frame int) ([]int, []int, []int) {
+//Returns the real r4 that made the keystream. Returns three frame long key. Returns fourth frame key
+func MakeRealKeyStreamFourFrames(frame int) ([]int, []int, []int) {
 	original_frame_number = frame
 	current_frame_number = frame
 	key1 := makeKeyStream()
@@ -244,15 +246,18 @@ func MakeRealKeyStreamThreeFrames(frame int) ([]int, []int, []int) {
 
 	current_frame_number++
 	key2 := makeKeyStream()
-	r4_second := r4.ArrImposter
+	// r4_second := r4.ArrImposter
 	// prints(r4_after_init.ArrImposter, "r4 after second init:       ") //[0 1 0 1 0 0 1 0 1 1 1 0 0 0 0 0 1]
 	current_frame_number++
 	key3 := makeKeyStream()
+
+	current_frame_number++
+	key4 := makeKeyStream()
 	// prints(r4_after_init.ArrImposter, "r4 after third init:       ")
 
 	key := append(key1, key2...)
 	key = append(key, key3...)
-	return r4_real, key, r4_second
+	return r4_real, key, key4
 }
 
 func TryAllReg4() {
@@ -267,12 +272,21 @@ func TryAllReg4() {
 	// solved := make([][]int, 0)
 	r4_guess := make([]int, 17)
 
-	// makeSessionKey() //Make a random session key
 	session_key = make([]int, 64) //all zero session key
+	makeSessionKey()              //Make a random session key
 	original_frame_number = 42
-	r4_real, real_key, _ := MakeRealKeyStreamThreeFrames(original_frame_number)
+	r4_real, real_key, r4_for_test := MakeRealKeyStreamFourFrames(original_frame_number)
+	//FIXME: we need to make a 4'th real key stream for testing if the found r4 values are correct
 
-	current_frame_number++
+	// current_frame_number++
+
+	reeee := make([]int, 0)
+	reeee = append(reeee, r4_real[:10]...)
+	reeee = append(reeee, r4_real[11:]...)
+	real_iteration := convertBinaryToDecimal(reeee)
+	lower := real_iteration - 150
+	upper := real_iteration + 150
+	fmt.Printf("real: %d, lower: %d, upper: %d\n", real_iteration, lower, upper)
 	// fourth_frame := makeKeyStream()
 	//[0 1 0 1 1 0 1 0 1 0 1 0 0 0 0 0 1] <- dette er R4 som vi skal frem til når der ikke er noget random
 	//[0 1 0 1 1 0 1 0 1 0 1 0 0 0 0 0 1] <- 33114 omgang
@@ -281,7 +295,7 @@ func TryAllReg4() {
 	// prints(real_key[:1], "keystream after first init")
 
 	// guesses := int(math.Pow(2, 16))
-	for i := 30000; i < 35000; i++ {
+	for i := lower; i < upper; i++ {
 		// for i := 0; i < guesses; i++ { //FIXME ind og udkommenter de to headers her for at skifte -AK
 		if i%100 == 0 {
 			fmt.Printf("iteration %d \n", i)
@@ -364,7 +378,7 @@ func TryAllReg4() {
 
 				}
 			}
-		} else if gauss.ResType == Valid {
+		} else if gauss.ResType == Valid { //TODO remove this code
 			// handle normally
 			if VerifyKeyStream(gauss.Solved) {
 				fmt.Printf("Found in iteration %d \n", i)
@@ -389,24 +403,30 @@ func TryAllReg4() {
 		// gauss: based on response add to found
 	}
 
-	/**
-	if len(r4_found) > 1 {
-		// we have multiple plausible solutions
+	// FIXME: this might not work ?
+	// 'trial encryptions'
+	correct_r4 := make([]int, len(r4_guess))
+	number_of_valid_r4 := len(r4_found)
+	if number_of_valid_r4 <= 0 {
+		fmt.Printf("We didn't find any at all \n")
+	} else if number_of_valid_r4 > 1 {
+		// we have multiple plausible solutions to r4
 		// somehow try them all and se what works
-		for i := 0; i > len(r4_found); i++ {
-			r4.ArrImposter = r4_found[i]
-
-			// do makeKeyStream change r4 ???? I sure hope not :))
-			// ks := makeKeyStream()
-			messageToEncrypt := make([]int, 184)
-			messageToEncrypt[5] = 42
-			messageToEncrypt[75] = 42
-			messageToEncrypt[150] = 42
-			messageToEncrypt[129] = 42
+		for i := 0; i > number_of_valid_r4; i++ {
+			r4.ArrImposter = r4_found[i] // is this how its supposed to happend?
+			//what should frame_number be ? original + 4
+			current_frame_number = original_frame_number + 4
+			ks := makeKeyStream()
+			if reflect.DeepEqual(ks, r4_for_test) {
+				fmt.Printf("This should be the right one: %d\n", r4_for_test)
+				correct_r4 = r4_found[i]
+				break
+			}
 
 		}
+	} else {
+		correct_r4 = r4_found[0]
 	}
-	*/
 
 	fmt.Printf("This is original r4:       %d\n", r4_real)
 	for i := range r4_found {
@@ -414,11 +434,11 @@ func TryAllReg4() {
 		// fmt.Printf("This is %d'th found solved:  %d \n", i, solved[i])
 	}
 	fmt.Println("Have we found the right r4?")
-	for i := range r4_found {
-		if reflect.DeepEqual(r4_found[i], r4_real) {
-			fmt.Println("Fuck yes we found it gutterne")
-		}
+	// for i := range r4_found {
+	if reflect.DeepEqual(correct_r4, r4_real) { // 'correct_r4' used to be 'r4_found[i]'
+		fmt.Println("Fuck yes we found it gutterne")
 	}
+	// }
 
 }
 
@@ -476,6 +496,42 @@ func helper(vars []int, prods []int) bool {
 	}
 
 	return true
+}
+
+func convertBinaryToDecimal(number []int) int {
+	bin_num := ""
+	// prints(number, "reee")
+
+	for i := len(number) - 1; i >= 0; i-- {
+		// println(i)
+		// println(number[i])
+		bin_num = bin_num + strconv.Itoa(number[i])
+	}
+
+	num, err := strconv.ParseInt(bin_num, 2, 64)
+
+	if err != nil {
+		panic(err)
+	}
+	return int(num)
+}
+
+func convertBinaryToDecimal2(number []int) int {
+	bin_num := ""
+	// prints(number, "reee")
+
+	for i := 0; i < len(number); i++ {
+		// println(i)
+		// println(number[i])
+		bin_num = bin_num + strconv.Itoa(number[i])
+	}
+
+	num, err := strconv.ParseInt(bin_num, 2, 64)
+
+	if err != nil {
+		panic(err)
+	}
+	return int(num)
 }
 
 // 	for i := 0; i < 2; i++ {

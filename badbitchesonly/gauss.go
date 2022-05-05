@@ -119,6 +119,7 @@ type GaussRes struct {
 	ResType string //Can be "Error" , "EmptyCol", "Multi"
 	TempRes [][]int
 	ColNo   []int   //index of empty columns
+	DepCol  []int   //index of dependent columns
 	Solved  []int   //After backsubstitution
 	Multi   [][]int //Multiple solutions
 }
@@ -129,6 +130,8 @@ const (
 	EmptyCol string = "EmptyCol"
 	Multi    string = "Multi"
 	Valid    string = "Valid"
+	DepVar   string = "DepVar"
+	Both     string = "Both"
 )
 
 func makeAugmentedMatrix(A [][]int, b []int) [][]int {
@@ -160,6 +163,7 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 		ResType: Valid,
 		TempRes: make([][]int, len(augMa)),
 		ColNo:   make([]int, 0),
+		DepCol:  make([]int, 0),
 	}
 
 	noUnknownVars := len(augMa[0]) - 2 // n is number of unknowns
@@ -195,6 +199,13 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 					for j := 0; j < i; j++ {
 						if augMa[j][i] == 1 {
 							allZero = false
+							if res.ResType == EmptyCol {
+								res.ResType = Both
+							} else {
+								res.ResType = DepVar
+							}
+							freeVar = append(freeVar, i)
+							res.DepCol = append(res.DepCol, i)
 							//fmt.Printf("dependent var at [%d][%d] \n", j, i)
 							//prints(augMa[j], "")
 							// res.ResType = Error
@@ -250,9 +261,9 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 		if augMa[q][bitIndex] == 1 {
 			if augMa[q][resIndex] != 1 {
 				// fmt.Printf("augma[%d][%d] = 1 but augma[%d][res] = %d \n", q, bitIndex, q, 0)
-				// // res.ResType = Error
-				// res.TempRes = augMa
-				// return res
+				res.ResType = Error
+				res.TempRes = augMa
+				return res
 			}
 		} else if augMa[q][resIndex] == 1 {
 			// fmt.Printf("augma[%d][res] == 1, \n", q)
@@ -293,73 +304,127 @@ func backSubstitution(gaussRes GaussRes) GaussRes {
 	noUnknownVars := lengthy - 2 // n is number of unknowns
 	lastCol := lengthy - 1
 	bitCol := lengthy - 2
-	res := make([]int, noUnknownVars)
-	//fmt.Printf("lengthy of augma: %d, noOfUnknownvars: %d, last col at: augMa[%d], bit entry at: augMa[%d] \n", lengthy, noUnknownVars, lastCol, bitCol)
+	//res := make([]int, noUnknownVars)
+	gaussRes = HandleMulti(gaussRes)
+	noMulti := len(gaussRes.Multi)
 
-	// printmatrix(augMatrix[:21])
-	// prints(augMatrix[noUnknownVars-1], "augma[-1]")
+	for m := 0; m < noMulti; m++ {
+		res := make([]int, noUnknownVars)
+		copy(res, gaussRes.Multi[m])
 
-	// start from the last variable = aug[x_n][k_n]
-	res[noUnknownVars-1] = augMatrix[noUnknownVars-1][lastCol] ^ augMatrix[noUnknownVars-1][bitCol]
+		// start from the last variable = aug[x_n][k_n]
+		res[noUnknownVars-1] = augMatrix[noUnknownVars-1][lastCol] ^ augMatrix[noUnknownVars-1][bitCol]
 
-	for i := noUnknownVars - 2; i >= 0; i-- { // looks at every row not all zero
-		if gaussRes.ResType == EmptyCol {
+		for i := noUnknownVars - 2; i >= 0; i-- { // looks at every row not all zero
 			if contains(gaussRes.ColNo, i) {
 				continue //if we are in an free collum then we skip iteration
 				//i.e. we need to have a res with both 0 and 1 for this variable
 			}
-		}
-		res[i] = augMatrix[i][lastCol]
-		// prints(augMatrix[i], "")
-		// fmt.Printf("res[i] is %d", res[i])
-		// prints(res, "res")
-		for j := i + 1; j < noUnknownVars; j++ {
-			// fmt.Printf("i is %d, j is %d \n", i, j)
-			if augMatrix[i][j] == 1 {
-				res[i] = res[i] ^ res[j]
+			if contains(gaussRes.DepCol, i) {
+				continue //if we are in an free collum then we skip iteration
+				//i.e. we need to have a res with both 0 and 1 for this variable
 			}
-		}
-		res[i] = res[i] ^ augMatrix[i][bitCol]
-		// fmt.Printf("res[i] is %d", res[i])
-	}
 
-	gaussRes.Solved = res
-	if gaussRes.ResType == EmptyCol {
-		gaussRes = HandleEmptyCol(gaussRes)
+			res[i] = augMatrix[i][lastCol]
+			for j := i + 1; j < noUnknownVars; j++ {
+				if augMatrix[i][j] == 1 {
+					res[i] = res[i] ^ res[j]
+				}
+			}
+			res[i] = res[i] ^ augMatrix[i][bitCol]
+
+		}
+
+		gaussRes.Multi[m] = res
 	}
 
 	return gaussRes
 }
 
-func HandleEmptyCol(gauss GaussRes) GaussRes {
+func HandleMulti(gauss GaussRes) GaussRes {
 	gaussRes := gauss
 	gaussRes.Multi = make([][]int, 0)
-	noEmptyCol := len(gauss.ColNo)
-	if noEmptyCol >= 1 {
-		// do something
-		bitSlice := MakeBitSlice(noEmptyCol)
-		for i := 0; i < len(bitSlice); i++ {
-			res := make([]int, len(gauss.Solved))
-			copy(res, gauss.Solved)
-			for j := 0; j < noEmptyCol; j++ {
-				index := gauss.ColNo[j]
-				res[index] = bitSlice[i][j]
-			}
-			gaussRes.Multi = append(gaussRes.Multi, res)
-		}
-		// else {
-		// 	index := gauss.ColNo[0]
-		// 	for i := 0; i < 2; i++ {
-		// 		res := make([]int, len(gauss.Solved))
-		// 		copy(res, gauss.Solved)
-		// 		res[index] = i
-		// 		gaussRes.Multi = append(gaussRes.Multi, res)
-		// 	}
-		// }
+
+	//fmt.Printf("ResType: %v \n", gaussRes.ResType)
+	if gaussRes.ResType == Both || gaussRes.ResType == EmptyCol {
+		gaussRes = HandleEmptyCol(gaussRes)
+
+	}
+	if gaussRes.ResType == Both || gaussRes.ResType == DepVar {
+		gaussRes = HandleDepVar(gaussRes)
+	}
+
+	noMulti := len(gaussRes.Multi)
+	//fmt.Printf("Length of Multi in HandleMulti %d, \n", noMulti)
+	if noMulti < 1 {
+		res := make([]int, (len(gaussRes.TempRes[0]) - 2))
+		gaussRes.Multi = append(gaussRes.Multi, res)
+		noMulti = len(gaussRes.Multi)
 	}
 
 	gaussRes.ResType = Multi
 	return gaussRes
+}
+
+func HandleEmptyCol(gauss GaussRes) GaussRes {
+	gaussRes := gauss
+	noEmptyCol := len(gauss.ColNo)
+	bitSlice := MakeBitSlice(noEmptyCol)
+	newMulti := make([][]int, 0)
+	for i := 0; i < len(bitSlice); i++ {
+		res := make([]int, (len(gaussRes.TempRes[0]) - 2))
+		for j := 0; j < noEmptyCol; j++ {
+			index := gauss.ColNo[j]
+			res[index] = bitSlice[i][j]
+		}
+		//fmt.Printf("hmmm %d, %d, \n", res, i)
+		newMulti = append(newMulti, res)
+	}
+	//fmt.Printf("Size of NewMulti: %d \n", len(newMulti))
+
+	newGauss := GaussRes{
+		ResType: gaussRes.ResType,
+		TempRes: gaussRes.TempRes,
+		DepCol:  gaussRes.DepCol,
+		ColNo:   gaussRes.ColNo,
+	}
+	newGauss.Multi = newMulti
+	return newGauss
+}
+
+func HandleDepVar(gauss GaussRes) GaussRes {
+	gaussRes := gauss
+	noDepVar := len(gaussRes.DepCol)
+	bitSlice := MakeBitSlice(noDepVar)
+	noMulti := len(gaussRes.Multi)
+	if noMulti < 1 {
+		res := make([]int, (len(gaussRes.TempRes[0]) - 2))
+		gaussRes.Multi = append(gaussRes.Multi, res)
+		noMulti = len(gaussRes.Multi)
+	}
+
+	newMulti := make([][]int, 0)
+	for m := 0; m < noMulti; m++ {
+		for i := 0; i < len(bitSlice); i++ {
+			res := make([]int, (len(gaussRes.TempRes[0]) - 2))
+			copy(res, gaussRes.Multi[m])
+
+			for j := 0; j < noDepVar; j++ {
+				index := gauss.DepCol[j]
+				res[index] = bitSlice[i][j]
+			}
+			newMulti = append(newMulti, res)
+		}
+	}
+
+	newGauss := GaussRes{
+		ResType: gaussRes.ResType,
+		TempRes: gaussRes.TempRes,
+		DepCol:  gaussRes.DepCol,
+		ColNo:   gaussRes.ColNo,
+	}
+	newGauss.Multi = newMulti
+	return newGauss
 }
 
 // Taken from https://stackoverflow.com/questions/10485743/contains-method-for-a-slice

@@ -55,17 +55,18 @@ func CreateKgMatrix() [][]int {
 //
 func MultiplyMatrix(A [][]int, B [][]int) [][]int {
 	noRows := len(A) // m
-	fmt.Printf("Number of rows in first matrix: %d\n", noRows)
+	// fmt.Printf("Number of rows in first matrix: %d\n", noRows)
 	noCol := len(A[0]) // n
-	fmt.Printf("Number of col in first matrix: %d\n", noCol)
+	// fmt.Printf("Number of col in first matrix: %d\n", noCol)
 
 	secNoRows := len(B) // p
-	fmt.Printf("Number of rows in second matrix: %d\n", secNoRows)
+	// fmt.Printf("Number of rows in second matrix: %d\n", secNoRows)
 	secNoCol := len(B[0]) // q
-	fmt.Printf("Number of columns in second matrix: %d\n", secNoCol)
+	// fmt.Printf("Number of columns in second matrix: %d\n", secNoCol)
 
 	if noCol != secNoRows {
 		fmt.Println("Error: The matrix cannot be multiplied")
+		fmt.Printf("Dimensions are %d x %d * %d x %d\n", noRows, noCol, secNoRows, secNoRows)
 	}
 
 	// Create result matrix after multiplication
@@ -129,10 +130,10 @@ func CalculateKgTimesSymKeyStream(Kg [][]int, symKeyStream [][]int) [][]int {
 	res := make([][]int, number_of_rows)
 
 	if number_of_columns != number_of_key_rows {
-		fmt.Printf("Dimensions of the given matrices doesn't match")
-		fmt.Printf("Dimension of Kg is: %d x %d", number_of_rows, number_of_columns)
-		fmt.Printf("Dimension of symKeyStream is: %d x %d", number_of_key_rows, number_of_variables)
-		fmt.Printf("%d is clearly different from %d", number_of_rows, number_of_key_rows)
+		fmt.Printf("Dimensions of the given matrices doesn't match.\n")
+		fmt.Printf("Dimension of Kg is: %d x %d \n", number_of_rows, number_of_columns)
+		fmt.Printf("Dimension of symKeyStream is: %d x %d \n", number_of_key_rows, number_of_variables)
+		fmt.Printf("%d is clearly different from %d \n", number_of_rows, number_of_key_rows)
 	}
 
 	for i := 0; i < number_of_rows; i++ {
