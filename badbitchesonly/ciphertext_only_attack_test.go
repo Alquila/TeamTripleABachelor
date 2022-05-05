@@ -22,6 +22,16 @@ func TestCreate_G_matrix(t *testing.T) {
 	}
 }
 
+func TestCreate_K_Matrix(t *testing.T) {
+	Kg := CreateKgMatrix()
+	printmatrix(Kg)
+	for i := 0; i < len(Kg[0]); i++ {
+		if Kg[0][i] == 1 {
+			fmt.Printf("1 at %d \n", i)
+		}
+	}
+}
+
 func TestMultiplyMatrix(t *testing.T) {
 	A := make([][]int, 3)
 
@@ -93,7 +103,7 @@ func TestCiphertextOnlyAttack(t *testing.T) {
 	current_frame_number, original_frame_number = 42, 42
 	// session_key is now all 0's
 	session_key = make([]int, 64)
-	makeSessionKey()
+	// makeSessionKey()
 	keyStream := make([]int, 0)      // append to this, assert that the length is rigth
 	symKeyStream := make([][]int, 0) // same here <3
 
@@ -103,9 +113,9 @@ func TestCiphertextOnlyAttack(t *testing.T) {
 		newKeyStream := makeKeyStream()
 		SymInitializeRegisters()
 		copy(sr4.ArrImposter, r4_after_init.ArrImposter)
-		sr4.ArrImposter[5] = 1
-		sr4.ArrImposter[6] = 1
-		sr4.ArrImposter[7] = 1
+		// sr4.ArrImposter[5] = 1
+		// sr4.ArrImposter[6] = 1
+		// sr4.ArrImposter[7] = 1
 		newSymKeyStream := ClockForKey(sr4)
 		// assert.Equal(t, sr4.ArrImposter, r4.ArrImposter)
 		keyStream = append(keyStream, newKeyStream...)
@@ -136,7 +146,11 @@ func TestCiphertextOnlyAttack(t *testing.T) {
 	fmt.Printf("dims of KG	%d x %d\n", len(KG), len(KG[0])) //272 x 456
 
 	/* Vores konkrete bitvektor som skal gives som second argument til Gauss */
+	prints(c[:456], "c")
 	KG_C := MatrixToSlice(MultiplyMatrix(KG, SliceToMatrix(c[:456])))
+	prints(KG_C, "KGc")
+	prints(c[184:456], "c[184:456]")
+	print(len(c[184:456]), "c[184:456]")
 	fmt.Printf("dims of K_G*C:  %d x 1 \n", len(KG_C)) //272 x 1
 	KG_C2 := MatrixToSlice(MultiplyMatrix(KG, SliceToMatrix(c[456:912])))
 	KG_C3 := MatrixToSlice(MultiplyMatrix(KG, SliceToMatrix(c[912:])))
@@ -219,7 +233,9 @@ func TestTryAllCombinationsOfR4(t *testing.T) {
 	r4_guess := make([]int, 17)
 
 	session_key = make([]int, 64) // FIXME: session_keyis all zeros now
+	// makeSessionKey()
 	original_frame_number, current_frame_number = 42, 42
+	// should have eight frames
 	r4_bin, bin_key, r4_for_test := MakeRealKeyStreamFourFrames(original_frame_number)
 
 	fmt.Printf("This is r4_found: %d\n", r4_found)

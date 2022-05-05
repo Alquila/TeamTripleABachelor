@@ -14,14 +14,14 @@ func CreateGMatrix() [][]int {
 
 	// Make 184 slices of length 456
 	for i := 0; i < 456; i++ {
-		colSlice := make([]int, 184)
+		row := make([]int, 184)
 
 		// Set diagonal to 1
 		if i < 184 {
-			colSlice[i] = 1
+			row[i] = 1
 		}
 
-		G[i] = colSlice
+		G[i] = row
 	}
 
 	return G
@@ -36,14 +36,14 @@ func CreateKgMatrix() [][]int {
 
 	// Make 184 slices of length 456
 	for i := 0; i < 272; i++ {
-		colSlice := make([]int, 456)
+		row := make([]int, 456)
 
 		// Set diagonal to 1 after 184
-		if i > 184 && i < 272 {
-			colSlice[i] = 1
-		}
-
-		KG[i] = colSlice
+		// if i > 184 && i < 272 {
+		// 	row[i] = 1
+		// }
+		row[i+184] = 1
+		KG[i] = row
 	}
 
 	return KG
