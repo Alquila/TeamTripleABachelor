@@ -88,50 +88,77 @@ func TestDescribeRegistersFromFrame(t *testing.T) {
 }
 
 func TestDescribeRegistersFromKey(t *testing.T) {
-	sre1 := SymMakeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14, 15)
-	sre2 := SymMakeRegister(22, []int{21, 20}, []int{9, 13}, 16, 16)
-	sre3 := SymMakeRegister(23, []int{22, 21, 20, 7}, []int{16, 18}, 13, 18)
+	// sre1 := SymMakeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14, 15)
+	// sre2 := SymMakeRegister(22, []int{21, 20}, []int{9, 13}, 16, 16)
+	// sre3 := SymMakeRegister(23, []int{22, 21, 20, 7}, []int{16, 18}, 13, 18)
 
-	for i := 0; i < sre1.Length; i++ {
-		sre1.ArrImposter[i] = make([]int, 64)
-	}
+	// for i := 0; i < sre1.Length; i++ {
+	// 	sre1.ArrImposter[i] = make([]int, 64)
+	// }
 
-	for i := 0; i < sre2.Length; i++ {
-		sre2.ArrImposter[i] = make([]int, 64)
-	}
+	// for i := 0; i < sre2.Length; i++ {
+	// 	sre2.ArrImposter[i] = make([]int, 64)
+	// }
 
-	for i := 0; i < sre3.Length; i++ {
-		sre3.ArrImposter[i] = make([]int, 64)
-	}
+	// for i := 0; i < sre3.Length; i++ {
+	// 	sre3.ArrImposter[i] = make([]int, 64)
+	// }
 
-	reg4 := SymMakeRegister(17, []int{16, 11}, []int{12, 15}, 14, 10)
-	for i := 0; i < 17; i++ {
-		reg4.ArrImposter[i] = make([]int, 64)
-	}
+	// reg4 := SymMakeRegister(17, []int{16, 11}, []int{12, 15}, 14, 10)
+	// for i := 0; i < 17; i++ {
+	// 	reg4.ArrImposter[i] = make([]int, 64)
+	// }
 
-	for i := 0; i < 64; i++ {
-		SymClock(sre1)
-		SymClock(sre2)
-		SymClock(sre3)
-		SymClock(reg4)
-		sre1.ArrImposter[0][i] = 1 //should this be xor? <- no den påvirkes kun af den i'te bit én gang
-		sre2.ArrImposter[0][i] = 1
-		sre3.ArrImposter[0][i] = 1
-		reg4.ArrImposter[0][i] = 1
-	}
-	println("sr1")
-	PrettySymPrintFrame(sre1.ArrImposter)
-	println("sr2")
-	PrettySymPrintFrame(sre2.ArrImposter)
-	println("sr3")
-	PrettySymPrintFrame(sre3.ArrImposter)
-	println("sr4")
-	PrettySymPrintFrame(reg4.ArrImposter)
+	// for i := 0; i < 64; i++ {
+	// 	SymClock(sre1)
+	// 	SymClock(sre2)
+	// 	SymClock(sre3)
+	// 	SymClock(reg4)
+	// 	sre1.ArrImposter[0][i] = 1 //should this be xor? <- no den påvirkes kun af den i'te bit én gang
+	// 	sre2.ArrImposter[0][i] = 1
+	// 	sre3.ArrImposter[0][i] = 1
+	// 	reg4.ArrImposter[0][i] = 1
+	// }
+
+	// println("sr1")
+	// PrettySymPrintFrame(sre1.ArrImposter)
+	// println("sr2")
+	// PrettySymPrintFrame(sre2.ArrImposter)
+	// println("sr3")
+	// PrettySymPrintFrame(sre3.ArrImposter)
+	// println("sr4")
+	// PrettySymPrintFrame(reg4.ArrImposter)
 
 	sym := DescribeRegistersFromKey()
 	PrettySymPrintFrame(sym)
-	fmt.Printf("dims %d x %d of sym \n", len(sym), len(sym[0]))
+	fmt.Printf("dims %d x %d of sym \n", len(sym), len(sym[0])) //81 x 64
 	printmatrix(sym)
+
+}
+
+func TestRetrieveSessionKey(t *testing.T) {
+	session_key = stringToIntArray("0 0 0 0 0 1 1 0 1 1 0 1 0 1 0 1 0 1 0 1 0 1 1 1 1 0 0 0 0 1 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 1 0 0")
+	real_ses := make([]int, 0)
+	copy(real_ses, session_key)
+
+	makeRegisters()
+	initializeRegisters()
+
+	rr1 := stringToIntArray("0 1 0 0 0 1 1 1 1 1 1 0 0 1 0 0 0 0 0")
+	rr2 := stringToIntArray("0 1 1 0 0 1 0 0 0 0 1 1 0 1 1 1 1 1 1 0 0 1")
+	rr3 := stringToIntArray("1 0 1 0 1 0 1 0 0 0 0 1 0 1 0 0 1 1 1 1 0 1 1")
+	rr4 := stringToIntArray("1 0 0 1 0 1 1 1 0 0 1 1 0 0 0 1 0")
+	all_reg := append(rr1, rr2...)
+	all_reg = append(all_reg, rr3...)
+	all_reg = append(all_reg, rr4...)
+
+	res := RetrieveSessionKey(all_reg)
+	println(len(res))
+	if !reflect.DeepEqual(res, real_ses) {
+		// fmt.Println("res was not complete %v", )
+		prints(res, "res was: ")
+		t.Fail()
+	}
 
 }
 

@@ -628,6 +628,12 @@ func RetrieveSessionKey(registers []int) []int {
 
 	skey := make([]int, 0)
 
+	symkey := DescribeRegistersFromKey() //
+	gauss := solveByGaussEliminationTryTwo(symkey, registers)
+	if gauss.ResType == Multi {
+		skey = gauss.Multi[0]
+	}
+
 	return skey
 }
 
