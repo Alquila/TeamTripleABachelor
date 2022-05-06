@@ -237,8 +237,8 @@ func TestTryAllCombinationsOfR4(t *testing.T) {
 	r4_bin, bin_key, key_for_test := MakeRealKeyStreamSixFrames(original_frame_number)
 
 	real_iteration := CalculateRealIteration(r4_bin)
-	lower := real_iteration - 150
-	upper := real_iteration + 150
+	lower := real_iteration - 100
+	upper := real_iteration + 100
 	fmt.Printf("real: %d, lower: %d, upper: %d\n", real_iteration, lower, upper)
 
 	/* calculate ciphertext */
@@ -296,18 +296,24 @@ func TestTryAllCombinationsOfR4(t *testing.T) {
 
 		if x.ResType == Multi {
 			//do stuff
-			if VerifyKeyStream(x.Multi[0]) {
-
+			for i := 0; i < len(x.Multi); i++ {
+				if VerifyKeyStream(x.Multi[i]) {
+					r4_found = append(r4_found, r4_guess)
+				}
 			}
+
+		}
+		if x.ResType == Error {
+			continue
 		}
 
 	}
 
-	fmt.Printf("This is r4_found: %d\n", r4_found)
-	fmt.Printf("This is r4_guess: %d\n", r4_guess)
-	fmt.Printf("This is r4_bin: %d\n", r4_bin)
-	fmt.Printf("This is bin_key: %d\n", bin_key)
-	fmt.Printf("This is key_for_test: %d\n", key_for_test)
+	fmt.Printf("This is r4_found: %v\n", r4_found)
+	// fmt.Printf("This is r4_guess: %v\n", r4_guess)
+	fmt.Printf("This is r4_bin: %v\n", r4_bin)
+	fmt.Printf("This is bin_key: %v\n", bin_key)
+	fmt.Printf("This is key_for_test: %v\n", key_for_test)
 }
 
 func TestCalculateXFramCiphertext(t *testing.T) {
