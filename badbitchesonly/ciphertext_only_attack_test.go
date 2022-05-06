@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	_ "fmt"
+	"math"
 	"reflect"
 	_ "reflect"
 	"testing"
@@ -113,9 +114,6 @@ func TestCiphertextOnlyAttack(t *testing.T) {
 		newKeyStream := makeKeyStream()
 		SymInitializeRegisters()
 		copy(sr4.ArrImposter, r4_after_init.ArrImposter)
-		// sr4.ArrImposter[5] = 1
-		// sr4.ArrImposter[6] = 1
-		// sr4.ArrImposter[7] = 1
 		newSymKeyStream := ClockForKey(sr4)
 		// assert.Equal(t, sr4.ArrImposter, r4.ArrImposter)
 		keyStream = append(keyStream, newKeyStream...)
@@ -236,11 +234,93 @@ func TestTryAllCombinationsOfR4(t *testing.T) {
 	// makeSessionKey()
 	original_frame_number, current_frame_number = 42, 42
 	// should have eight frames
-	r4_bin, bin_key, r4_for_test := MakeRealKeyStreamFourFrames(original_frame_number)
+	r4_bin, bin_key, key_for_test := MakeRealKeyStreamSixFrames(original_frame_number)
+
+	real_iteration := CalculateRealIteration(r4_bin)
+	lower := real_iteration - 150
+	upper := real_iteration + 150
+	fmt.Printf("real: %d, lower: %d, upper: %d\n", real_iteration, lower, upper)
+
+	/* calculate ciphertext */
+	c := CalculateXFrameCiphertext(bin_key, 6)
+	c_for_test := CalculateXFrameCiphertext(key_for_test, 2)
+	println(c[0] + c_for_test[0])
+	/* Calculate KG*C */
+	KG := CreateKgMatrix()
+	KG_C := MatrixToSlice(MultiplyMatrix(KG, SliceToMatrix(c[:456])))
+	KG_C2 := MatrixToSlice(MultiplyMatrix(KG, SliceToMatrix(c[456:912])))
+	KG_C3 := MatrixToSlice(MultiplyMatrix(KG, SliceToMatrix(c[912:])))
+	full_KGC := append(KG_C, KG_C2...)
+	full_KGC = append(full_KGC, KG_C3...)
+
+	guesses := int(math.Pow(2, 16))
+	println(guesses)
+	for i := lower; i < upper; i++ {
+		if i%100 == 0 {
+			fmt.Printf("iteration %d \n", i)
+		}
+		if i == real_iteration {
+			fmt.Printf("iteration %d\n", real_iteration)
+		}
+		if i == real_iteration+1 {
+			fmt.Printf("iteration %d\n", real_iteration+1)
+		}
+		original_frame_number = 42 //reset the framenumber for the symbolic version
+		current_frame_number = 42
+
+		r4_guess = MakeR4Guess(i)
+		r4_guess = putConstantBackInRes(r4_guess, 10)
+
+		symKeyStream := make([][]int, 0)
+
+		for i := 0; i < 6; i++ { //Make six frame long sym-keystream for the guess
+			r4 = makeR4()
+			copy(r4.ArrImposter, r4_guess) //TODO this is technically not needed anymore
+			frame_influenced_bits := simulateClockingR4WithFrameDifference(original_frame_number, current_frame_number)
+			r4.ArrImposter = XorSlice(frame_influenced_bits, r4_guess) //TODO check this for first frame
+			r4.ArrImposter[10] = 1                                     //FIXME IM ASSUMING THIS NEEDS TO BE DONE AT THIS STAGE
+			key1 := makeSymKeyStream()                                 //this clocks sr4 which has r4_guess as its array
+			symKeyStream = append(symKeyStream, key1...)
+			current_frame_number++
+		} //TODO this part is not fully tested
+
+		/* Multiply KG with the SymbolicKeyStream to make KGK */
+		KGk := CalculateKgTimesSymKeyStream(KG, symKeyStream[:456])
+		KGk2 := CalculateKgTimesSymKeyStream(KG, symKeyStream[456:912])
+		KGk3 := CalculateKgTimesSymKeyStream(KG, symKeyStream[912:])
+		full_KGk := append(KGk, KGk2...)
+		full_KGk = append(full_KGk, KGk3...)
+
+		x := solveByGaussEliminationTryTwo(full_KGk, full_KGC)
+		println(x.ResType)
+
+		if x.ResType == Multi {
+			//do stuff
+			if VerifyKeyStream(x.Multi[0]) {
+
+			}
+		}
+
+	}
 
 	fmt.Printf("This is r4_found: %d\n", r4_found)
 	fmt.Printf("This is r4_guess: %d\n", r4_guess)
 	fmt.Printf("This is r4_bin: %d\n", r4_bin)
 	fmt.Printf("This is bin_key: %d\n", bin_key)
-	fmt.Printf("This is r4_for_test: %d\n", r4_for_test)
+	fmt.Printf("This is key_for_test: %d\n", key_for_test)
+}
+
+func TestCalculateXFramCiphertext(t *testing.T) {
+	session_key = make([]int, 64)
+	original_frame_number = 42
+	current_frame_number = 42
+	_, key, _ := MakeRealKeyStreamSixFrames(42)
+
+	c := CalculateXFrameCiphertext(key, 6)
+	assert.Equal(t, 1368, len(c))
+	prints(c, "c")
+
+	c = CalculateXFrameCiphertext(key, 2)
+	assert.Equal(t, 456, len(c))
+
 }

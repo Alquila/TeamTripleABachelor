@@ -151,3 +151,23 @@ func CalculateKgTimesSymKeyStream(Kg [][]int, symKeyStream [][]int) [][]int {
 	//i bogen (K_G * S)*V_f
 	return res
 }
+
+/* For number_of_frames = 6 returns 1368 long c.  */
+func CalculateXFrameCiphertext(key []int, number_of_frames int) []int {
+	// create matrix used for error correction
+	G := CreateGMatrix()
+	// use error-correction on message
+	// 'error_corrected_msg' correspons to M in text
+	full_msg := make([][]int, 0)
+	for i := 0; i < number_of_frames/2; i++ {
+		error_corrected_msg := MultiplyMatrix(G, SliceToMatrix(createRandomMessage(184))) //456 x 1
+		full_msg = append(full_msg, error_corrected_msg...)
+
+	}
+
+	c := make([]int, len(full_msg)) // cipher text = key xor msg
+	for i := 0; i < len(c); i++ {
+		c[i] = full_msg[i][0] ^ key[i]
+	}
+	return c
+}

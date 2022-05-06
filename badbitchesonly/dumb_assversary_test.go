@@ -635,10 +635,6 @@ func stringToIntArray(s string) []int {
 	return ary
 }
 
-func TestFullAttack(t *testing.T) {
-
-}
-
 func TestVerifyKeyStream(t *testing.T) {
 	key := MakeLongIntSlice()
 	// prints(key, "key")

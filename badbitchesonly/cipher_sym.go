@@ -213,7 +213,7 @@ func SymMajorityOutput(r SymRegister) []int {
 	return long_slice
 }
 
-//XorSlice Takes two slices and xors them indexwise together. Assumed to be of same lenght. Returns slice of size len(a)
+//XorSlice Takes two slices and xors them indexwise together. Assumed to be of same lenght. Returns new slice of size len(a)
 func XorSlice(a []int, b []int) []int {
 	res := make([]int, len(a))
 	for i := 0; i < len(a); i++ {

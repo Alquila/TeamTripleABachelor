@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"reflect"
 	"strconv"
 )
@@ -140,6 +141,18 @@ func simulateClockingWithFrameDifference(diff_arr []int, register Register) []in
 	return he
 }
 
+//Creates a new r4 register and initialises it with the difference between the current and original frame number.
+//Returns the ArrImposter of the register wich contains 1's in the place where the bits have been flipped with the new frame.
+func simulateClockingR4WithFrameDifference(original_frame_number int, current_frame int) []int {
+	fake_r4 := makeR4()
+	diff := FindDifferenceOfFrameNumbers(original_frame_number, current_frame)
+	for i := 0; i < 22; i++ {
+		Clock(fake_r4)
+		fake_r4.ArrImposter[0] = fake_r4.ArrImposter[0] ^ diff[i]
+	}
+	return fake_r4.ArrImposter
+}
+
 /**
 FindDifferenceOfFrameNumbers
 TRYING TO USE THE DIFFERENCE IN FRAMENUMBER TO
@@ -260,6 +273,41 @@ func MakeRealKeyStreamFourFrames(frame int) ([]int, []int, []int) {
 	return r4_real, key, key4
 }
 
+/*Makes a six frame long key stream and returns it along the initial r4 value. returns two extra frame for test.
+Returns r4_real, key, extra_key */
+func MakeRealKeyStreamSixFrames(frame int) ([]int, []int, []int) {
+	original_frame_number = frame
+	current_frame_number = frame
+	key := make([]int, 0)
+	key1 := makeKeyStream()
+	// prints(r4.ArrImposter, "r4 after makeKeyStream:     					")
+	r4_real := make([]int, 17)
+	copy(r4_real, r4_after_init.ArrImposter)
+	key = append(key, key1...)
+
+	for i := 0; i < 5; i++ {
+		current_frame_number++
+		newKeyStream := makeKeyStream()
+		key = append(key, newKeyStream...)
+	}
+
+	current_frame_number++
+	extra_key_stream := makeKeyStream()
+	current_frame_number++
+	extra_key_stream2 := makeKeyStream()
+	extra_key_stream = append(extra_key_stream, extra_key_stream2...)
+
+	return r4_real, key, extra_key_stream
+}
+
+func CalculateRealIteration(r4 []int) int {
+	reeee := make([]int, 0)
+	reeee = append(reeee, r4[:10]...)
+	reeee = append(reeee, r4[11:]...)
+	real_iteration := convertBinaryToDecimal(reeee)
+	return real_iteration
+}
+
 func TryAllReg4() {
 	/*
 		"For all possible 2^16 values of R4 solve the linearized system of equations that describe the output.
@@ -273,38 +321,32 @@ func TryAllReg4() {
 	r4_guess := make([]int, 17)
 
 	session_key = make([]int, 64) //all zero session key
-	makeSessionKey()              //Make a random session key
+	// makeSessionKey()              //Make a random session key
 	original_frame_number = 42
 	r4_real, real_key, r4_for_test := MakeRealKeyStreamFourFrames(original_frame_number)
 	//FIXME: we need to make a 4'th real key stream for testing if the found r4 values are correct
 
 	// current_frame_number++
 
-	reeee := make([]int, 0)
-	reeee = append(reeee, r4_real[:10]...)
-	reeee = append(reeee, r4_real[11:]...)
-	real_iteration := convertBinaryToDecimal(reeee)
+	real_iteration := CalculateRealIteration(r4_real)
 	lower := real_iteration - 150
 	upper := real_iteration + 150
 	fmt.Printf("real: %d, lower: %d, upper: %d\n", real_iteration, lower, upper)
-	// fourth_frame := makeKeyStream()
 	//[0 1 0 1 1 0 1 0 1 0 1 0 0 0 0 0 1] <- dette er R4 som vi skal frem til når der ikke er noget random
 	//[0 1 0 1 1 0 1 0 1 0 1 0 0 0 0 0 1] <- 33114 omgang
-	//
-	// prints(r4_real, "r4 after first init   ")
-	// prints(real_key[:1], "keystream after first init")
 
-	// guesses := int(math.Pow(2, 16))
+	guesses := int(math.Pow(2, 16))
+	println(guesses)
 	for i := lower; i < upper; i++ {
 		// for i := 0; i < guesses; i++ { //FIXME ind og udkommenter de to headers her for at skifte -AK
 		if i%100 == 0 {
 			fmt.Printf("iteration %d \n", i)
 		}
-		if i == 33114 {
-			print("iteration 33114\n")
+		if i == real_iteration {
+			fmt.Printf("iteration %d\n", real_iteration)
 		}
-		if i == 33115 {
-			print("iteration 33115\n")
+		if i == real_iteration+1 {
+			fmt.Printf("iteration %d\n", real_iteration+1)
 		}
 		original_frame_number = 42 //reset the framenumber for the symbolic version
 		current_frame_number = 42
@@ -325,30 +367,35 @@ func TryAllReg4() {
 		//update r4_guess with new frame value //we want it to be clean right..??
 		// prints(r4_guess, "r4_guess")
 		r4 = makeR4()
-		fake_r4 := makeR4()
+		// fake_r4 := makeR4()
 		copy(r4.ArrImposter, r4_guess)
-		diff := FindDifferenceOfFrameNumbers(original_frame_number, current_frame_number)
-		for i := 0; i < 22; i++ {
-			Clock(fake_r4)
-			fake_r4.ArrImposter[0] = fake_r4.ArrImposter[0] ^ diff[i]
-		} //fake_r4.ArrImposter er nu clocked således at det er [...1..] de steder hvor diff påvirker indgangene
-		r4.ArrImposter = XorSlice(fake_r4.ArrImposter, r4.ArrImposter)
-		fake_r4.ArrImposter[10] = 1 //FIXME
+
+		frame_influenced_bits := simulateClockingR4WithFrameDifference(original_frame_number, current_frame_number)
+		r4.ArrImposter = XorSlice(frame_influenced_bits, r4_guess)
+
+		// diff := FindDifferenceOfFrameNumbers(original_frame_number, current_frame_number)
+		// for i := 0; i < 22; i++ {
+		// 	Clock(fake_r4)
+		// 	fake_r4.ArrImposter[0] = fake_r4.ArrImposter[0] ^ diff[i]
+		// } //fake_r4.ArrImposter er nu clocked således at det er [...1..] de steder hvor diff påvirker indgangene
+		// r4.ArrImposter = XorSlice(fake_r4.ArrImposter, r4.ArrImposter)
+		// fake_r4.ArrImposter[10] = 1 //FIXME
+		r4.ArrImposter[10] = 1
 		//FIXME
 		//FIXME
 		//FIXME
 
 		//we want this -> [0 1 0 1 0 0 1 0 1 1 1 0 0 0 0 0 1]
-		// prints(r4.ArrImposter, "sr4_guess init ")
+		prints(r4.ArrImposter, "sr4_guess init ")
 		key2 := makeSymKeyStream() //this will now copy the updated r4_arrimposter into sr4
 		// prints(r4_second, "r4_second ")
 		// prints(sr4.ArrImposter, "sr4_after2")
 
 		current_frame_number++
 		r4 = makeR4()
-		fake_r4 = makeR4()
+		fake_r4 := makeR4()
 		copy(r4.ArrImposter, r4_guess)
-		diff = FindDifferenceOfFrameNumbers(original_frame_number, current_frame_number)
+		diff := FindDifferenceOfFrameNumbers(original_frame_number, current_frame_number)
 		for i := 0; i < 22; i++ {
 			Clock(fake_r4)
 			fake_r4.ArrImposter[0] = fake_r4.ArrImposter[0] ^ diff[i]
