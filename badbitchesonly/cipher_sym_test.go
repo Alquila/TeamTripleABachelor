@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	_ "fmt"
 	"reflect"
 	"testing"
@@ -126,6 +127,12 @@ func TestDescribeRegistersFromKey(t *testing.T) {
 	PrettySymPrintFrame(sre3.ArrImposter)
 	println("sr4")
 	PrettySymPrintFrame(reg4.ArrImposter)
+
+	sym := DescribeRegistersFromKey()
+	PrettySymPrintFrame(sym)
+	fmt.Printf("dims %d x %d of sym \n", len(sym), len(sym[0]))
+	printmatrix(sym)
+
 }
 
 func TestSymRegistersSameAfterInitWithSameFrameNumber(t *testing.T) {

@@ -308,6 +308,49 @@ func CalculateRealIteration(r4 []int) int {
 	return real_iteration
 }
 
+func DescribeRegistersFromKey() [][]int {
+	sre1 := SymMakeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14, 15)
+	sre2 := SymMakeRegister(22, []int{21, 20}, []int{9, 13}, 16, 16)
+	sre3 := SymMakeRegister(23, []int{22, 21, 20, 7}, []int{16, 18}, 13, 18)
+
+	for i := 0; i < sre1.Length; i++ {
+		sre1.ArrImposter[i] = make([]int, 64)
+	}
+
+	for i := 0; i < sre2.Length; i++ {
+		sre2.ArrImposter[i] = make([]int, 64)
+	}
+
+	for i := 0; i < sre3.Length; i++ {
+		sre3.ArrImposter[i] = make([]int, 64)
+	}
+
+	reg4 := SymMakeRegister(17, []int{16, 11}, []int{12, 15}, 14, 10)
+	for i := 0; i < 17; i++ {
+		reg4.ArrImposter[i] = make([]int, 64)
+	}
+
+	for i := 0; i < 64; i++ {
+		SymClock(sre1)
+		SymClock(sre2)
+		SymClock(sre3)
+		SymClock(reg4)
+		sre1.ArrImposter[0][i] = 1 //should this be xor? <- no den påvirkes kun af den i'te bit én gang
+		sre2.ArrImposter[0][i] = 1
+		sre3.ArrImposter[0][i] = 1
+		reg4.ArrImposter[0][i] = 1
+	}
+
+	symbolicDescription := make([][]int, 0)
+	symbolicDescription = append(symbolicDescription, sre1.ArrImposter...)
+	symbolicDescription = append(symbolicDescription, sre2.ArrImposter...)
+	symbolicDescription = append(symbolicDescription, sre3.ArrImposter...)
+	symbolicDescription = append(symbolicDescription, reg4.ArrImposter...)
+
+	return symbolicDescription
+
+}
+
 func TryAllReg4() {
 	/*
 		"For all possible 2^16 values of R4 solve the linearized system of equations that describe the output.
@@ -579,6 +622,13 @@ func convertBinaryToDecimal2(number []int) int {
 		panic(err)
 	}
 	return int(num)
+}
+
+func RetrieveSessionKey(registers []int) []int {
+
+	skey := make([]int, 0)
+
+	return skey
 }
 
 // 	for i := 0; i < 2; i++ {
