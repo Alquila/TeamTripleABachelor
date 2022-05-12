@@ -429,7 +429,7 @@ func TryAllReg4() {
 		//FIXME
 
 		//we want this -> [0 1 0 1 0 0 1 0 1 1 1 0 0 0 0 0 1]
-		prints(r4.ArrImposter, "sr4_guess init ")
+		// prints(r4.ArrImposter, "sr4_guess init ")
 		key2 := makeSymKeyStream() //this will now copy the updated r4_arrimposter into sr4
 		// prints(r4_second, "r4_second ")
 		// prints(sr4.ArrImposter, "sr4_after2")

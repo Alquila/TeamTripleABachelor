@@ -169,8 +169,8 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 	noUnknownVars := len(augMa[0]) - 2 // n is number of unknowns
 	noEquations := len(augMa)
 	freeVar := make([]int, 0)
-	fmt.Printf("len of unknown variable %d \n", noUnknownVars)
-	fmt.Printf("len of equations %d \n", noEquations)
+	// fmt.Printf("len of unknown variable %d \n", noUnknownVars)
+	// fmt.Printf("len of equations %d \n", noEquations)
 	// for i := noUnknownVars; i < noEquations; i++ {
 	// 	prints(augMa[i], strconv.Itoa(i))
 	// }

@@ -312,8 +312,8 @@ func TestTryAllCombinationsOfR4(t *testing.T) {
 	fmt.Printf("This is r4_found: %v\n", r4_found)
 	// fmt.Printf("This is r4_guess: %v\n", r4_guess)
 	fmt.Printf("This is r4_bin: %v\n", r4_bin)
-	fmt.Printf("This is bin_key: %v\n", bin_key)
-	fmt.Printf("This is key_for_test: %v\n", key_for_test)
+	fmt.Printf("This is bin_key: %v\n", bin_key[:2])
+	fmt.Printf("This is key_for_test: %v\n", key_for_test[:2])
 }
 
 func TestCalculateXFramCiphertext(t *testing.T) {
