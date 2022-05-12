@@ -254,6 +254,19 @@ func TestFinalXorSomething(t *testing.T) {
 	print(res[len(res)-1])
 }
 
+func TestFinalXorLenght(t *testing.T) {
+	current_frame_number = 22
+	original_frame_number = 22
+	session_key = make([]int, 64)
+	makeRegisters()
+	initializeRegisters()
+	SymInitializeRegisters()
+
+	res := SymMakeFinalXOR(sr1, sr2, sr3)
+	println(len(res))
+
+}
+
 func TestSymClock(t *testing.T) {
 	reg := InitOneSymRegister()
 	// for i := 0; i < 19; i++ {
