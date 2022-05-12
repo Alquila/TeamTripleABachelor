@@ -140,7 +140,7 @@ func SymInitializeRegisters() {
 /*
 SymMakeFinalXOR
 Makes the final xor of r1[-1] ⨁ maj(r1) ⨁ r2[-1] ⨁ maj(r2) ⨁ r3[-1] ⨁ maj(r3)
-returns [vars1 | vars2 | vars3 | prod1 | prod2 prod3 | b ]
+returns [vars1 | vars2 | vars3 | prod1 | prod2 | prod3 | b ]
 Calls SymMajorityOutput and OverwriteXorSlice
 */
 func SymMakeFinalXOR(r1 SymRegister, r2 SymRegister, r3 SymRegister) []int {
@@ -152,11 +152,17 @@ func SymMakeFinalXOR(r1 SymRegister, r2 SymRegister, r3 SymRegister) []int {
 	maj_r1 := SymMajorityOutput(r1)
 	maj_r2 := SymMajorityOutput(r2)
 	maj_r3 := SymMajorityOutput(r3)
+	// Println(len(maj_r1))
+	// Println(len(maj_r2))
+	// Println(len(maj_r3))
 
 	//Xor them "locally" together first
 	OverwriteXorSlice(last_r1, maj_r1) //[vars1 | prods1][b] = [vars1][b] ⨁ [vars1 | prods1][b]
 	OverwriteXorSlice(last_r2, maj_r2)
 	OverwriteXorSlice(last_r3, maj_r3)
+	// Println(len(maj_r1))
+	// Println(len(maj_r2))
+	// Println(len(maj_r3))
 
 	v1 := len(last_r1) - 1 //18?
 	v2 := len(last_r2) - 1
@@ -169,15 +175,18 @@ func SymMakeFinalXOR(r1 SymRegister, r2 SymRegister, r3 SymRegister) []int {
 	copy(start, vars1)                     //start by res = [vars1] (without the bit)
 	start = append(start, maj_r2[0:v2]...) //now [vars1 | vars2 ]
 	start = append(start, maj_r3[0:v3]...) //now [vars1 | vars2 | vars3]
+	// Println(len(start))                    //61
 
 	bit_entry1 := len(maj_r1) - 1
 	bit_entry2 := len(maj_r2) - 1
 	bit_entry3 := len(maj_r3) - 1
 
 	start = append(start, maj_r1[v1:bit_entry1]...) //now [vars1 | vars2 | vars3 | prod1] without the bit entry
+	// Println(len(start))                             //214
 	start = append(start, maj_r2[v2:bit_entry2]...) //now [vars1 | vars2 | vars3 | prod1 | prod2 ]
-	start = append(start, maj_r3[v2:bit_entry3]...) //now [vars1 | vars2 | vars3 | prod1 | prod2 | prod3]
-
+	// Println(len(start))                             //424
+	start = append(start, maj_r3[v3:bit_entry3]...) //now [vars1 | vars2 | vars3 | prod1 | prod2 | prod3]
+	// Println(len(start))                             //656
 	final_bit := maj_r1[bit_entry1] ^ maj_r2[bit_entry2] ^ maj_r3[bit_entry3]
 
 	start = append(start, []int{final_bit}...)
