@@ -380,8 +380,8 @@ func TryAllReg4() {
 
 	guesses := int(math.Pow(2, 16))
 	println(guesses)
-	for i := lower; i < upper; i++ {
-		// for i := 0; i < guesses; i++ { //FIXME ind og udkommenter de to headers her for at skifte -AK
+	// for i := lower; i < upper; i++ {
+	for i := 0; i < guesses; i++ { //FIXME ind og udkommenter de to headers her for at skifte -AK
 		if i%100 == 0 {
 			fmt.Printf("iteration %d \n", i)
 		}
@@ -468,16 +468,7 @@ func TryAllReg4() {
 
 				}
 			}
-		} else if gauss.ResType == Valid { //TODO remove this code
-			// handle normally
-			if VerifyKeyStream(gauss.Solved) {
-				fmt.Printf("Found in iteration %d \n", i)
-				r4_found = append(r4_found, r4_guess)
-				// solved = append(solved, gauss.Solved)
-				// solved = append(solved, []int{42})
-			}
 		}
-
 		//init sr1 sr2 sr3
 		//make first sym-keystream based on r4 guess and symbol registers
 		//key1 := makeSymKeyStream()
@@ -630,6 +621,7 @@ func RetrieveSessionKey(registers []int) []int {
 
 	symkey := DescribeRegistersFromKey() //
 	gauss := solveByGaussEliminationTryTwo(symkey, registers)
+	println(gauss.ResType)
 	if gauss.ResType == Multi {
 		skey = gauss.Multi[0]
 	}

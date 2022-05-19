@@ -138,8 +138,9 @@ func TestDescribeRegistersFromKey(t *testing.T) {
 
 func TestRetrieveSessionKey(t *testing.T) {
 	session_key = stringToIntArray("0 0 0 0 0 1 1 0 1 1 0 1 0 1 0 1 0 1 0 1 0 1 1 1 1 0 0 0 0 1 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 1 0 0")
-	real_ses := make([]int, 0)
+	real_ses := make([]int, 64)
 	copy(real_ses, session_key)
+	prints(real_ses, "rree")
 
 	makeRegisters()
 	initializeRegisters()

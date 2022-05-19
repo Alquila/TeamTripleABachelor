@@ -194,10 +194,10 @@ func initializeRegisters() { // used to have session_key and frame_number as par
 		r4.ArrImposter[0] = r4.ArrImposter[0] ^ session_key[i]
 	}
 
-	prints(r1.ArrImposter, "r1")
-	prints(r2.ArrImposter, "r2")
-	prints(r3.ArrImposter, "r3")
-	prints(r4.ArrImposter, "r4")
+	// prints(r1.ArrImposter, "r1")
+	// prints(r2.ArrImposter, "r2")
+	// prints(r3.ArrImposter, "r3")
+	// prints(r4.ArrImposter, "r4")
 
 	// makes frame_number from int -> bits in array
 	frame_bits := MakeFrameNumberToBits(current_frame_number)
