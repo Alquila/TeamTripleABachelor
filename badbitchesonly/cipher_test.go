@@ -18,27 +18,27 @@ func TestPrint(t *testing.T) {
 
 func TestMajority(t *testing.T) {
 
-	x := majority(0, 0, 0)
+	x := Majority(0, 0, 0)
 	if x != 0 {
 		t.Errorf(" x is not 0 but %d", x)
 	}
 
-	x = majority(0, 0, 1)
+	x = Majority(0, 0, 1)
 	if x != 0 {
 		t.Errorf(" x is not 0 but %d", x)
 	}
 
-	x = majority(0, 1, 1)
+	x = Majority(0, 1, 1)
 	if x != 1 {
 		t.Errorf(" x is not 1 but %d", x)
 	}
 
-	x = majority(1, 1, 1)
+	x = Majority(1, 1, 1)
 	if x != 1 {
 		t.Errorf(" x is not 1 but %d", x)
 	}
 
-	x = majority(1, 0, 1)
+	x = Majority(1, 0, 1)
 	if x != 1 {
 		t.Errorf(" x is not 1 but %d", x)
 	}
@@ -46,11 +46,11 @@ func TestMajority(t *testing.T) {
 
 func makeSmallReg() Register { //[0 0 0 0 0 0 0 0 0 0]
 	r1 = Register{
-		Length:      10,
-		ArrImposter: make([]int, 10),
-		Tabs:        []int{3, 5, 9}, // [0] = [3] ^ [5] ^ [9]
-		Majs:        []int{4, 7},
-		Ært:         6}
+		Length:   10,
+		RegSlice: make([]int, 10),
+		Taps:     []int{3, 5, 9}, // [0] = [3] ^ [5] ^ [9]
+		MajsTaps: []int{4, 7},
+		NegTap:   6}
 
 	return r1
 }
@@ -98,16 +98,16 @@ func TestClock(t *testing.T) {
 
 	r0 := makeSmallReg()
 
-	r0.ArrImposter[8] = 1
+	r0.RegSlice[8] = 1
 
 	Clock(r0)
 
-	if r0.ArrImposter[9] != 1 {
-		t.Errorf("x_9 should be 1 but was %d", r0.ArrImposter[9])
+	if r0.RegSlice[9] != 1 {
+		t.Errorf("x_9 should be 1 but was %d", r0.RegSlice[9])
 	}
 
 	for i := 0; i < 10; i++ {
-		prettyPrint(r0)
+		PrettyPrintRegister(r0)
 		Clock(r0)
 	}
 
@@ -132,19 +132,19 @@ func TestSmallPrint(t *testing.T) {
 	PrettyPrint(r0)
 
 	SymClock(r0)
-	//Printf("%+v \n", r0.ArrImposter)
+	//Printf("%+v \n", r0.RegSlice)
 	//println(" 1st clock")
 	//PrettyPrint(r0)
 	SymClock(r0)
 	//println(" 2nd clock")
 	//PrettyPrint(r0)
-	//Printf("%+v \n", r0.ArrImposter)
+	//Printf("%+v \n", r0.RegSlice)
 	SymClock(r0)
-	//Printf("%+v \n", r0.ArrImposter)
+	//Printf("%+v \n", r0.RegSlice)
 	SymClock(r0)
-	//Printf("%+v \n", r0.ArrImposter)
+	//Printf("%+v \n", r0.RegSlice)
 	SymClock(r0)
-	//Printf("%+v \n", r0.ArrImposter)
+	//Printf("%+v \n", r0.RegSlice)
 	SymClock(r0)
 	SymClock(r0)
 	SymClock(r0)
@@ -158,7 +158,7 @@ func TestSmallPrint(t *testing.T) {
 	SymClock(r0)
 	Printf("%+v \n", r0.ArrImposter)
 	PrettyPrint(r0)
-	//Printf("%+v \n", r0.ArrImposter)
+	//Printf("%+v \n", r0.RegSlice)
 
 }
 
@@ -195,70 +195,70 @@ func TestMakeFrameNumber(t *testing.T) { // REVIEW: denne test, tester ikke meto
 }
 
 func TestSetIndiciesToOne(t *testing.T) {
-	makeRegisters()
-	setIndicesToOne()
-	printAll()
-	if r1.ArrImposter[15] != 1 {
-		t.Log("r1[15] should be 1 but was ", r1.ArrImposter[15])
+	MakeRegisters()
+	SetIndicesToOne()
+	PrintAllRegisters()
+	if r1.RegSlice[15] != 1 {
+		t.Log("r1[15] should be 1 but was ", r1.RegSlice[15])
 		t.Fail()
 	}
-	if r2.ArrImposter[16] != 1 {
-		t.Log("r2[16] should be 1 but was ", r2.ArrImposter[16])
+	if r2.RegSlice[16] != 1 {
+		t.Log("r2[16] should be 1 but was ", r2.RegSlice[16])
 		t.Fail()
 	}
-	if r3.ArrImposter[18] != 1 {
-		t.Log("r3[18] should be 1 but was ", r3.ArrImposter[18])
+	if r3.RegSlice[18] != 1 {
+		t.Log("r3[18] should be 1 but was ", r3.RegSlice[18])
 		t.Fail()
 	}
-	if r4.ArrImposter[10] != 1 {
-		t.Log("r4[10] should be 1 but was ", r4.ArrImposter[10])
+	if r4.RegSlice[10] != 1 {
+		t.Log("r4[10] should be 1 but was ", r4.RegSlice[10])
 		t.Fail()
 	}
 }
 
 func TestRegistersAreSameAfterInitWithSameFrameNumber(t *testing.T) { // TODO: test at initreg er forskellig når framenumber er forskellig :-)
-	makeRegisters()
+	MakeRegisters()
 	current_frame_number = 22
-	makeSessionKey()
-	initializeRegisters()
-	setIndicesToOne()
+	MakeSessionKey()
+	InitializeRegisters()
+	SetIndicesToOne()
 	reg1 := make([]int, 19)
 	reg2 := make([]int, 22)
 	reg3 := make([]int, 23)
 	reg4 := make([]int, 17)
-	copy(reg1, r1.ArrImposter)
-	copy(reg2, r2.ArrImposter)
-	copy(reg3, r3.ArrImposter)
-	copy(reg4, r4.ArrImposter)
+	copy(reg1, r1.RegSlice)
+	copy(reg2, r2.RegSlice)
+	copy(reg3, r3.RegSlice)
+	copy(reg4, r4.RegSlice)
 	//TODO få amalie til at forklare den her test
 
 	Printf("First initialisation: \n")
-	printAll()
+	PrintAllRegisters()
 
-	r1.ArrImposter[6] = 42
-	r2.ArrImposter[6] = 42
-	r3.ArrImposter[6] = 42
-	r4.ArrImposter[6] = 42
+	r1.RegSlice[6] = 42
+	r2.RegSlice[6] = 42
+	r3.RegSlice[6] = 42
+	r4.RegSlice[6] = 42
 
-	//printAll()
-	initializeRegisters()
-	setIndicesToOne()
+	//PrintAllRegisters()
+	InitializeRegisters()
+	SetIndicesToOne()
 	Printf("Initialise registers again: \n")
-	printAll()
+	PrintAllRegisters()
 
-	if !reflect.DeepEqual(reg1, r1.ArrImposter) {
+	if !reflect.DeepEqual(reg1, r1.RegSlice) {
 		t.Log("reg1 and r1 are different, but should be equal")
 		t.Fail()
 	}
-	if !reflect.DeepEqual(reg2, r2.ArrImposter) {
+	if !reflect.DeepEqual(reg2, r2.RegSlice) {
 		t.Log("reg2 and r2 are different but should be equal")
 		t.Fail()
 	}
-	if !reflect.DeepEqual(reg3, r3.ArrImposter) {
+	if !reflect.DeepEqual(reg3, r3.RegSlice) {
 		t.Log("reg3 and r3 are different but should be equal")
 		t.Fail()
 	}
-	if !reflect.DeepEqual(reg4, r4.ArrImposter) {
+	if !reflect.DeepEqual(reg4, r4.RegSlice) {
 		t.Log("reg4 and r4 are different but should be equal")
 		t.Fail()
 	}
@@ -266,14 +266,14 @@ func TestRegistersAreSameAfterInitWithSameFrameNumber(t *testing.T) { // TODO: t
 }
 
 func TestCalculateNewBit(t *testing.T) {
-	makeRegisters()
+	MakeRegisters()
 
-	a1 := r1.ArrImposter
+	a1 := r1.RegSlice
 	a1[13] = 1
 	a1[16] = 0
 	a1[17] = 1
 	a1[18] = 0 //set the tap indexes to concrete values 1 ⨁ 0 ⨁ 1 ⨁ 0 = 0
-	res := feedbackFunction(r1)
+	res := FeedbackFunction(r1)
 	if res != 0 {
 		t.Fail()
 	}
@@ -282,32 +282,32 @@ func TestCalculateNewBit(t *testing.T) {
 	a1[16] = 0
 	a1[17] = 1
 	a1[18] = 1 //set the tap indexes to concrete values 1 ⨁ 0 ⨁ 1 ⨁ 1 = 1
-	res = feedbackFunction(r1)
+	res = FeedbackFunction(r1)
 	if res != 1 {
 		t.Fail()
 	}
 
-	a2 := r2.ArrImposter
+	a2 := r2.RegSlice
 	a2[20] = 0
 	a2[21] = 0 //set the tap indexes to concrete values  0 ⨁ 0 = 0
-	res = feedbackFunction(r2)
+	res = FeedbackFunction(r2)
 	if res != 0 {
 		t.Fail()
 	}
 
 	a2[20] = 1
 	a2[21] = 0 //set the tap indexes to concrete values 1 ⨁ 0 = 1
-	res = feedbackFunction(r2)
+	res = FeedbackFunction(r2)
 	if res != 1 {
 		t.Fail()
 	}
 
-	a3 := r3.ArrImposter
+	a3 := r3.RegSlice
 	a3[22] = 0
 	a3[21] = 1
 	a3[20] = 0
 	a3[7] = 1 //set the tap indexes to concrete values 0 ⨁ 1 ⨁ 0 ⨁ 1 = 0
-	res = feedbackFunction(r3)
+	res = FeedbackFunction(r3)
 	if res != 0 {
 		t.Fail()
 	}
@@ -316,7 +316,7 @@ func TestCalculateNewBit(t *testing.T) {
 	a3[21] = 1
 	a3[20] = 0
 	a3[7] = 1 //set the tap indexes to concrete values 1 ⨁ 1 ⨁ 0 ⨁ 1 = 1
-	res = feedbackFunction(r3)
+	res = FeedbackFunction(r3)
 	if res != 1 {
 		t.Fail()
 	}
@@ -324,14 +324,14 @@ func TestCalculateNewBit(t *testing.T) {
 }
 
 func TestMajorityOutput(t *testing.T) {
-	makeRegisters()
+	MakeRegisters()
 
-	a := r1.ArrImposter
+	a := r1.RegSlice
 	a[12] = 1
 	a[14] = 1
 	a[15] = 0
 	//set the tap indexes to concrete values maj(1,(1 ⨁ 1), 0)
-	res := majorityOutput(r1)
+	res := MajorityOutput(r1)
 	if res != 0 {
 		t.Errorf(" x is not 0 but %d", res)
 	}
@@ -339,17 +339,17 @@ func TestMajorityOutput(t *testing.T) {
 	a[14] = 0
 	a[15] = 0
 	//set the tap indexes to concrete values maj(1,(0 ⨁ 1), 0)
-	res = majorityOutput(r1)
+	res = MajorityOutput(r1)
 	if res != 1 {
 		t.Errorf(" x is not 1 but %d", res)
 	}
 
-	a = r2.ArrImposter
+	a = r2.RegSlice
 	a[9] = 1
 	a[13] = 1
 	a[16] = 0
 	//set the tap indexes to concrete values maj(1, 1, (0 ⨁ 1))
-	res = majorityOutput(r2)
+	res = MajorityOutput(r2)
 	if res != 1 {
 		t.Errorf(" x is not 1 but %d", res)
 	}
@@ -357,17 +357,17 @@ func TestMajorityOutput(t *testing.T) {
 	a[13] = 0
 	a[16] = 1
 	//set the tap indexes to concrete values maj(1, 0, (1 ⨁ 1))
-	res = majorityOutput(r2)
+	res = MajorityOutput(r2)
 	if res != 0 {
 		t.Errorf(" x is not 0 but %d", res)
 	}
 
-	a = r3.ArrImposter
+	a = r3.RegSlice
 	a[13] = 1
 	a[16] = 0
 	a[18] = 0
 	//set the tap indexes to concrete values maj((1 ⨁ 1), 0, 0)
-	res = majorityOutput(r3)
+	res = MajorityOutput(r3)
 	if res != 0 {
 		t.Errorf(" x is not 0 but %d", res)
 	}
@@ -375,30 +375,30 @@ func TestMajorityOutput(t *testing.T) {
 	a[16] = 1
 	a[18] = 1
 	//set the tap indexes to concrete values maj((1 ⨁ 1), 1, 1)
-	res = majorityOutput(r3)
+	res = MajorityOutput(r3)
 	if res != 1 {
 		t.Errorf(" x is not 0 but %d", res)
 	}
 }
 
 func TestClockingUnit(t *testing.T) {
-	makeRegisters()
+	MakeRegisters()
 
-	a := r4.ArrImposter
+	a := r4.RegSlice
 	//clock R2 og R3
 	a[3] = 1
 	a[7] = 1
 	a[10] = 0
-	clockingUnit(r4) //will print those it clocks
+	ClockingUnit(r4) //will print those it clocks
 
 	//clock all
 	Clock(r4) //will have 0's in the indexes
-	clockingUnit(r4)
+	ClockingUnit(r4)
 }
 
 func TestFinalXor(t *testing.T) {
 	//hooow to teeeeest
-	//right now we just show that it takes the three registers and calculates the majority and takes the last slice in each and xors it all together. returns a long array with all the stuff
+	//right now we just show that it takes the three registers and calculates the Majority and takes the last slice in each and xors it all together. returns a long array with all the stuff
 	r1 := SymMakeRegister(4, []int{1, 3}, []int{0, 2}, 3, 0)
 	for i := 0; i < 4; i++ {
 		r1.ArrImposter[i][i] = 1 // each entry in the diagonal set to 1 as x_i is only dependent on x_i when initialized
@@ -422,16 +422,16 @@ func TestFinalXor(t *testing.T) {
 	maj_r2 := SymMajorityOutput(r2)
 	maj_r3 := SymMajorityOutput(r3)
 
-	prints(maj_r1, "r1 majority")
-	prints(maj_r2, "r2 majority")
-	prints(maj_r3, "r3 majority")
-	// r1 majority[1 0 1 0 0 1 1 0 0 1]
-	// r2 majority[0 0 1 0 1 0 1 0 1 0 0 0 0 1 0]
-	// r3 majority[0 1 1 0 0 0 0 0 1 1 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+	prints(maj_r1, "r1 Majority")
+	prints(maj_r2, "r2 Majority")
+	prints(maj_r3, "r3 Majority")
+	// r1 Majority[1 0 1 0 0 1 1 0 0 1]
+	// r2 Majority[0 0 1 0 1 0 1 0 1 0 0 0 0 1 0]
+	// r3 Majority[0 1 1 0 0 0 0 0 1 1 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
 
-	// last_r1 := r1.ArrImposter[r1.Length-1]
-	// last_r2 := r2.ArrImposter[r2.Length-1]
-	// last_r3 := r3.ArrImposter[r3.Length-1]
+	// last_r1 := r1.RegSlice[r1.Length-1]
+	// last_r2 := r2.RegSlice[r2.Length-1]
+	// last_r3 := r3.RegSlice[r3.Length-1]
 	// prints(last_r1, "last r1")
 	// prints(last_r2, "last r2")
 	// prints(last_r3, "last r3")
@@ -448,9 +448,9 @@ func TestFinalXor(t *testing.T) {
 }
 
 func TestKeyStreamSimple(t *testing.T) {
-	makeSessionKey() // TODO snak om hvor vores loop skal være, som kalder makeKeyStream for nye frames
+	MakeSessionKey() // TODO snak om hvor vores loop skal være, som kalder MakeKeyStream for nye frames
 	current_frame_number = -1
-	x := makeKeyStream()
+	x := MakeKeyStream()
 	Printf("%+v \n", x)
 	Printf("mean %f \n", mean(x))
 }

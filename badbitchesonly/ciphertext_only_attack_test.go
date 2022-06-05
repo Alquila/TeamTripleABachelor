@@ -104,18 +104,18 @@ func TestCiphertextOnlyAttack(t *testing.T) {
 	current_frame_number, original_frame_number = 42, 42
 	// session_key is now all 0's
 	session_key = make([]int, 64)
-	// makeSessionKey()
+	// MakeSessionKey()
 	keyStream := make([]int, 0)      // append to this, assert that the length is rigth
 	symKeyStream := make([][]int, 0) // same here <3
 
 	// how many frames do we need ?
 	for i := 0; i < 6; i++ {
 		// handle new frame variables ?
-		newKeyStream := makeKeyStream()
+		newKeyStream := MakeKeyStream()
 		SymInitializeRegisters()
-		copy(sr4.ArrImposter, r4_after_init.ArrImposter)
+		copy(sr4.RegSlice, r4_after_init.RegSlice)
 		newSymKeyStream := ClockForKey(sr4)
-		// assert.Equal(t, sr4.ArrImposter, r4.ArrImposter)
+		// assert.Equal(t, sr4.RegSlice, r4.RegSlice)
 		keyStream = append(keyStream, newKeyStream...)
 		symKeyStream = append(symKeyStream, newSymKeyStream...)
 		current_frame_number++
@@ -231,7 +231,7 @@ func TestTryAllCombinationsOfR4(t *testing.T) {
 	r4_guess := make([]int, 17)
 
 	session_key = make([]int, 64) // FIXME: session_keyis all zeros now
-	// makeSessionKey()
+	// MakeSessionKey()
 	original_frame_number, current_frame_number = 42, 42
 	// should have eight frames
 	r4_bin, bin_key, key_for_test := MakeRealKeyStreamSixFrames(original_frame_number)
@@ -274,12 +274,12 @@ func TestTryAllCombinationsOfR4(t *testing.T) {
 		symKeyStream := make([][]int, 0)
 
 		for i := 0; i < 6; i++ { //Make six frame long sym-keystream for the guess
-			r4 = makeR4()
-			copy(r4.ArrImposter, r4_guess) //TODO this is technically not needed anymore
+			r4 = MakeR4()
+			copy(r4.RegSlice, r4_guess) //TODO this is technically not needed anymore
 			frame_influenced_bits := simulateClockingR4WithFrameDifference(original_frame_number, current_frame_number)
-			r4.ArrImposter = XorSlice(frame_influenced_bits, r4_guess) //TODO check this for first frame
-			r4.ArrImposter[10] = 1                                     //FIXME IM ASSUMING THIS NEEDS TO BE DONE AT THIS STAGE
-			key1 := makeSymKeyStream()                                 //this clocks sr4 which has r4_guess as its array
+			r4.RegSlice = XorSlice(frame_influenced_bits, r4_guess) //TODO check this for first frame
+			r4.RegSlice[10] = 1                                     //FIXME IM ASSUMING THIS NEEDS TO BE DONE AT THIS STAGE
+			key1 := makeSymKeyStream()                              //this clocks sr4 which has r4_guess as its array
 			symKeyStream = append(symKeyStream, key1...)
 			current_frame_number++
 		} //TODO this part is not fully tested

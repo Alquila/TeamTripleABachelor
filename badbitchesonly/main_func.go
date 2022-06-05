@@ -1,9 +1,9 @@
 package main
 
 func main() {
-	// makeSessionKey() // TODO snak om hvor vores loop skal være, som kalder makeKeyStream for nye frames
+	// MakeSessionKey() // TODO snak om hvor vores loop skal være, som kalder MakeKeyStream for nye frames
 	// current_frame_number = -1
-	// makeKeyStream()
+	// MakeKeyStream()
 	// idk()
 	TryAllReg4()
 }

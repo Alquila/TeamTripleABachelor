@@ -18,7 +18,7 @@ func doTheSimpleHack() {
 	symReg := InitOneSymRegister()
 	reg := InitOneRegister()
 	orgReg := make([]int, 19)
-	copy(orgReg, reg.ArrImposter)
+	copy(orgReg, reg.RegSlice)
 
 	// make output keystream in both
 	symKeyStream := SimpleKeyStreamSym(symReg)
@@ -34,13 +34,13 @@ func doTheSimpleHack() {
 	if !reflect.DeepEqual(res.Solved, orgReg) {
 		fmt.Printf("This is fucking wrong\n")
 		fmt.Printf("Res er: %d\n", res.Solved)
-		fmt.Printf("reg er: %d\n", reg.ArrImposter)
+		fmt.Printf("reg er: %d\n", reg.RegSlice)
 	}
 }
 
 func DoTheKnownPlainTextHack() ([]int, []int, []int) {
 	// // Init all four Registers
-	// initializeRegisters()
+	// InitializeRegisters()
 	// SymInitializeRegisters()
 
 	// make stream cipher ?
@@ -131,8 +131,8 @@ func simulateClockingWithFrameDifference(diff_arr []int, register Register) []in
 
 	for i := 0; i < 22; i++ {
 		yas := 0
-		for j := 0; j < len(register.Tabs); j++ {
-			yas = he[register.Tabs[i]] ^ yas
+		for j := 0; j < len(register.Taps); j++ {
+			yas = he[register.Taps[i]] ^ yas
 		}
 
 		he[0] = diff_arr[i] ^ yas
@@ -142,15 +142,15 @@ func simulateClockingWithFrameDifference(diff_arr []int, register Register) []in
 }
 
 //Creates a new r4 register and initialises it with the difference between the current and original frame number.
-//Returns the ArrImposter of the register wich contains 1's in the place where the bits have been flipped with the new frame.
+//Returns the RegSlice of the register wich contains 1's in the place where the bits have been flipped with the new frame.
 func simulateClockingR4WithFrameDifference(original_frame_number int, current_frame int) []int {
-	fake_r4 := makeR4()
+	fake_r4 := MakeR4()
 	diff := FindDifferenceOfFrameNumbers(original_frame_number, current_frame)
 	for i := 0; i < 22; i++ {
 		Clock(fake_r4)
-		fake_r4.ArrImposter[0] = fake_r4.ArrImposter[0] ^ diff[i]
+		fake_r4.RegSlice[0] = fake_r4.RegSlice[0] ^ diff[i]
 	}
-	return fake_r4.ArrImposter
+	return fake_r4.RegSlice
 }
 
 /**
@@ -252,21 +252,21 @@ func DescribeNewFrameWithOldVariables(original_framenum int, current_framenum in
 func MakeRealKeyStreamFourFrames(frame int) ([]int, []int, []int) {
 	original_frame_number = frame
 	current_frame_number = frame
-	key1 := makeKeyStream()
-	// prints(r4.ArrImposter, "r4 after makeKeyStream:     					")
+	key1 := MakeKeyStream()
+	// prints(r4.RegSlice, "r4 after MakeKeyStream:     					")
 	r4_real := make([]int, 17)
-	copy(r4_real, r4_after_init.ArrImposter)
+	copy(r4_real, r4_after_init.RegSlice)
 
 	current_frame_number++
-	key2 := makeKeyStream()
-	// r4_second := r4.ArrImposter
-	// prints(r4_after_init.ArrImposter, "r4 after second init:       ") //[0 1 0 1 0 0 1 0 1 1 1 0 0 0 0 0 1]
+	key2 := MakeKeyStream()
+	// r4_second := r4.RegSlice
+	// prints(r4_after_init.RegSlice, "r4 after second init:       ") //[0 1 0 1 0 0 1 0 1 1 1 0 0 0 0 0 1]
 	current_frame_number++
-	key3 := makeKeyStream()
+	key3 := MakeKeyStream()
 
 	current_frame_number++
-	key4 := makeKeyStream()
-	// prints(r4_after_init.ArrImposter, "r4 after third init:       ")
+	key4 := MakeKeyStream()
+	// prints(r4_after_init.RegSlice, "r4 after third init:       ")
 
 	key := append(key1, key2...)
 	key = append(key, key3...)
@@ -279,22 +279,22 @@ func MakeRealKeyStreamSixFrames(frame int) ([]int, []int, []int) {
 	original_frame_number = frame
 	current_frame_number = frame
 	key := make([]int, 0)
-	key1 := makeKeyStream()
-	// prints(r4.ArrImposter, "r4 after makeKeyStream:     					")
+	key1 := MakeKeyStream()
+	// prints(r4.RegSlice, "r4 after MakeKeyStream:     					")
 	r4_real := make([]int, 17)
-	copy(r4_real, r4_after_init.ArrImposter)
+	copy(r4_real, r4_after_init.RegSlice)
 	key = append(key, key1...)
 
 	for i := 0; i < 5; i++ {
 		current_frame_number++
-		newKeyStream := makeKeyStream()
+		newKeyStream := MakeKeyStream()
 		key = append(key, newKeyStream...)
 	}
 
 	current_frame_number++
-	extra_key_stream := makeKeyStream()
+	extra_key_stream := MakeKeyStream()
 	current_frame_number++
-	extra_key_stream2 := makeKeyStream()
+	extra_key_stream2 := MakeKeyStream()
 	extra_key_stream = append(extra_key_stream, extra_key_stream2...)
 
 	return r4_real, key, extra_key_stream
@@ -365,7 +365,7 @@ func TryAllReg4() {
 	r4_guess := make([]int, 17)
 
 	session_key = make([]int, 64) //all zero session key
-	// makeSessionKey()              //Make a random session key
+	// MakeSessionKey()              //Make a random session key
 	original_frame_number = 42
 	r4_real, real_key, r4_for_test := MakeRealKeyStreamFourFrames(original_frame_number)
 	//FIXME: we need to make a 4'th real key stream for testing if the found r4 values are correct
@@ -400,53 +400,53 @@ func TryAllReg4() {
 		// prints(r4_guess, "r4_guess")
 
 		//do this such that r4 guess can be copied into sr4 in SymSetRegisters()
-		r4 = makeR4()
-		copy(r4.ArrImposter, r4_guess)
-		// prints(r4.ArrImposter, "r4_guess1 ")
+		r4 = MakeR4()
+		copy(r4.RegSlice, r4_guess)
+		// prints(r4.RegSlice, "r4_guess1 ")
 		key1 := makeSymKeyStream() //this clocks sr4 which has r4_guess as its array
-		// prints(sr4.ArrImposter, "sr4 after makeSymkey  						")
+		// prints(sr4.RegSlice, "sr4 after makeSymkey  						")
 
 		current_frame_number++
 
 		//update r4_guess with new frame value //we want it to be clean right..??
 		// prints(r4_guess, "r4_guess")
-		r4 = makeR4()
-		// fake_r4 := makeR4()
-		copy(r4.ArrImposter, r4_guess)
+		r4 = MakeR4()
+		// fake_r4 := MakeR4()
+		copy(r4.RegSlice, r4_guess)
 
 		frame_influenced_bits := simulateClockingR4WithFrameDifference(original_frame_number, current_frame_number)
-		r4.ArrImposter = XorSlice(frame_influenced_bits, r4_guess)
+		r4.RegSlice = XorSlice(frame_influenced_bits, r4_guess)
 
 		// diff := FindDifferenceOfFrameNumbers(original_frame_number, current_frame_number)
 		// for i := 0; i < 22; i++ {
 		// 	Clock(fake_r4)
-		// 	fake_r4.ArrImposter[0] = fake_r4.ArrImposter[0] ^ diff[i]
-		// } //fake_r4.ArrImposter er nu clocked således at det er [...1..] de steder hvor diff påvirker indgangene
-		// r4.ArrImposter = XorSlice(fake_r4.ArrImposter, r4.ArrImposter)
-		// fake_r4.ArrImposter[10] = 1 //FIXME
-		r4.ArrImposter[10] = 1
+		// 	fake_r4.RegSlice[0] = fake_r4.RegSlice[0] ^ diff[i]
+		// } //fake_r4.RegSlice er nu clocked således at det er [...1..] de steder hvor diff påvirker indgangene
+		// r4.RegSlice = XorSlice(fake_r4.RegSlice, r4.RegSlice)
+		// fake_r4.RegSlice[10] = 1 //FIXME
+		r4.RegSlice[10] = 1
 		//FIXME
 		//FIXME
 		//FIXME
 
 		//we want this -> [0 1 0 1 0 0 1 0 1 1 1 0 0 0 0 0 1]
-		// prints(r4.ArrImposter, "sr4_guess init ")
+		// prints(r4.RegSlice, "sr4_guess init ")
 		key2 := makeSymKeyStream() //this will now copy the updated r4_arrimposter into sr4
 		// prints(r4_second, "r4_second ")
-		// prints(sr4.ArrImposter, "sr4_after2")
+		// prints(sr4.RegSlice, "sr4_after2")
 
 		current_frame_number++
-		r4 = makeR4()
-		fake_r4 := makeR4()
-		copy(r4.ArrImposter, r4_guess)
+		r4 = MakeR4()
+		fake_r4 := MakeR4()
+		copy(r4.RegSlice, r4_guess)
 		diff := FindDifferenceOfFrameNumbers(original_frame_number, current_frame_number)
 		for i := 0; i < 22; i++ {
 			Clock(fake_r4)
-			fake_r4.ArrImposter[0] = fake_r4.ArrImposter[0] ^ diff[i]
-		} //fake_r4.ArrImposter er nu clocked således at det er [...1..] de steder hvor diff påvirker indgangene
-		r4.ArrImposter = XorSlice(fake_r4.ArrImposter, r4.ArrImposter)
-		r4.ArrImposter[10] = 1
-		//prints(r4.ArrImposter, " sr4 after third")
+			fake_r4.RegSlice[0] = fake_r4.RegSlice[0] ^ diff[i]
+		} //fake_r4.RegSlice er nu clocked således at det er [...1..] de steder hvor diff påvirker indgangene
+		r4.RegSlice = XorSlice(fake_r4.RegSlice, r4.RegSlice)
+		r4.RegSlice[10] = 1
+		//prints(r4.RegSlice, " sr4 after third")
 		key3 := makeSymKeyStream()
 		current_frame_number++
 
@@ -495,10 +495,10 @@ func TryAllReg4() {
 		// we have multiple plausible solutions to r4
 		// somehow try them all and se what works
 		for i := 0; i > number_of_valid_r4; i++ {
-			r4.ArrImposter = r4_found[i] // is this how its supposed to happend?
+			r4.RegSlice = r4_found[i] // is this how its supposed to happend?
 			//what should frame_number be ? original + 4
 			current_frame_number = original_frame_number + 4
-			ks := makeKeyStream()
+			ks := MakeKeyStream()
 			if reflect.DeepEqual(ks, r4_for_test) {
 				fmt.Printf("This should be the right one: %d\n", r4_for_test)
 				correct_r4 = r4_found[i]

@@ -59,7 +59,7 @@ func TestDoTheSimpleHack1(t *testing.T) {
 	symReg := InitOneSymRegister()
 	reg := InitOneRegister()
 	orgReg := make([]int, 19)
-	copy(orgReg, reg.ArrImposter)
+	copy(orgReg, reg.RegSlice)
 	Bit_entry(symReg)
 
 	// make output keystream in both
@@ -93,10 +93,10 @@ func TestDoTheSimpleHackSecondVersion(t *testing.T) {
 	reg := InitOneRegister()
 	// orgReg is init, has entry for each variable, including the one set to 1
 	orgReg := make([]int, 19)
-	copy(orgReg, reg.ArrImposter)
+	copy(orgReg, reg.RegSlice)
 	Bit_entry(symReg)
 
-	assert.Equal(t, orgReg, reg.ArrImposter, "orgReg and reg are not the same")
+	assert.Equal(t, orgReg, reg.RegSlice, "orgReg and reg are not the same")
 
 	// make output keystream in both
 	symKeyStream := SimpleKeyStreamSymSecondVersion(symReg)
@@ -129,9 +129,9 @@ func TestDoTheSimpleHackSecondVersion(t *testing.T) {
 
 func TestPlaintextAttack(t *testing.T) {
 	//orgReg := []int{0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0}
-	//sr4.ArrImposter = []int{0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1}
+	//sr4.RegSlice = []int{0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1}
 	//orgReg := make([]int, 17) [0 0 0 1 1 1 1 1 0 0 0 0 0 0 0 1 1 1 0]
-	//copy(orgReg, r4.ArrImposter)
+	//copy(orgReg, r4.RegSlice)
 
 	session_key = make([]int, 64)
 	original_frame_number = 55
@@ -140,7 +140,7 @@ func TestPlaintextAttack(t *testing.T) {
 	sr1.ArrImposter = make([][]int, r1.Length)
 	sr2.ArrImposter = make([][]int, r2.Length)
 	sr3.ArrImposter = make([][]int, r3.Length)
-	sr4.ArrImposter = make([]int, r4.Length)
+	sr4.RegSlice = make([]int, r4.Length)
 
 	res1, _, _ := DoTheKnownPlainTextHack()
 
@@ -178,9 +178,9 @@ func TestFindDiffOfFrameNumbers(t *testing.T) {
 func TestDescribeNewFrameNumberWithOldVar(t *testing.T) {
 	firstSymReg := InitOneSymRegister()
 
-	// prints(firstSymReg.ArrImposter[15], "række 15")
-	// prints(firstSymReg.ArrImposter[0], "række 0")
-	// prints(firstSymReg.ArrImposter[16], "række 16")
+	// prints(firstSymReg.RegSlice[15], "række 15")
+	// prints(firstSymReg.RegSlice[0], "række 0")
+	// prints(firstSymReg.RegSlice[16], "række 16")
 
 	firstSymReg.ArrImposter = DescribeNewFrameWithOldVariables(0, 1, firstSymReg)
 
@@ -353,122 +353,122 @@ func TestMAKETEST(t *testing.T) {
 	*/
 
 	/* init r1 r2 r3 r4 */
-	makeRegisters()
+	MakeRegisters()
 	/* set frame number */
 	current_frame_number = 42
 	original_frame_number = 42
 
 	// key := make([]int, 64)
-	makeSessionKey()
+	MakeSessionKey()
 
 	/* init registers with key and framenumber*/
-	initializeRegisters()
-	setIndicesToOne()
-	// fmt.Printf("This is r1 after init: \n%v\n", r1.ArrImposter)
+	InitializeRegisters()
+	SetIndicesToOne()
+	// fmt.Printf("This is r1 after init: \n%v\n", r1.RegSlice)
 
 	/*save initial state registers*/
 	old_r1 := make([]int, r1.Length)
-	copy(old_r1, r1.ArrImposter)
+	copy(old_r1, r1.RegSlice)
 	old_r2 := make([]int, r2.Length)
-	copy(old_r2, r2.ArrImposter)
+	copy(old_r2, r2.RegSlice)
 	old_r3 := make([]int, r3.Length)
-	copy(old_r3, r3.ArrImposter)
+	copy(old_r3, r3.RegSlice)
 	old_r4 := make([]int, r4.Length)
-	copy(old_r4, r4.ArrImposter)
+	copy(old_r4, r4.RegSlice)
 
 	fmt.Printf("This is old_r1 after init: \n%v\n", old_r1)
 	fmt.Printf("This is old_r2 after init: \n%v\n", old_r2)
 	fmt.Printf("This is old_r3 after init: \n%v\n", old_r3)
 	fmt.Printf("This is old_r4 after init: \n%v\n", old_r4)
 
-	/*should init the SymRegisters to ~I with bit in the last entry. Sr4 has copy of r4.ArrImposter */
+	/*should init the SymRegisters to ~I with bit in the last entry. Sr4 has copy of r4.RegSlice */
 	SymInitializeRegisters()
 
-	assert.Equal(t, old_r1, r1.ArrImposter, "r1")
-	assert.Equal(t, old_r2, r2.ArrImposter, "r2")
-	assert.Equal(t, old_r3, r3.ArrImposter, "r3")
-	assert.Equal(t, old_r4, r4.ArrImposter, "r3")
+	assert.Equal(t, old_r1, r1.RegSlice, "r1")
+	assert.Equal(t, old_r2, r2.RegSlice, "r2")
+	assert.Equal(t, old_r3, r3.RegSlice, "r3")
+	assert.Equal(t, old_r4, r4.RegSlice, "r3")
 
 	keyStream1 := make([]int, 228)
 	keyStreamSym1 := make([][]int, 228)
-	assert.Equal(t, r4.ArrImposter, sr4.ArrImposter, "R4 and SR4 are not the same")
+	assert.Equal(t, r4.RegSlice, sr4.RegSlice, "R4 and SR4 are not the same")
 
 	/* Run A5/2 for 99 clocks and ignore output */
 	for i := 0; i < 99; i++ {
-		clockingUnit(r4)
+		ClockingUnit(r4)
 		Clock(r4)
 		SymClockingUnit(sr4)
 		Clock(sr4)
 	}
-	assert.Equal(t, r4.ArrImposter, sr4.ArrImposter, "R4 and SR4 are not the same")
+	assert.Equal(t, r4.RegSlice, sr4.RegSlice, "R4 and SR4 are not the same")
 
 	/* Run A5/2 for 228 clocks and use outputs as key-stream */
 	for i := 0; i < 228; i++ {
-		clockingUnit(r4)
+		ClockingUnit(r4)
 		SymClockingUnit(sr4)
 		Clock(r4)
 		Clock(sr4)
-		keyStream1[i] = makeFinalXOR()
+		keyStream1[i] = MakeFinalXOR()
 		keyStreamSym1[i] = SymMakeFinalXOR(sr1, sr2, sr3)
 	}
 
 	//Do it all again
 	current_frame_number++
-	initializeRegisters()
-	setIndicesToOne()
+	InitializeRegisters()
+	SetIndicesToOne()
 
 	SymInitializeRegisters()
 
 	keyStream2 := make([]int, 228)
 	keyStreamSym2 := make([][]int, 228)
-	assert.Equal(t, r4.ArrImposter, sr4.ArrImposter, "R4 and SR4 are not the same pt 2")
+	assert.Equal(t, r4.RegSlice, sr4.RegSlice, "R4 and SR4 are not the same pt 2")
 
 	/* Run A5/2 for 99 clocks and ignore output */
 	for i := 0; i < 99; i++ {
-		clockingUnit(r4)
+		ClockingUnit(r4)
 		Clock(r4)
 		SymClockingUnit(sr4)
 		Clock(sr4)
 	}
-	assert.Equal(t, r4.ArrImposter, sr4.ArrImposter, "R4 and SR4 are not the same pt 2")
+	assert.Equal(t, r4.RegSlice, sr4.RegSlice, "R4 and SR4 are not the same pt 2")
 
 	/* Run A5/2 for 228 clocks and use outputs as key-stream */
 	for i := 0; i < 228; i++ {
-		clockingUnit(r4)
+		ClockingUnit(r4)
 		SymClockingUnit(sr4)
 		Clock(r4)
 		Clock(sr4)
-		keyStream2[i] = makeFinalXOR()
+		keyStream2[i] = MakeFinalXOR()
 		keyStreamSym2[i] = SymMakeFinalXOR(sr1, sr2, sr3)
 	}
 	fmt.Printf("keystreamsym %d \n", len(keyStreamSym2[0]))
 	//Do it all again
 	current_frame_number++
-	initializeRegisters()
-	setIndicesToOne()
+	InitializeRegisters()
+	SetIndicesToOne()
 
 	SymInitializeRegisters()
 
 	keyStream3 := make([]int, 228)
 	keyStreamSym3 := make([][]int, 228)
-	assert.Equal(t, r4.ArrImposter, sr4.ArrImposter, "R4 and SR4 are not the same pt 3")
+	assert.Equal(t, r4.RegSlice, sr4.RegSlice, "R4 and SR4 are not the same pt 3")
 
 	/* Run A5/2 for 99 clocks and ignore output */
 	for i := 0; i < 99; i++ {
-		clockingUnit(r4)
+		ClockingUnit(r4)
 		Clock(r4)
 		SymClockingUnit(sr4)
 		Clock(sr4)
 	}
-	assert.Equal(t, r4.ArrImposter, sr4.ArrImposter, "R4 and SR4 are not the same pt 3")
+	assert.Equal(t, r4.RegSlice, sr4.RegSlice, "R4 and SR4 are not the same pt 3")
 
 	/* Run A5/2 for 228 clocks and use outputs as key-stream */
 	for i := 0; i < 228; i++ {
-		clockingUnit(r4)
+		ClockingUnit(r4)
 		SymClockingUnit(sr4)
 		Clock(r4)
 		Clock(sr4)
-		keyStream3[i] = makeFinalXOR()
+		keyStream3[i] = MakeFinalXOR()
 		keyStreamSym3[i] = SymMakeFinalXOR(sr1, sr2, sr3)
 	}
 
@@ -517,14 +517,14 @@ func TestDescribeSimpleSymWithFrame(t *testing.T) {
 
 	sreg := SymMakeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14, 15) // equvalent to reg1
 	for i := 0; i < 19; i++ {
-		// reg.ArrImposter[i] = make([]int, 19)
+		// reg.RegSlice[i] = make([]int, 19)
 		sreg.ArrImposter[i][i] = 1 // each entry in the diagonal set to 1 as x_i is only dependent on x_i when initialized
 	}
 
 }
 
 func TestMakeGaussResToRegisters(t *testing.T) {
-	makeRegisters()
+	MakeRegisters()
 	SymSetRegisters()
 
 	res := make([]int, 0, 61)
@@ -591,7 +591,7 @@ func TestPutConstantBackInRes(t *testing.T) {
 	arr = putConstantBackInRes(arr, 5)
 	assert.Equal(t, arr[5], 1)
 
-	makeRegisters()
+	MakeRegisters()
 	SymSetRegisters()
 
 	res := make([]int, 0, 19)
@@ -659,7 +659,7 @@ func TestVerifyKeyStream(t *testing.T) {
 
 	}
 
-	makeRegisters()
+	MakeRegisters()
 	key = make([]int, 655)
 	key[16] = 1           //x17 = 1
 	key[17] = 1           //x18 = 1
@@ -705,14 +705,14 @@ func TestWhy(t *testing.T) {
 	current_frame_number = 43
 	diff := FindDifferenceOfFrameNumbers(original_frame_number, current_frame_number)
 	prints(diff, "diff")
-	iiii := makeR4()
+	iiii := MakeR4()
 	for i := 0; i < 22; i++ {
 		Clock(iiii)
-		iiii.ArrImposter[0] = iiii.ArrImposter[0] ^ diff[i]
-		// prints(iiii.ArrImposter, strconv.Itoa(i))
+		iiii.RegSlice[0] = iiii.RegSlice[0] ^ diff[i]
+		// prints(iiii.RegSlice, strconv.Itoa(i))
 	}
-	prints(iiii.ArrImposter, "will this work ")
-	prints(XorSlice(r4_first_real, iiii.ArrImposter), "?")
+	prints(iiii.RegSlice, "will this work ")
+	prints(XorSlice(r4_first_real, iiii.RegSlice), "?")
 }
 
 func TestBinaryConverter(t *testing.T) {

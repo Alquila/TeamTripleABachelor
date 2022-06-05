@@ -32,7 +32,7 @@ func TestHowFrames(t *testing.T) {
 		reg1.ArrImposter[i] = make([]int, 22)
 		// ree[i][i] = 1
 	}
-	// printmatrix(reg1.ArrImposter)
+	// printmatrix(reg1.RegSlice)
 
 	for i := 0; i < 22; i++ {
 		SymClock(reg1)
@@ -93,20 +93,20 @@ func TestDescribeRegistersFromKey(t *testing.T) {
 	// sre3 := SymMakeRegister(23, []int{22, 21, 20, 7}, []int{16, 18}, 13, 18)
 
 	// for i := 0; i < sre1.Length; i++ {
-	// 	sre1.ArrImposter[i] = make([]int, 64)
+	// 	sre1.RegSlice[i] = make([]int, 64)
 	// }
 
 	// for i := 0; i < sre2.Length; i++ {
-	// 	sre2.ArrImposter[i] = make([]int, 64)
+	// 	sre2.RegSlice[i] = make([]int, 64)
 	// }
 
 	// for i := 0; i < sre3.Length; i++ {
-	// 	sre3.ArrImposter[i] = make([]int, 64)
+	// 	sre3.RegSlice[i] = make([]int, 64)
 	// }
 
 	// reg4 := SymMakeRegister(17, []int{16, 11}, []int{12, 15}, 14, 10)
 	// for i := 0; i < 17; i++ {
-	// 	reg4.ArrImposter[i] = make([]int, 64)
+	// 	reg4.RegSlice[i] = make([]int, 64)
 	// }
 
 	// for i := 0; i < 64; i++ {
@@ -114,20 +114,20 @@ func TestDescribeRegistersFromKey(t *testing.T) {
 	// 	SymClock(sre2)
 	// 	SymClock(sre3)
 	// 	SymClock(reg4)
-	// 	sre1.ArrImposter[0][i] = 1 //should this be xor? <- no den påvirkes kun af den i'te bit én gang
-	// 	sre2.ArrImposter[0][i] = 1
-	// 	sre3.ArrImposter[0][i] = 1
-	// 	reg4.ArrImposter[0][i] = 1
+	// 	sre1.RegSlice[0][i] = 1 //should this be xor? <- no den påvirkes kun af den i'te bit én gang
+	// 	sre2.RegSlice[0][i] = 1
+	// 	sre3.RegSlice[0][i] = 1
+	// 	reg4.RegSlice[0][i] = 1
 	// }
 
 	// println("sr1")
-	// PrettySymPrintFrame(sre1.ArrImposter)
+	// PrettySymPrintFrame(sre1.RegSlice)
 	// println("sr2")
-	// PrettySymPrintFrame(sre2.ArrImposter)
+	// PrettySymPrintFrame(sre2.RegSlice)
 	// println("sr3")
-	// PrettySymPrintFrame(sre3.ArrImposter)
+	// PrettySymPrintFrame(sre3.RegSlice)
 	// println("sr4")
-	// PrettySymPrintFrame(reg4.ArrImposter)
+	// PrettySymPrintFrame(reg4.RegSlice)
 
 	sym := DescribeRegistersFromKey()
 	PrettySymPrintFrame(sym)
@@ -142,8 +142,8 @@ func TestRetrieveSessionKey(t *testing.T) {
 	copy(real_ses, session_key)
 	prints(real_ses, "rree")
 
-	makeRegisters()
-	initializeRegisters()
+	MakeRegisters()
+	InitializeRegisters()
 
 	rr1 := stringToIntArray("0 1 0 0 0 1 1 1 1 1 1 0 0 1 0 0 0 0 0")
 	rr2 := stringToIntArray("0 1 1 0 0 1 0 0 0 0 1 1 0 1 1 1 1 1 1 0 0 1")
@@ -166,9 +166,9 @@ func TestRetrieveSessionKey(t *testing.T) {
 func TestSymRegistersSameAfterInitWithSameFrameNumber(t *testing.T) {
 	current_frame_number = 22
 	original_frame_number = 22
-	makeSessionKey()
-	makeRegisters()
-	initializeRegisters()
+	MakeSessionKey()
+	MakeRegisters()
+	InitializeRegisters()
 	SymInitializeRegisters()
 
 	reg1 := make([]int, 19)
@@ -178,15 +178,15 @@ func TestSymRegistersSameAfterInitWithSameFrameNumber(t *testing.T) {
 	copy(reg1, sr1.ArrImposter[0])
 	copy(reg2, sr2.ArrImposter[0])
 	copy(reg3, sr3.ArrImposter[0])
-	copy(reg4, sr4.ArrImposter)
+	copy(reg4, sr4.RegSlice)
 
 	sr1.ArrImposter[0][0] = 42
 	sr2.ArrImposter[0][0] = 42
 	sr3.ArrImposter[0][0] = 42
-	sr4.ArrImposter[0] = 42
+	sr4.RegSlice[0] = 42
 
-	makeRegisters()
-	initializeRegisters()
+	MakeRegisters()
+	InitializeRegisters()
 	SymInitializeRegisters()
 
 	if !reflect.DeepEqual(reg1, sr1.ArrImposter[0]) {
@@ -201,7 +201,7 @@ func TestSymRegistersSameAfterInitWithSameFrameNumber(t *testing.T) {
 		t.Log("reg3 and r3 are different but should be equal")
 		t.Fail()
 	}
-	if !reflect.DeepEqual(reg4, sr4.ArrImposter) {
+	if !reflect.DeepEqual(reg4, sr4.RegSlice) {
 		t.Log("reg4 and r4 are different but should be equal")
 		t.Fail()
 	}
@@ -211,11 +211,11 @@ func TestSymRegistersSameAfterInitWithSameFrameNumber(t *testing.T) {
 func TestFinalXorSomething(t *testing.T) {
 	current_frame_number = 22
 	original_frame_number = 22
-	makeSessionKey()
-	makeRegisters()
-	initializeRegisters()
+	MakeSessionKey()
+	MakeRegisters()
+	InitializeRegisters()
 	SymInitializeRegisters()
-	// sr1.ArrImposter[sr1.Length-1][sr1.Length-1] = 1
+	// sr1.RegSlice[sr1.Length-1][sr1.Length-1] = 1
 
 	last_r1 := sr1.ArrImposter[sr1.Length-1]
 	last_r2 := sr2.ArrImposter[sr2.Length-1]
@@ -259,8 +259,8 @@ func TestFinalXorLenght(t *testing.T) {
 	current_frame_number = 22
 	original_frame_number = 22
 	session_key = make([]int, 64)
-	makeRegisters()
-	initializeRegisters()
+	MakeRegisters()
+	InitializeRegisters()
 	SymInitializeRegisters()
 
 	res := SymMakeFinalXOR(sr1, sr2, sr3)
@@ -271,11 +271,11 @@ func TestFinalXorLenght(t *testing.T) {
 func TestSymClock(t *testing.T) {
 	reg := InitOneSymRegister()
 	// for i := 0; i < 19; i++ {
-	// 	prints(reg.ArrImposter[i], "")
+	// 	prints(reg.RegSlice[i], "")
 	// } <- her er der bare masser af nuller
 	Bit_entry(reg)
 	// for i := 0; i < 19; i++ {
-	// 	prints(reg.ArrImposter[i], "")
+	// 	prints(reg.RegSlice[i], "")
 	// } // <- her er der 1 taller diagonal
 	PrettySymPrintSliceBit(reg.ArrImposter, reg.set1)
 	SymClock(reg)
@@ -294,7 +294,7 @@ func TestCompliance(t *testing.T) {
 	symReg := InitOneSymRegister()
 	reg := InitOneRegister()
 	orgReg := make([]int, 19)
-	copy(orgReg, reg.ArrImposter)
+	copy(orgReg, reg.RegSlice)
 	prints(orgReg, "Original reg")
 	Bit_entry(symReg)
 
@@ -315,7 +315,7 @@ func TestCompliance(t *testing.T) {
 
 func MakeLongIntSlice() []int {
 	res := make([]int, 0)
-	makeRegisters()
+	MakeRegisters()
 	SymSetRegisters()
 
 	for i := 0; i < 15; i++ {

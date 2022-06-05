@@ -43,11 +43,11 @@ func SymMakeRegister(length int, tabs []int, major_idx []int, compliment_idx int
 
 // Bit_entry Make weird I matrix
 func Bit_entry(reg SymRegister) {
-	// reg.ArrImposter[reg.bit_entry] = make([]int, reg.Length)
-	// reg.ArrImposter[reg.bit_entry][reg.Length-1] = 1
+	// reg.RegSlice[reg.bit_entry] = make([]int, reg.Length)
+	// reg.RegSlice[reg.bit_entry][reg.Length-1] = 1
 	bit_entry := reg.set1
 	for i := 0; i < reg.Length; i++ {
-		// reg.ArrImposter[i] = make([]int, reg.Length)
+		// reg.RegSlice[i] = make([]int, reg.Length)
 		if i < bit_entry {
 			reg.ArrImposter[i][i] = 1
 		}
@@ -60,19 +60,19 @@ func Bit_entry(reg SymRegister) {
 	}
 }
 
-// SymSetRegisters Calls SymMakeRegister on each register. Each register is initialised with array initialized for every entry, but no values inserted. Copies r4.ArrImposter into sr4
+// SymSetRegisters Calls SymMakeRegister on each register. Each register is initialised with array initialized for every entry, but no values inserted. Copies r4.RegSlice into sr4
 func SymSetRegisters() {
 	sr1 = SymMakeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14, 15)
 	sr2 = SymMakeRegister(22, []int{21, 20}, []int{9, 13}, 16, 16)
 	sr3 = SymMakeRegister(23, []int{22, 21, 20, 7}, []int{16, 18}, 13, 18)
-	sr4 = makeRegister(17, []int{16, 11}, nil, -1)
-	copy(sr4.ArrImposter, r4.ArrImposter)
+	sr4 = MakeRegister(17, []int{16, 11}, nil, -1)
+	copy(sr4.RegSlice, r4.RegSlice)
 }
 
 // SymClockingUnit Clock SR1, SR2, SR3 based on given state
 func SymClockingUnit(rr4 Register) {
-	arr := rr4.ArrImposter
-	maj := majority(arr[3], arr[7], arr[10])
+	arr := rr4.RegSlice
+	maj := Majority(arr[3], arr[7], arr[10])
 
 	if maj == arr[10] {
 		SymClock(sr1)
@@ -114,7 +114,7 @@ func SymCalculateNewBit(r SymRegister) []int {
 
 	for i := range r.Tabs {
 		tabslice := slice_slice[r.Tabs[i]] //get the slice for the tap
-		//Printf("slice %d is %+v \n",r.Tabs[i], tabslice)
+		//Printf("slice %d is %+v \n",r.Taps[i], tabslice)
 		for i := 0; i < len(r.ArrImposter[0]); i++ { //loop through the slices and xor them index-wise
 			newbit[i] = newbit[i] ^ tabslice[i]
 		}
@@ -197,8 +197,8 @@ func SymMakeFinalXOR(r1 SymRegister, r2 SymRegister, r3 SymRegister) []int {
 
 /*
 SymMajorityOutput
-Symbolic majority function. Calls SymMajorityMultiply and XorSlice.
-Performs xy ⨁ xz ⨁ yz ⨁ x ⨁ y on the majority tabs of the register.
+Symbolic Majority function. Calls SymMajorityMultiply and XorSlice.
+Performs xy ⨁ xz ⨁ yz ⨁ x ⨁ y on the Majority tabs of the register.
 Returns slice of lengt len(r)+ (len(r)*(len(r)-1))/2 with the original variables in the first len(r)-1 entries and products in the rest
 */
 func SymMajorityOutput(r SymRegister) []int {
@@ -307,21 +307,21 @@ func ClockForKey(r Register) [][]int {
 
 func MakeTwoKeyStream() ([]int, [][]int) {
 	// all registers contain 0s
-	makeRegisters()
+	MakeRegisters()
 
 	/* Initialize internal state with K_c and frame number */
-	initializeRegisters() // TODO: Test me
+	InitializeRegisters() // TODO: Test me
 
 	//Init sym registers sr1, sr2, sr3
 	SymInitializeRegisters()
 
 	/* Force bits R1[15], R2[16], R3[18], R4[10] to be 1 */
-	setIndicesToOne()
+	SetIndicesToOne()
 
 	Print("r1 is ")
-	prettyPrint(r1)
+	PrettyPrintRegister(r1)
 	Print("r4 is ")
-	prettyPrint(r4)
+	PrettyPrintRegister(r4)
 
 	return RunA5_2()
 }
@@ -334,7 +334,7 @@ func RunA5_2() ([]int, [][]int) {
 	/* Run A5/2 for 99 clocks and ignore output  */
 	for i := 0; i < 99; i++ {
 		// do the clock thingy and ignore
-		clockingUnit(r4)
+		ClockingUnit(r4)
 		SymClockingUnit(r4)
 		Clock(r4)
 	}
@@ -342,10 +342,10 @@ func RunA5_2() ([]int, [][]int) {
 	/* Run A5/2 for 228 clocks and use outputs as key-stream */
 	for i := 0; i < 228; i++ {
 		// do the clock thingy and output
-		clockingUnit(r4)
+		ClockingUnit(r4)
 		SymClockingUnit(r4)
 		Clock(r4)
-		keyStream[i] = makeFinalXOR()
+		keyStream[i] = MakeFinalXOR()
 		keyStreamSym[i] = SymMakeFinalXOR(sr1, sr2, sr3)
 	}
 
@@ -356,8 +356,8 @@ func RunA5_2() ([]int, [][]int) {
 func InitOneSymRegister() SymRegister {
 	reg := SymMakeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14, 15) // equvalent to reg1
 	// for i := 0; i < 19; i++ {
-	// 	// reg.ArrImposter[i] = make([]int, 19)
-	// 	reg.ArrImposter[i][i] = 1 // each entry in the diagonal set to 1 as x_i is only dependent on x_i when initialized
+	// 	// reg.RegSlice[i] = make([]int, 19)
+	// 	reg.RegSlice[i][i] = 1 // each entry in the diagonal set to 1 as x_i is only dependent on x_i when initialized
 	// }
 	// Bit_entry(reg)
 	return reg
@@ -381,10 +381,10 @@ func SimpleKeyStreamSym(r SymRegister) [][]int {
 		SymClock(r)
 		keyStream[i] = r.ArrImposter[r.Length-1]
 		if i == 200 {
-			// Printf(" 200'th bit is %d \n", r.ArrImposter[r.Length-1])
+			// Printf(" 200'th bit is %d \n", r.RegSlice[r.Length-1])
 		}
 	}
-	// PrettySymPrintSliceBit(r.ArrImposter, r.set1)
+	// PrettySymPrintSliceBit(r.RegSlice, r.set1)
 	return keyStream
 }
 
@@ -407,7 +407,7 @@ func SimpleKeyStreamSymSecondVersion(r SymRegister) [][]int {
 		aaa := SymMajorityOutput(r)
 		OverwriteXorSlice(r.ArrImposter[r.Length-1], aaa)
 		keyStream[i] = aaa
-		// overw(SymMajorityOutput(r), r.ArrImposter[r.Length-1])
+		// overw(SymMajorityOutput(r), r.RegSlice[r.Length-1])
 		//Printf("Length of output from symMajorFunc %d\n", len(SymMajorityOutput(r)))
 	}
 	return keyStream
@@ -427,16 +427,16 @@ func symMakeKeyStream() [][]int {
 	// Run A5/2 for 99 clocks and ignore output
 	for i := 0; i < 99; i++ {
 		// do the clock thingy and ignore
-		clockingUnit(r4)
+		ClockingUnit(r4)
 		Clock(r4)
 	}
 
 	// Run A5/2 for 228 clocks and use outputs as key-stream
 	for i := 0; i < 228; i++ {
 		// do the clock thingy and output
-		clockingUnit(r4)
+		ClockingUnit(r4)
 		Clock(r4)
-		keyStream[i] = makeFinalXOR()
+		keyStream[i] = MakeFinalXOR()
 	}
 	return keyStream
 
