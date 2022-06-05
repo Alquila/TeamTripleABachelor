@@ -605,9 +605,6 @@ func TestVerifyKeyStream(t *testing.T) {
 }
 
 func TestKnownPlaintextAttack(t *testing.T) {
-	x := 33114
-	Prints(MakeR4Guess(x), "")
-	Prints(PutConstantBackInRes(MakeR4Guess(x), 10), "")
 	KnownPlaintextAttack()
 }
 

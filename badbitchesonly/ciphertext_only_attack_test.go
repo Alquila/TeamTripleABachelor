@@ -79,7 +79,7 @@ func TestMultiplyMatrix2(t *testing.T) {
 
 }
 
-func TestCiphertextOnlyAttack(t *testing.T) {
+func TestCiphertextOnlyAttackGauss(t *testing.T) {
 
 	// create message to encrypt
 	msg := CreateRandomMessage(184)
@@ -209,7 +209,7 @@ func TestMatrixToSlice(t *testing.T) {
 	assert.Equal(t, slice, backToSlice)
 }
 
-func TestTryAllCombinationsOfR4(t *testing.T) {
+func TestCiphertextOnlyAttack(t *testing.T) {
 	r4_found := make([][]int, 0)
 	r4_guess := make([]int, 17)
 
