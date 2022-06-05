@@ -88,7 +88,7 @@ func MakeGaussResultToRegisters(res []int) ([]int, []int, []int) {
 	copy(r1_res, res[:reg_range])
 	offset = reg_range
 	// fmt.Printf("r1 range: %d. len of r1_res: %d \n", reg_range, len(r1_res))
-	// prints(r1_res, "r1_res")
+	// Prints(r1_res, "r1_res")
 	r2_res := make([]int, r2.Length-1)
 	reg_range += r2.Length - 1
 	copy(r2_res, res[offset:reg_range])
@@ -253,20 +253,20 @@ func MakeRealKeyStreamFourFrames(frame int) ([]int, []int, []int) {
 	original_frame_number = frame
 	current_frame_number = frame
 	key1 := MakeKeyStream()
-	// prints(r4.RegSlice, "r4 after MakeKeyStream:     					")
+	// Prints(r4.RegSlice, "r4 after MakeKeyStream:     					")
 	r4_real := make([]int, 17)
 	copy(r4_real, r4_after_init.RegSlice)
 
 	current_frame_number++
 	key2 := MakeKeyStream()
 	// r4_second := r4.RegSlice
-	// prints(r4_after_init.RegSlice, "r4 after second init:       ") //[0 1 0 1 0 0 1 0 1 1 1 0 0 0 0 0 1]
+	// Prints(r4_after_init.RegSlice, "r4 after second init:       ") //[0 1 0 1 0 0 1 0 1 1 1 0 0 0 0 0 1]
 	current_frame_number++
 	key3 := MakeKeyStream()
 
 	current_frame_number++
 	key4 := MakeKeyStream()
-	// prints(r4_after_init.RegSlice, "r4 after third init:       ")
+	// Prints(r4_after_init.RegSlice, "r4 after third init:       ")
 
 	key := append(key1, key2...)
 	key = append(key, key3...)
@@ -280,7 +280,7 @@ func MakeRealKeyStreamSixFrames(frame int) ([]int, []int, []int) {
 	current_frame_number = frame
 	key := make([]int, 0)
 	key1 := MakeKeyStream()
-	// prints(r4.RegSlice, "r4 after MakeKeyStream:     					")
+	// Prints(r4.RegSlice, "r4 after MakeKeyStream:     					")
 	r4_real := make([]int, 17)
 	copy(r4_real, r4_after_init.RegSlice)
 	key = append(key, key1...)
@@ -397,19 +397,19 @@ func TryAllReg4() {
 
 		r4_guess = MakeR4Guess(i) //for all possible value of r4 we need three frames
 		r4_guess = putConstantBackInRes(r4_guess, 10)
-		// prints(r4_guess, "r4_guess")
+		// Prints(r4_guess, "r4_guess")
 
 		//do this such that r4 guess can be copied into sr4 in SymSetRegisters()
 		r4 = MakeR4()
 		copy(r4.RegSlice, r4_guess)
-		// prints(r4.RegSlice, "r4_guess1 ")
+		// Prints(r4.RegSlice, "r4_guess1 ")
 		key1 := makeSymKeyStream() //this clocks sr4 which has r4_guess as its array
-		// prints(sr4.RegSlice, "sr4 after makeSymkey  						")
+		// Prints(sr4.RegSlice, "sr4 after makeSymkey  						")
 
 		current_frame_number++
 
 		//update r4_guess with new frame value //we want it to be clean right..??
-		// prints(r4_guess, "r4_guess")
+		// Prints(r4_guess, "r4_guess")
 		r4 = MakeR4()
 		// fake_r4 := MakeR4()
 		copy(r4.RegSlice, r4_guess)
@@ -430,10 +430,10 @@ func TryAllReg4() {
 		//FIXME
 
 		//we want this -> [0 1 0 1 0 0 1 0 1 1 1 0 0 0 0 0 1]
-		// prints(r4.RegSlice, "sr4_guess init ")
+		// Prints(r4.RegSlice, "sr4_guess init ")
 		key2 := makeSymKeyStream() //this will now copy the updated r4_arrimposter into sr4
-		// prints(r4_second, "r4_second ")
-		// prints(sr4.RegSlice, "sr4_after2")
+		// Prints(r4_second, "r4_second ")
+		// Prints(sr4.RegSlice, "sr4_after2")
 
 		current_frame_number++
 		r4 = MakeR4()
@@ -446,7 +446,7 @@ func TryAllReg4() {
 		} //fake_r4.RegSlice er nu clocked således at det er [...1..] de steder hvor diff påvirker indgangene
 		r4.RegSlice = XorSlice(fake_r4.RegSlice, r4.RegSlice)
 		r4.RegSlice[10] = 1
-		//prints(r4.RegSlice, " sr4 after third")
+		//Prints(r4.RegSlice, " sr4 after third")
 		key3 := makeSymKeyStream()
 		current_frame_number++
 
@@ -548,11 +548,11 @@ func VerifyKeyStream(key []int) bool {
 	prod1 := key[vars1_len+vars2_len+vars3_len : vars1_len+vars2_len+vars3_len+prod1_len]
 	prod2 := key[vars1_len+vars2_len+vars3_len+prod1_len : vars1_len+vars2_len+vars3_len+prod1_len+prod2_len]
 	prod3 := key[vars1_len+vars2_len+vars3_len+prod1_len+prod2_len : vars1_len+vars2_len+vars3_len+prod1_len+prod2_len+prod3_len]
-	// prints(prod1, "prod1")
+	// Prints(prod1, "prod1")
 	// print("\n")
-	// prints(prod2, "prod2")
+	// Prints(prod2, "prod2")
 	// print("\n")
-	// prints(prod3, "prod3")
+	// Prints(prod3, "prod3")
 
 	helper(key[0:vars1_len], prod1)
 	helper(key[vars1_len:vars1_len+vars2_len], prod2)
@@ -582,7 +582,7 @@ func helper(vars []int, prods []int) bool {
 
 func convertBinaryToDecimal(number []int) int {
 	bin_num := ""
-	// prints(number, "reee")
+	// Prints(number, "reee")
 
 	for i := len(number) - 1; i >= 0; i-- {
 		// println(i)
@@ -600,7 +600,7 @@ func convertBinaryToDecimal(number []int) int {
 
 func convertBinaryToDecimal2(number []int) int {
 	bin_num := ""
-	// prints(number, "reee")
+	// Prints(number, "reee")
 
 	for i := 0; i < len(number); i++ {
 		// println(i)

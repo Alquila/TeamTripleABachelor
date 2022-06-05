@@ -178,9 +178,9 @@ func TestFindDiffOfFrameNumbers(t *testing.T) {
 func TestDescribeNewFrameNumberWithOldVar(t *testing.T) {
 	firstSymReg := InitOneSymRegister()
 
-	// prints(firstSymReg.RegSlice[15], "række 15")
-	// prints(firstSymReg.RegSlice[0], "række 0")
-	// prints(firstSymReg.RegSlice[16], "række 16")
+	// Prints(firstSymReg.RegSlice[15], "række 15")
+	// Prints(firstSymReg.RegSlice[0], "række 0")
+	// Prints(firstSymReg.RegSlice[16], "række 16")
 
 	firstSymReg.ArrImposter = DescribeNewFrameWithOldVariables(0, 1, firstSymReg)
 
@@ -189,7 +189,7 @@ func TestDescribeNewFrameNumberWithOldVar(t *testing.T) {
 	// fmt.Printf("res er: \n%d \n", res)
 	println("res er")
 	for i := 0; i < len(res); i++ {
-		prints(res[i], "")
+		Prints(res[i], "")
 	}
 	fmt.Printf("res er %d \n", len(res))
 	fmt.Printf("res[0] er %d \n", len(res[0]))
@@ -215,11 +215,11 @@ func TestDescribeNewFrameNumberWithOldVar(t *testing.T) {
 	// fmt.Printf("shouldBe: %d \n", shouldBe)
 	println("shouldBe er")
 	for i := 0; i < len(shouldBe); i++ {
-		prints(shouldBe[i], "")
+		Prints(shouldBe[i], "")
 	}
 	println("res er")
 	for i := 0; i < len(res); i++ {
-		prints(res[i], "")
+		Prints(res[i], "")
 	}
 	// shouldBe[0] = []int{""}
 	// shouldBe[0]
@@ -238,10 +238,10 @@ func TestDescribeNewFrameWithVariables8And15(t *testing.T) {
 	// fmt.Printf("res is: \n %d \n", res)
 	println("res er")
 	for i := 0; i < len(res); i++ {
-		prints(res[i], "")
+		Prints(res[i], "")
 	}
 	PrettySymPrintSliceBit(res, firstSymReg.set1)
-	prints(res[0], "")
+	Prints(res[0], "")
 	shouldBe := make([][]int, 19)
 	for i := 0; i < 19; i++ {
 		if i == 0 || i == 2 || i == 4 || i == 5 || i == 6 || i == 7 {
@@ -278,7 +278,7 @@ func TestDescribeFrameWithOldVariables2(t *testing.T) {
 
 	println("res er")
 	for i := 0; i < len(res); i++ {
-		prints(res[i], "")
+		Prints(res[i], "")
 	}
 
 	shouldBe := make([][]int, firstSymReg.Length)
@@ -294,7 +294,7 @@ func TestDescribeFrameWithOldVariables2(t *testing.T) {
 
 	println("shouldBe er")
 	for i := 0; i < len(res); i++ {
-		prints(shouldBe[i], "")
+		Prints(shouldBe[i], "")
 	}
 
 	if !reflect.DeepEqual(res, shouldBe) {
@@ -481,7 +481,7 @@ func TestMAKETEST(t *testing.T) {
 
 	x := solveByGaussEliminationTryTwo(A, b)
 	println(x.ResType)
-	// prints(x[0:20], "res 20xx")
+	// Prints(x[0:20], "res 20xx")
 	println(len(x.Multi))
 	assert.Equal(t, true, VerifyKeyStream(x.Multi[0]), "VerifyKeyStream returned false")
 	// println(x.Multi[0])
@@ -556,9 +556,9 @@ func TestMakeGaussResToRegisters(t *testing.T) {
 	for i := 11; i < r4.Length; i++ {
 		res = append(res, i)
 	}
-	// prints(res, "")
+	// Prints(res, "")
 	r1s, r2s, r3s := MakeGaussResultToRegisters(res)
-	// prints(r1s, "")	// prints(r2s, "")	// prints(r3s, "")
+	// Prints(r1s, "")	// Prints(r2s, "")	// Prints(r3s, "")
 	r1shouldbe := stringToIntArray("0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 1 16 17 18")
 	r2shouldbe := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 1, 17, 18, 19, 20, 21}
 	r3shouldbe := stringToIntArray("0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 1 19 20 21 22")
@@ -602,10 +602,10 @@ func TestPutConstantBackInRes(t *testing.T) {
 	for i := 16; i < 19; i++ {
 		res = append(res, i)
 	}
-	// prints(res, "")
+	// Prints(res, "")
 	res = putConstantBackInRes(res, 15)
 	assert.Equal(t, []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 1, 16, 17, 18}, res)
-	// prints(res, "")
+	// Prints(res, "")
 }
 
 // func TestMakeR4Guess(t *testing.T) { //outcommented becuase it doesn't really test anything, just to look in terminal
@@ -614,15 +614,15 @@ func TestPutConstantBackInRes(t *testing.T) {
 
 // 	// for i := 0; i < int(math.Pow(2, 16)); i++ {
 // 	// 	r4 := MakeR4Guess(i)
-// 	// 	prints(r4, strconv.Itoa(i))
+// 	// 	Prints(r4, strconv.Itoa(i))
 // 	// }
 // 	r4 := MakeR4Guess(0)
-// 	prints(r4, strconv.Itoa(0))
-// 	prints(putConstantBackInRes(r4, 10), "with constant")
+// 	Prints(r4, strconv.Itoa(0))
+// 	Prints(putConstantBackInRes(r4, 10), "with constant")
 
 // 	r4 = MakeR4Guess(int(math.Pow(2, 16)) - 1)
-// 	prints(r4, strconv.Itoa(0))
-// 	prints(putConstantBackInRes(r4, 10), "with constant")
+// 	Prints(r4, strconv.Itoa(0))
+// 	Prints(putConstantBackInRes(r4, 10), "with constant")
 
 // }
 
@@ -637,7 +637,7 @@ func stringToIntArray(s string) []int {
 
 func TestVerifyKeyStream(t *testing.T) {
 	key := MakeLongIntSlice()
-	// prints(key, "key")
+	// Prints(key, "key")
 	// fmt.Printf("len of key: %d \n", len(key))
 
 	// VerifyKeyStream(key)
@@ -684,8 +684,8 @@ func TestVerifyKeyStream(t *testing.T) {
 
 func TestTryAllReg4(t *testing.T) {
 	x := 33114
-	prints(MakeR4Guess(x), "")
-	prints(putConstantBackInRes(MakeR4Guess(x), 10), "")
+	Prints(MakeR4Guess(x), "")
+	Prints(putConstantBackInRes(MakeR4Guess(x), 10), "")
 	TryAllReg4()
 }
 
@@ -699,20 +699,20 @@ func TestWhy(t *testing.T) {
 		acc[i] = r4_first_real[i] ^ r4_sec_real[i]
 	}
 	// diff between fake and real sec [0 0 1 1 1 0 1 0 1 0 0 0 0 0 1 1 0]
-	prints(acc, "diff")
+	Prints(acc, "diff")
 
 	original_frame_number = 42
 	current_frame_number = 43
 	diff := FindDifferenceOfFrameNumbers(original_frame_number, current_frame_number)
-	prints(diff, "diff")
+	Prints(diff, "diff")
 	iiii := MakeR4()
 	for i := 0; i < 22; i++ {
 		Clock(iiii)
 		iiii.RegSlice[0] = iiii.RegSlice[0] ^ diff[i]
-		// prints(iiii.RegSlice, strconv.Itoa(i))
+		// Prints(iiii.RegSlice, strconv.Itoa(i))
 	}
-	prints(iiii.RegSlice, "will this work ")
-	prints(XorSlice(r4_first_real, iiii.RegSlice), "?")
+	Prints(iiii.RegSlice, "will this work ")
+	Prints(XorSlice(r4_first_real, iiii.RegSlice), "?")
 }
 
 func TestBinaryConverter(t *testing.T) {

@@ -71,7 +71,7 @@ func TestSimpleKeyStream(t *testing.T) {
 	key := SimpleKeyStreamSym(r0)
 	Println("rip3")
 	for i := 0; i < 228; i++ {
-		// PrettyPrint()
+		// PrettyPrintSymRegister()
 		for i := 0; i < r0.Length; i++ {
 			accString := "["
 			for j := 0; j < r0.Length; j++ {
@@ -129,15 +129,15 @@ func TestSmallPrint(t *testing.T) {
 	r0.ArrImposter[1][1] = 1
 	r0.ArrImposter[5][5] = 1
 	r0.ArrImposter[3][3] = 1
-	PrettyPrint(r0)
+	PrettyPrintSymRegister(r0)
 
 	SymClock(r0)
 	//Printf("%+v \n", r0.RegSlice)
 	//println(" 1st clock")
-	//PrettyPrint(r0)
+	//PrettyPrintSymRegister(r0)
 	SymClock(r0)
 	//println(" 2nd clock")
-	//PrettyPrint(r0)
+	//PrettyPrintSymRegister(r0)
 	//Printf("%+v \n", r0.RegSlice)
 	SymClock(r0)
 	//Printf("%+v \n", r0.RegSlice)
@@ -150,14 +150,14 @@ func TestSmallPrint(t *testing.T) {
 	SymClock(r0)
 	SymClock(r0)
 	SymClock(r0)
-	PrettyPrint(r0)
+	PrettyPrintSymRegister(r0)
 	SymClock(r0)
 	SymClock(r0)
 	SymClock(r0)
 	SymClock(r0)
 	SymClock(r0)
 	Printf("%+v \n", r0.ArrImposter)
-	PrettyPrint(r0)
+	PrettyPrintSymRegister(r0)
 	//Printf("%+v \n", r0.RegSlice)
 
 }
@@ -413,7 +413,7 @@ func TestFinalXor(t *testing.T) {
 	}
 
 	res := SymMakeFinalXOR(r1, r2, r3)
-	prints(res, "result")
+	Prints(res, "result")
 	Printf("lenght %d \n", len(res))
 	// 4+5+8 = 17
 	// 4*3/2 + 5*4/2+ 8*7/2 = 44
@@ -422,9 +422,9 @@ func TestFinalXor(t *testing.T) {
 	maj_r2 := SymMajorityOutput(r2)
 	maj_r3 := SymMajorityOutput(r3)
 
-	prints(maj_r1, "r1 Majority")
-	prints(maj_r2, "r2 Majority")
-	prints(maj_r3, "r3 Majority")
+	Prints(maj_r1, "r1 Majority")
+	Prints(maj_r2, "r2 Majority")
+	Prints(maj_r3, "r3 Majority")
 	// r1 Majority[1 0 1 0 0 1 1 0 0 1]
 	// r2 Majority[0 0 1 0 1 0 1 0 1 0 0 0 0 1 0]
 	// r3 Majority[0 1 1 0 0 0 0 0 1 1 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
@@ -432,9 +432,9 @@ func TestFinalXor(t *testing.T) {
 	// last_r1 := r1.RegSlice[r1.Length-1]
 	// last_r2 := r2.RegSlice[r2.Length-1]
 	// last_r3 := r3.RegSlice[r3.Length-1]
-	// prints(last_r1, "last r1")
-	// prints(last_r2, "last r2")
-	// prints(last_r3, "last r3")
+	// Prints(last_r1, "last r1")
+	// Prints(last_r2, "last r2")
+	// Prints(last_r3, "last r3")
 	/*
 			last r1[0 0 0 1]
 			last r2[0 0 0 0 1]

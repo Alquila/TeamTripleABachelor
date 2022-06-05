@@ -171,7 +171,7 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 	// fmt.Printf("len of unknown variable %d \n", noUnknownVars)
 	// fmt.Printf("len of equations %d \n", noEquations)
 	// for i := noUnknownVars; i < noEquations; i++ {
-	// 	prints(augMa[i], strconv.Itoa(i))
+	// 	Prints(augMa[i], strconv.Itoa(i))
 	// }
 	for i := 0; i < noUnknownVars; i++ {
 		s := i
@@ -206,7 +206,7 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 							freeVar = append(freeVar, i)
 							res.DepCol = append(res.DepCol, i)
 							//fmt.Printf("dependent var at [%d][%d] \n", j, i)
-							//prints(augMa[j], "")
+							//Prints(augMa[j], "")
 							// res.ResType = Error
 							// return res
 						}
@@ -266,9 +266,9 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 			}
 		} else if augMa[q][resIndex] == 1 {
 			// fmt.Printf("augma[%d][res] == 1, \n", q)
-			// prints(augMa[q], "stupid")
+			// Prints(augMa[q], "stupid")
 			// for i := noUnknownVars; i < noEquations; i++ {
-			// 	prints(augMa[i], strconv.Itoa(i))
+			// 	Prints(augMa[i], strconv.Itoa(i))
 			// }
 			res.ResType = Error
 			return res

@@ -2,8 +2,6 @@ package main
 
 import (
 	. "fmt"
-	"strconv"
-	"strings"
 )
 
 var original_frame_number int
@@ -411,108 +409,4 @@ func SimpleKeyStreamSymSecondVersion(r SymRegister) [][]int {
 		//Printf("Length of output from symMajorFunc %d\n", len(SymMajorityOutput(r)))
 	}
 	return keyStream
-}
-
-/*
-func symMakeKeyStream() [][]int {
-
-	symSetRegisters()
-
-	frame_number++
-
-	keyStream := make([][]int, 228)
-
-	initialiseRgisters()
-
-	// Run A5/2 for 99 clocks and ignore output
-	for i := 0; i < 99; i++ {
-		// do the clock thingy and ignore
-		ClockingUnit(r4)
-		Clock(r4)
-	}
-
-	// Run A5/2 for 228 clocks and use outputs as key-stream
-	for i := 0; i < 228; i++ {
-		// do the clock thingy and output
-		ClockingUnit(r4)
-		Clock(r4)
-		keyStream[i] = MakeFinalXOR()
-	}
-	return keyStream
-
-}
-
-*/
-
-func PrettyPrint(r SymRegister) {
-	rMatrix := r.ArrImposter
-	rBit := r.set1
-
-	PrettySymPrintSliceBit(rMatrix, rBit)
-}
-
-func PrettySymPrintSlice(slice [][]int) {
-	for i := 0; i < len(slice); i++ { //19
-		accString := "["
-		for j := 0; j < len(slice[0])-1; j++ { //19
-			if slice[i][j] == 1 {
-				str := strconv.Itoa(j)
-				accString += "x" + (str) + " ⨁ "
-			}
-		}
-		accString += strconv.Itoa(slice[i][len(slice[0])-1]) + "]  \n"
-		print(accString)
-	}
-	Println()
-
-}
-
-func PrettySymPrintFrame(slice [][]int) {
-	for i := 0; i < len(slice); i++ { //19
-		accString := "["
-		for j := 0; j < len(slice[0]); j++ { //19
-			if slice[i][j] == 1 {
-				str := strconv.Itoa(j)
-				accString += "k" + (str) + " ⨁ "
-			}
-		}
-		accString = strings.TrimRight(accString, "⨁ ")
-		accString += "]  \n"
-		print(accString)
-	}
-	Println()
-
-}
-
-func PrettySymPrintSliceBit(rMatrix [][]int, bit_entry int) {
-	rLength := len(rMatrix)
-	for i := 0; i < rLength; i++ {
-		accString := "r" + strconv.Itoa(i) + " = "
-		for j := 0; j < len(rMatrix[0])-1; j++ {
-			if j >= bit_entry {
-				if rMatrix[i][j] == 1 {
-					str := strconv.Itoa(j + 1)
-					accString += " x" + (str) + " ⨁ "
-				}
-			} else if rMatrix[i][j] == 1 {
-				str := strconv.Itoa(j)
-				accString += " x" + (str) + " ⨁ "
-			}
-		}
-		// accString = strings.TrimRight(accString, "⨁ ")
-		accString = accString + strconv.Itoa(rMatrix[i][len(rMatrix[0])-1])
-		Printf("")
-		println(accString)
-	}
-
-}
-
-func prints(res []int, text string) {
-	Printf(text+"%+v \n", res)
-}
-
-func printmatrix(matrix [][]int) {
-	for i := 0; i < len(matrix); i++ {
-		prints(matrix[i], strconv.Itoa(i))
-	}
 }

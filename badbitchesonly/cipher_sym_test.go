@@ -14,14 +14,14 @@ func TestBitEntry(t *testing.T) {
 	Bit_entry(reg)
 	PrettySymPrintSlice(reg.ArrImposter)
 	for i := 0; i < reg.Length; i++ {
-		prints(reg.ArrImposter[i], "")
+		Prints(reg.ArrImposter[i], "")
 	}
 }
 
 func TestConstPrettyPrint(t *testing.T) {
 	reg := InitOneSymRegister()
 	Bit_entry(reg)
-	PrettyPrint(reg)
+	PrettyPrintSymRegister(reg)
 }
 
 func TestHowFrames(t *testing.T) {
@@ -32,7 +32,7 @@ func TestHowFrames(t *testing.T) {
 		reg1.ArrImposter[i] = make([]int, 22)
 		// ree[i][i] = 1
 	}
-	// printmatrix(reg1.RegSlice)
+	// PrintMatrix(reg1.RegSlice)
 
 	for i := 0; i < 22; i++ {
 		SymClock(reg1)
@@ -40,7 +40,7 @@ func TestHowFrames(t *testing.T) {
 		// ree[i][i] = 1
 	}
 
-	printmatrix(reg1.ArrImposter)
+	PrintMatrix(reg1.ArrImposter)
 	PrettySymPrintSlice(reg1.ArrImposter)
 
 }
@@ -132,7 +132,7 @@ func TestDescribeRegistersFromKey(t *testing.T) {
 	sym := DescribeRegistersFromKey()
 	PrettySymPrintFrame(sym)
 	fmt.Printf("dims %d x %d of sym \n", len(sym), len(sym[0])) //81 x 64
-	printmatrix(sym)
+	PrintMatrix(sym)
 
 }
 
@@ -140,7 +140,7 @@ func TestRetrieveSessionKey(t *testing.T) {
 	session_key = stringToIntArray("0 0 0 0 0 1 1 0 1 1 0 1 0 1 0 1 0 1 0 1 0 1 1 1 1 0 0 0 0 1 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 1 0 0")
 	real_ses := make([]int, 64)
 	copy(real_ses, session_key)
-	prints(real_ses, "rree")
+	Prints(real_ses, "rree")
 
 	MakeRegisters()
 	InitializeRegisters()
@@ -157,7 +157,7 @@ func TestRetrieveSessionKey(t *testing.T) {
 	println(len(res))
 	if !reflect.DeepEqual(res, real_ses) {
 		// fmt.Println("res was not complete %v", )
-		prints(res, "res was: ")
+		Prints(res, "res was: ")
 		t.Fail()
 	}
 
@@ -235,23 +235,23 @@ func TestFinalXorSomething(t *testing.T) {
 
 	res := SymMakeFinalXOR(sr1, sr2, sr3)
 
-	prints(last_r1, "last sr1\n")
-	prints(maj_r1[:v1], "maj_sr1\n")
-	prints(res[:v1], "first r1 entries of finalxor\n")
+	Prints(last_r1, "last sr1\n")
+	Prints(maj_r1[:v1], "maj_sr1\n")
+	Prints(res[:v1], "first r1 entries of finalxor\n")
 
-	prints(last_r2, "last sr2\n")
-	prints(maj_r2[:v2], "maj_sr2\n")
-	prints(res[v1:v1+v2], "first r2 entries of finalxor\n")
+	Prints(last_r2, "last sr2\n")
+	Prints(maj_r2[:v2], "maj_sr2\n")
+	Prints(res[v1:v1+v2], "first r2 entries of finalxor\n")
 
-	prints(last_r3, "last sr3\n")
-	prints(maj_r3[:v3], "maj_sr3\n")
-	prints(res[v1+v2:v1+v2+v3], "first r3 entries of finalxor\n")
+	Prints(last_r3, "last sr3\n")
+	Prints(maj_r3[:v3], "maj_sr3\n")
+	Prints(res[v1+v2:v1+v2+v3], "first r3 entries of finalxor\n")
 
-	prints(maj_r1[v1:bit_entry1], "maj bits of sr1\n")
+	Prints(maj_r1[v1:bit_entry1], "maj bits of sr1\n")
 	print(len(maj_r1[v1:bit_entry1]))
 	print("\n")
 	print(len(res[v1+v2+v3 : v2+v3+bit_entry1]))
-	prints(res[v1+v2+v3:v2+v3+bit_entry1], "maj bits sr1 finalxor\n")
+	Prints(res[v1+v2+v3:v2+v3+bit_entry1], "maj bits sr1 finalxor\n")
 	print(res[len(res)-1])
 }
 
@@ -271,11 +271,11 @@ func TestFinalXorLenght(t *testing.T) {
 func TestSymClock(t *testing.T) {
 	reg := InitOneSymRegister()
 	// for i := 0; i < 19; i++ {
-	// 	prints(reg.RegSlice[i], "")
+	// 	Prints(reg.RegSlice[i], "")
 	// } <- her er der bare masser af nuller
 	Bit_entry(reg)
 	// for i := 0; i < 19; i++ {
-	// 	prints(reg.RegSlice[i], "")
+	// 	Prints(reg.RegSlice[i], "")
 	// } // <- her er der 1 taller diagonal
 	PrettySymPrintSliceBit(reg.ArrImposter, reg.set1)
 	SymClock(reg)
@@ -295,21 +295,21 @@ func TestCompliance(t *testing.T) {
 	reg := InitOneRegister()
 	orgReg := make([]int, 19)
 	copy(orgReg, reg.RegSlice)
-	prints(orgReg, "Original reg")
+	Prints(orgReg, "Original reg")
 	Bit_entry(symReg)
 
 	// make output keystream in both
 	reg1 := SimpleKeyStreamSym(symReg)
 	reg2 := SimpleKeyStream(reg)
 
-	prints(reg1[0], "reg1[0")
-	prints(reg1[1], "reg1[1]")
+	Prints(reg1[0], "reg1[0")
+	Prints(reg1[1], "reg1[1]")
 	PrettySymPrintSliceBit(reg1[:20], symReg.set1)
-	prints(reg2[:20], "res")
+	Prints(reg2[:20], "res")
 
 	res := solveByGaussEliminationTryTwo(reg1, reg2)
-	prints(res.Solved, "gauss")
-	prints(orgReg, "Original reg")
+	Prints(res.Solved, "gauss")
+	Prints(orgReg, "Original reg")
 
 }
 
@@ -339,7 +339,7 @@ func MakeLongIntSlice() []int {
 		res = append(res, i)
 	}
 
-	// prints(res, "res before products")
+	// Prints(res, "res before products")
 
 	//lol the first 0-x products just becomes x
 	prod1 := stringToIntArray("01 02 03 04 05 06 07 08 09 010 011 012 013 014 016 017 018 12 13 14 15 16 17 18 19 110 111 112 113 114 116 117 118 23 24 25 26 27 28 29 210 211 212 213 214 216 217 218 34 35 36 37 38 39 310 311 312 313 314 316 317 318 45 46 47 48 49 410 411 412 413 414 416 417 418 56 57 58 59 510 511 512 513 514 516 517 518 67 68 69 610 611 612 613 614 616 617 618 78 79 710 711 712 713 714 716 717 718 89 810 811 812 813 814 816 817 818 910 911 912 913 914 916 917 918 1011 1012 1013 1014 1016 1017 1018 1112 1113 1114 1116 1117 1118 1213 1214 1216 1217 1218 1314 1316 1317 1318 1416 1417 1418 1617 1618 1718")
@@ -347,7 +347,7 @@ func MakeLongIntSlice() []int {
 	prod3 := stringToIntArray("01 02 03 04 05 06 07 08 09 010 011 012 013 014 015 016 017 019 020 021 022 12 13 14 15 16 17 18 19 110 111 112 113 114 115 116 117 119 120 121 122 23 24 25 26 27 28 29 210 211 212 213 214 215 216 217 219 220 221 222 34 35 36 37 38 39 310 311 312 313 314 315 316 317 319 320 321 322 45 46 47 48 49 410 411 412 413 414 415 416 417 419 420 421 422 56 57 58 59 510 511 512 513 514 515 516 517 519 520 521 522 67 68 69 610 611 612 613 614 615 616 617 619 620 621 622 78 79 710 711 712 713 714 715 716 717 719 720 721 722 89 810 811 812 813 814 815 816 817 819 820 821 822 910 911 912 913 914 915 916 917 919 920 921 922 1011 1012 1013 1014 1015 1016 1017 1019 1020 1021 1022 1112 1113 1114 1115 1116 1117 1119 1120 1121 1122 1213 1214 1215 1216 1217 1219 1220 1221 1222 1314 1315 1316 1317 1319 1320 1321 1322 1415 1416 1417 1419 1420 1421 1422 1516 1517 1519 1520 1521 1522 1617 1619 1620 1621 1622 1719 1720 1721 1722 1920 1921 1922 2021 2022 2122")
 
 	res = append(res, prod1...)
-	// prints(res, "res after prod1")
+	// Prints(res, "res after prod1")
 	res = append(res, prod2...)
 	res = append(res, prod3...)
 
@@ -391,7 +391,7 @@ func MakeLongIntSlice() []int {
 // 	// if err != nil {
 // 	// 	panic(err)
 // 	// }
-// 	// prints(p, "")
+// 	// Prints(p, "")
 // }
 
 // func TestTest2(t *testing.T) {
@@ -412,5 +412,5 @@ func MakeLongIntSlice() []int {
 // 	if err != nil {
 // 		panic(err)
 // 	}
-// 	prints(p, "")
+// 	Prints(p, "")
 // }

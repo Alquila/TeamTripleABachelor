@@ -1,7 +1,6 @@
 package main
 
 import (
-	. "fmt"
 	"math/rand"
 	"time"
 )
@@ -63,22 +62,6 @@ func MakeRegisters() {
 	r2 = MakeR2()
 	r3 = MakeR3()
 	r4 = MakeR4()
-}
-
-// PrettyPrintRegister
-// a helping function to print registers
-func PrettyPrintRegister(r Register) {
-	Printf("%+v", r.RegSlice)
-	print("\n")
-}
-
-// PrintAllRegisters
-// a helping function that prints all registers
-func PrintAllRegisters() {
-	Printf("R1: %+v \n", r1.RegSlice)
-	Printf("R2: %+v \n", r2.RegSlice)
-	Printf("R3: %+v \n", r3.RegSlice)
-	Printf("R4: %+v \n", r4.RegSlice)
 }
 
 // Majority
@@ -263,10 +246,10 @@ func MakeKeyStream() []int {
 
 	r4_after_init = MakeR4()
 	copy(r4_after_init.RegSlice, r4.RegSlice)
-	prints(r1.RegSlice, "R1 after clocking with frame")
-	prints(r2.RegSlice, "R2 after clocking with frame")
-	prints(r3.RegSlice, "R3 after clocking with frame")
-	prints(r4.RegSlice, "r4 after clocking with frame")
+	Prints(r1.RegSlice, "R1 after clocking with frame")
+	Prints(r2.RegSlice, "R2 after clocking with frame")
+	Prints(r3.RegSlice, "R3 after clocking with frame")
+	Prints(r4.RegSlice, "r4 after clocking with frame")
 
 	/* Run A5/2 for 99 clocks and ignore output */
 	for i := 0; i < 99; i++ {

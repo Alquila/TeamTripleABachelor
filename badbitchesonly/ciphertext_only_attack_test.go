@@ -25,7 +25,7 @@ func TestCreate_G_matrix(t *testing.T) {
 
 func TestCreate_K_Matrix(t *testing.T) {
 	Kg := CreateKgMatrix()
-	printmatrix(Kg)
+	PrintMatrix(Kg)
 	for i := 0; i < len(Kg[0]); i++ {
 		if Kg[0][i] == 1 {
 			fmt.Printf("1 at %d \n", i)
@@ -144,10 +144,10 @@ func TestCiphertextOnlyAttack(t *testing.T) {
 	fmt.Printf("dims of KG	%d x %d\n", len(KG), len(KG[0])) //272 x 456
 
 	/* Vores konkrete bitvektor som skal gives som second argument til Gauss */
-	prints(c[:456], "c")
+	Prints(c[:456], "c")
 	KG_C := MatrixToSlice(MultiplyMatrix(KG, SliceToMatrix(c[:456])))
-	prints(KG_C, "KGc")
-	prints(c[184:456], "c[184:456]")
+	Prints(KG_C, "KGc")
+	Prints(c[184:456], "c[184:456]")
 	print(len(c[184:456]), "c[184:456]")
 	fmt.Printf("dims of K_G*C:  %d x 1 \n", len(KG_C)) //272 x 1
 	KG_C2 := MatrixToSlice(MultiplyMatrix(KG, SliceToMatrix(c[456:912])))
@@ -173,15 +173,15 @@ func TestCiphertextOnlyAttack(t *testing.T) {
 
 	/* Try to solve KG*k = KG*C for V_f*/
 	x := solveByGaussEliminationTryTwo(full_KGk, full_KGC)
-	// prints(full_KGC[:60], "")
-	// printmatrix(full_KGk[:60][:60])
+	// Prints(full_KGC[:60], "")
+	// PrintMatrix(full_KGk[:60][:60])
 	println(x.ResType)
 	fmt.Printf("Size of multi %d\n", len(x.Multi))
 	fmt.Printf("Verifykeystream: %v\n", VerifyKeyStream(x.Multi[0]))
 	r1_solved, r2_solved, r3_solved := MakeGaussResultToRegisters(x.Multi[0])
-	prints(r1_solved, "r1")
-	prints(r2_solved, "r2")
-	prints(r3_solved, "r3")
+	Prints(r1_solved, "r1")
+	Prints(r2_solved, "r2")
+	Prints(r3_solved, "r3")
 
 	// if reflect.DeepEqual(r1_solved, r2_solved) {
 	// t.Fails
@@ -216,7 +216,7 @@ func TestCalculateKgTimesSymKeyStream(t *testing.T) {
 func TestSliceToMatrix(t *testing.T) {
 	slice := stringToIntArray("0 1 0 1 1 0 1 0 1 0 1 0 0 0 0 0 1")
 	slice_matrix := SliceToMatrix(slice)
-	printmatrix(slice_matrix)
+	PrintMatrix(slice_matrix)
 }
 
 func TestMatrixToSlice(t *testing.T) {
@@ -324,7 +324,7 @@ func TestCalculateXFramCiphertext(t *testing.T) {
 
 	c := CalculateXFrameCiphertext(key, 6)
 	assert.Equal(t, 1368, len(c))
-	prints(c, "c")
+	Prints(c, "c")
 
 	c = CalculateXFrameCiphertext(key, 2)
 	assert.Equal(t, 456, len(c))
