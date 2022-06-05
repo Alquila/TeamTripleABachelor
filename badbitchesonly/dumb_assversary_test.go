@@ -60,7 +60,7 @@ func TestDoTheSimpleHack1(t *testing.T) {
 	reg := InitOneRegister()
 	orgReg := make([]int, 19)
 	copy(orgReg, reg.RegSlice)
-	Bit_entry(symReg)
+	BitEntry(symReg)
 
 	// make output keystream in both
 	symKeyStream := SimpleKeyStreamSym(symReg)
@@ -89,12 +89,12 @@ func TestDoTheSimpleHackSecondVersion(t *testing.T) {
 
 	// init one register, in both OG and sym version
 	symReg := InitOneSymRegister()
-	// Bit_entry(symReg) REVIEW: I moved this - Am
+	// BitEntry(symReg) REVIEW: I moved this - Am
 	reg := InitOneRegister()
 	// orgReg is init, has entry for each variable, including the one set to 1
 	orgReg := make([]int, 19)
 	copy(orgReg, reg.RegSlice)
-	Bit_entry(symReg)
+	BitEntry(symReg)
 
 	assert.Equal(t, orgReg, reg.RegSlice, "orgReg and reg are not the same")
 
@@ -137,9 +137,9 @@ func TestPlaintextAttack(t *testing.T) {
 	original_frame_number = 55
 	current_frame_number = 55
 
-	sr1.ArrImposter = make([][]int, r1.Length)
-	sr2.ArrImposter = make([][]int, r2.Length)
-	sr3.ArrImposter = make([][]int, r3.Length)
+	sr1.RegSlice = make([][]int, r1.Length)
+	sr2.RegSlice = make([][]int, r2.Length)
+	sr3.RegSlice = make([][]int, r3.Length)
 	sr4.RegSlice = make([]int, r4.Length)
 
 	res1, _, _ := DoTheKnownPlainTextHack()
@@ -148,11 +148,11 @@ func TestPlaintextAttack(t *testing.T) {
 
 	// offset := r1.Length + r2.Length + r3.Length
 	// compare if found res is equal to init registers
-	if !reflect.DeepEqual(res1, sr1.ArrImposter) {
+	if !reflect.DeepEqual(res1, sr1.RegSlice) {
 		t.Fail()
 		fmt.Printf("Res1 er   : %d\n", res1)
 		// fmt.Printf("reg er: %d\n", orgReg)
-		fmt.Printf("sr1.Arr er: %d\n", sr1.ArrImposter)
+		fmt.Printf("sr1.Arr er: %d\n", sr1.RegSlice)
 	}
 	// fmt.Printf("reg er: %d\n", orgReg)
 	// fmt.Printf("Res er: %d\n", res[offset:offset+17])
@@ -182,10 +182,10 @@ func TestDescribeNewFrameNumberWithOldVar(t *testing.T) {
 	// Prints(firstSymReg.RegSlice[0], "række 0")
 	// Prints(firstSymReg.RegSlice[16], "række 16")
 
-	firstSymReg.ArrImposter = DescribeNewFrameWithOldVariables(0, 1, firstSymReg)
+	firstSymReg.RegSlice = DescribeNewFrameWithOldVariables(0, 1, firstSymReg)
 
-	Bit_entry(firstSymReg)
-	res := firstSymReg.ArrImposter
+	BitEntry(firstSymReg)
+	res := firstSymReg.RegSlice
 	// fmt.Printf("res er: \n%d \n", res)
 	println("res er")
 	for i := 0; i < len(res); i++ {
@@ -232,7 +232,7 @@ func TestDescribeNewFrameNumberWithOldVar(t *testing.T) {
 
 func TestDescribeNewFrameWithVariables8And15(t *testing.T) {
 	firstSymReg := InitOneSymRegister()
-	Bit_entry(firstSymReg)
+	BitEntry(firstSymReg)
 
 	res := DescribeNewFrameWithOldVariables(8, 15, firstSymReg)
 	// fmt.Printf("res is: \n %d \n", res)
@@ -240,7 +240,7 @@ func TestDescribeNewFrameWithVariables8And15(t *testing.T) {
 	for i := 0; i < len(res); i++ {
 		Prints(res[i], "")
 	}
-	PrettySymPrintSliceBit(res, firstSymReg.set1)
+	PrettySymPrintSliceBit(res, firstSymReg.SetToOne)
 	Prints(res[0], "")
 	shouldBe := make([][]int, 19)
 	for i := 0; i < 19; i++ {
@@ -257,7 +257,7 @@ func TestDescribeNewFrameWithVariables8And15(t *testing.T) {
 			shouldBe[i][i-1] = 1
 		}
 	}
-	PrettySymPrintSliceBit(shouldBe, firstSymReg.set1)
+	PrettySymPrintSliceBit(shouldBe, firstSymReg.SetToOne)
 	if !reflect.DeepEqual(res, shouldBe) {
 		t.Fail()
 		t.Log("The result is not correct")
@@ -272,7 +272,7 @@ func TestFindDifferenceOfFrameNumbers(t *testing.T) {
 
 func TestDescribeFrameWithOldVariables2(t *testing.T) {
 	firstSymReg := InitOneSymRegister()
-	Bit_entry(firstSymReg)
+	BitEntry(firstSymReg)
 
 	res := DescribeNewFrameWithOldVariables(136, 1357, firstSymReg)
 
@@ -284,11 +284,11 @@ func TestDescribeFrameWithOldVariables2(t *testing.T) {
 	shouldBe := make([][]int, firstSymReg.Length)
 
 	for i := range shouldBe {
-		shouldBe[i] = make([]int, len(firstSymReg.ArrImposter[0]))
-		copy(shouldBe[i], firstSymReg.ArrImposter[i])
+		shouldBe[i] = make([]int, len(firstSymReg.RegSlice[0]))
+		copy(shouldBe[i], firstSymReg.RegSlice[i])
 
 		if i == 3 || i == 4 || i == 5 || i == 7 || i == 11 || i == 13 || i == 14 || i == 15 {
-			shouldBe[i][len(firstSymReg.ArrImposter[0])-1] = 1
+			shouldBe[i][len(firstSymReg.RegSlice[0])-1] = 1
 		}
 	}
 
@@ -518,7 +518,7 @@ func TestDescribeSimpleSymWithFrame(t *testing.T) {
 	sreg := SymMakeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14, 15) // equvalent to reg1
 	for i := 0; i < 19; i++ {
 		// reg.RegSlice[i] = make([]int, 19)
-		sreg.ArrImposter[i][i] = 1 // each entry in the diagonal set to 1 as x_i is only dependent on x_i when initialized
+		sreg.RegSlice[i][i] = 1 // each entry in the diagonal set to 1 as x_i is only dependent on x_i when initialized
 	}
 
 }
@@ -536,17 +536,17 @@ func TestMakeGaussResToRegisters(t *testing.T) {
 		res = append(res, i)
 	}
 
-	for i := 0; i < sr2.set1; i++ {
+	for i := 0; i < sr2.SetToOne; i++ {
 		res = append(res, i)
 	}
-	for i := sr2.set1 + 1; i < r2.Length; i++ {
+	for i := sr2.SetToOne + 1; i < r2.Length; i++ {
 		res = append(res, i)
 	}
 
-	for i := 0; i < sr3.set1; i++ {
+	for i := 0; i < sr3.SetToOne; i++ {
 		res = append(res, i)
 	}
-	for i := sr3.set1 + 1; i < r3.Length; i++ {
+	for i := sr3.SetToOne + 1; i < r3.Length; i++ {
 		res = append(res, i)
 	}
 

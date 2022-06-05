@@ -44,21 +44,21 @@ func DoTheKnownPlainTextHack() ([]int, []int, []int) {
 	// SymInitializeRegisters()
 
 	// make stream cipher ?
-	sr1.ArrImposter = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr1)
-	sr2.ArrImposter = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr2)
-	sr3.ArrImposter = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr3)
+	sr1.RegSlice = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr1)
+	sr2.RegSlice = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr2)
+	sr3.RegSlice = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr3)
 	b1, A1 := RunA5_2()
 
 	current_frame_number++
-	sr1.ArrImposter = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr1)
-	sr2.ArrImposter = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr2)
-	sr3.ArrImposter = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr3)
+	sr1.RegSlice = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr1)
+	sr2.RegSlice = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr2)
+	sr3.RegSlice = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr3)
 	b2, A2 := RunA5_2()
 
 	current_frame_number++
-	sr1.ArrImposter = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr1)
-	sr2.ArrImposter = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr2)
-	sr3.ArrImposter = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr3)
+	sr1.RegSlice = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr1)
+	sr2.RegSlice = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr2)
+	sr3.RegSlice = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr3)
 	b3, A3 := RunA5_2()
 
 	// A := make([][]int, 684)
@@ -100,9 +100,9 @@ func MakeGaussResultToRegisters(res []int) ([]int, []int, []int) {
 	offset = reg_range
 
 	// Move r1
-	r1_res = putConstantBackInRes(r1_res, sr1.set1)
-	r2_res = putConstantBackInRes(r2_res, sr2.set1)
-	r3_res = putConstantBackInRes(r3_res, sr3.set1)
+	r1_res = putConstantBackInRes(r1_res, sr1.SetToOne)
+	r2_res = putConstantBackInRes(r2_res, sr2.SetToOne)
+	r3_res = putConstantBackInRes(r3_res, sr3.SetToOne)
 
 	return r1_res, r2_res, r3_res
 }
@@ -184,7 +184,7 @@ func DescribeNewFrameWithOldVariables(original_framenum int, current_framenum in
 	diff := FindDifferenceOfFrameNumbers(original_framenum, current_framenum)
 
 	// init the predicted new symReg
-	length := len(original_reg.ArrImposter)
+	length := len(original_reg.RegSlice)
 
 	/*	Res is used to simulate what indices gets
 		affected by the difference in frame number.
@@ -201,10 +201,10 @@ func DescribeNewFrameWithOldVariables(original_framenum int, current_framenum in
 		newbit := 0 // newbit is now zero
 
 		// do the feedback function
-		for j := range original_reg.Tabs {
+		for j := range original_reg.Taps {
 			// takes the index corresponding to tab[i] in res and
 			// XOR with newbit
-			newbit = newbit ^ res[original_reg.Tabs[j]]
+			newbit = newbit ^ res[original_reg.Taps[j]]
 		}
 
 		// this is copied from cipher.Clock
@@ -228,9 +228,9 @@ func DescribeNewFrameWithOldVariables(original_framenum int, current_framenum in
 	// frame with varibales from previous frame
 	newReg := make([][]int, length)
 	for i := range newReg { // for each entry in the outermost array
-		newReg[i] = make([]int, len(original_reg.ArrImposter[0]))
+		newReg[i] = make([]int, len(original_reg.RegSlice[0]))
 		// copy each 'expression'
-		copy(newReg[i], original_reg.ArrImposter[i])
+		copy(newReg[i], original_reg.RegSlice[i])
 	}
 
 	// create the new reg from old variables, based on res
@@ -238,12 +238,12 @@ func DescribeNewFrameWithOldVariables(original_framenum int, current_framenum in
 		if res[i] == 0 {
 			continue
 		} else {
-			newReg[i][len(original_reg.ArrImposter[0])-1] = newReg[i][len(original_reg.ArrImposter[0])-1] ^ 1
+			newReg[i][len(original_reg.RegSlice[0])-1] = newReg[i][len(original_reg.RegSlice[0])-1] ^ 1
 		}
 	}
 
-	newReg[original_reg.set1] = make([]int, len(original_reg.ArrImposter[0]))
-	newReg[original_reg.set1][len(original_reg.ArrImposter[0])-1] = 1
+	newReg[original_reg.SetToOne] = make([]int, len(original_reg.RegSlice[0]))
+	newReg[original_reg.SetToOne][len(original_reg.RegSlice[0])-1] = 1
 
 	return newReg
 }
@@ -315,20 +315,20 @@ func DescribeRegistersFromKey() [][]int {
 	sre3 := SymMakeRegister(23, []int{22, 21, 20, 7}, []int{16, 18}, 13, 18)
 
 	for i := 0; i < sre1.Length; i++ {
-		sre1.ArrImposter[i] = make([]int, 64)
+		sre1.RegSlice[i] = make([]int, 64)
 	}
 
 	for i := 0; i < sre2.Length; i++ {
-		sre2.ArrImposter[i] = make([]int, 64)
+		sre2.RegSlice[i] = make([]int, 64)
 	}
 
 	for i := 0; i < sre3.Length; i++ {
-		sre3.ArrImposter[i] = make([]int, 64)
+		sre3.RegSlice[i] = make([]int, 64)
 	}
 
 	reg4 := SymMakeRegister(17, []int{16, 11}, []int{12, 15}, 14, 10)
 	for i := 0; i < 17; i++ {
-		reg4.ArrImposter[i] = make([]int, 64)
+		reg4.RegSlice[i] = make([]int, 64)
 	}
 
 	for i := 0; i < 64; i++ {
@@ -336,17 +336,17 @@ func DescribeRegistersFromKey() [][]int {
 		SymClock(sre2)
 		SymClock(sre3)
 		SymClock(reg4)
-		sre1.ArrImposter[0][i] = 1 //should this be xor? <- no den påvirkes kun af den i'te bit én gang
-		sre2.ArrImposter[0][i] = 1
-		sre3.ArrImposter[0][i] = 1
-		reg4.ArrImposter[0][i] = 1
+		sre1.RegSlice[0][i] = 1 //should this be xor? <- no den påvirkes kun af den i'te bit én gang
+		sre2.RegSlice[0][i] = 1
+		sre3.RegSlice[0][i] = 1
+		reg4.RegSlice[0][i] = 1
 	}
 
 	symbolicDescription := make([][]int, 0)
-	symbolicDescription = append(symbolicDescription, sre1.ArrImposter...)
-	symbolicDescription = append(symbolicDescription, sre2.ArrImposter...)
-	symbolicDescription = append(symbolicDescription, sre3.ArrImposter...)
-	symbolicDescription = append(symbolicDescription, reg4.ArrImposter...)
+	symbolicDescription = append(symbolicDescription, sre1.RegSlice...)
+	symbolicDescription = append(symbolicDescription, sre2.RegSlice...)
+	symbolicDescription = append(symbolicDescription, sre3.RegSlice...)
+	symbolicDescription = append(symbolicDescription, reg4.RegSlice...)
 
 	return symbolicDescription
 
@@ -403,7 +403,7 @@ func TryAllReg4() {
 		r4 = MakeR4()
 		copy(r4.RegSlice, r4_guess)
 		// Prints(r4.RegSlice, "r4_guess1 ")
-		key1 := makeSymKeyStream() //this clocks sr4 which has r4_guess as its array
+		key1 := MakeSymKeyStream() //this clocks sr4 which has r4_guess as its array
 		// Prints(sr4.RegSlice, "sr4 after makeSymkey  						")
 
 		current_frame_number++
@@ -431,7 +431,7 @@ func TryAllReg4() {
 
 		//we want this -> [0 1 0 1 0 0 1 0 1 1 1 0 0 0 0 0 1]
 		// Prints(r4.RegSlice, "sr4_guess init ")
-		key2 := makeSymKeyStream() //this will now copy the updated r4_arrimposter into sr4
+		key2 := MakeSymKeyStream() //this will now copy the updated r4_arrimposter into sr4
 		// Prints(r4_second, "r4_second ")
 		// Prints(sr4.RegSlice, "sr4_after2")
 
@@ -447,7 +447,7 @@ func TryAllReg4() {
 		r4.RegSlice = XorSlice(fake_r4.RegSlice, r4.RegSlice)
 		r4.RegSlice[10] = 1
 		//Prints(r4.RegSlice, " sr4 after third")
-		key3 := makeSymKeyStream()
+		key3 := MakeSymKeyStream()
 		current_frame_number++
 
 		key := append(key1, key2...)
@@ -472,15 +472,15 @@ func TryAllReg4() {
 		}
 		//init sr1 sr2 sr3
 		//make first sym-keystream based on r4 guess and symbol registers
-		//key1 := makeSymKeyStream()
+		//key1 := MakeSymKeyStream()
 		//framenumber ++
 		//init sr1 sr2 sr3 again with the new framenumber
 		//init r4_guess with the new frame number
-		//key2 := makeSymKeyStream()
+		//key2 := MakeSymKeyStream()
 		//framenumber ++
 		//init sr1 sr2 sr3 again with the new framenumber
 		//init r4_guess with the new frame number
-		//key3 := makeSymKeyStream()
+		//key3 := MakeSymKeyStream()
 
 		// gauss: based on response add to found
 	}

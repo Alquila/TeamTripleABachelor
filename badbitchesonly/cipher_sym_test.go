@@ -10,17 +10,17 @@ import (
 
 func TestBitEntry(t *testing.T) {
 	reg := InitOneSymRegister()
-	PrettySymPrintSlice(reg.ArrImposter)
-	Bit_entry(reg)
-	PrettySymPrintSlice(reg.ArrImposter)
+	PrettySymPrintSlice(reg.RegSlice)
+	BitEntry(reg)
+	PrettySymPrintSlice(reg.RegSlice)
 	for i := 0; i < reg.Length; i++ {
-		Prints(reg.ArrImposter[i], "")
+		Prints(reg.RegSlice[i], "")
 	}
 }
 
 func TestConstPrettyPrint(t *testing.T) {
 	reg := InitOneSymRegister()
-	Bit_entry(reg)
+	BitEntry(reg)
 	PrettyPrintSymRegister(reg)
 }
 
@@ -29,19 +29,19 @@ func TestHowFrames(t *testing.T) {
 	reg1 := SymMakeRegister(17, []int{16, 11}, []int{12, 15}, 14, 10)
 	// ree := make([][]int, 19)
 	for i := 0; i < 17; i++ {
-		reg1.ArrImposter[i] = make([]int, 22)
+		reg1.RegSlice[i] = make([]int, 22)
 		// ree[i][i] = 1
 	}
 	// PrintMatrix(reg1.RegSlice)
 
 	for i := 0; i < 22; i++ {
 		SymClock(reg1)
-		reg1.ArrImposter[0][i] = 1 //should this be xor?
+		reg1.RegSlice[0][i] = 1 //should this be xor?
 		// ree[i][i] = 1
 	}
 
-	PrintMatrix(reg1.ArrImposter)
-	PrettySymPrintSlice(reg1.ArrImposter)
+	PrintMatrix(reg1.RegSlice)
+	PrettySymPrintSlice(reg1.RegSlice)
 
 }
 
@@ -51,20 +51,20 @@ func TestDescribeRegistersFromFrame(t *testing.T) {
 	sre3 := SymMakeRegister(23, []int{22, 21, 20, 7}, []int{16, 18}, 13, 18)
 
 	for i := 0; i < sre1.Length; i++ {
-		sre1.ArrImposter[i] = make([]int, 22)
+		sre1.RegSlice[i] = make([]int, 22)
 	}
 
 	for i := 0; i < sre2.Length; i++ {
-		sre2.ArrImposter[i] = make([]int, 22)
+		sre2.RegSlice[i] = make([]int, 22)
 	}
 
 	for i := 0; i < sre3.Length; i++ {
-		sre3.ArrImposter[i] = make([]int, 22)
+		sre3.RegSlice[i] = make([]int, 22)
 	}
 
 	reg4 := SymMakeRegister(17, []int{16, 11}, []int{12, 15}, 14, 10)
 	for i := 0; i < 17; i++ {
-		reg4.ArrImposter[i] = make([]int, 22)
+		reg4.RegSlice[i] = make([]int, 22)
 	}
 
 	for i := 0; i < 22; i++ {
@@ -72,19 +72,19 @@ func TestDescribeRegistersFromFrame(t *testing.T) {
 		SymClock(sre2)
 		SymClock(sre3)
 		SymClock(reg4)
-		sre1.ArrImposter[0][i] = 1 //should this be xor? <- no den påvirkes kun af den i'te bit én gang
-		sre2.ArrImposter[0][i] = 1
-		sre3.ArrImposter[0][i] = 1
-		reg4.ArrImposter[0][i] = 1
+		sre1.RegSlice[0][i] = 1 //should this be xor? <- no den påvirkes kun af den i'te bit én gang
+		sre2.RegSlice[0][i] = 1
+		sre3.RegSlice[0][i] = 1
+		reg4.RegSlice[0][i] = 1
 	}
 	println("sr1")
-	PrettySymPrintFrame(sre1.ArrImposter)
+	PrettySymPrintFrame(sre1.RegSlice)
 	println("sr2")
-	PrettySymPrintFrame(sre2.ArrImposter)
+	PrettySymPrintFrame(sre2.RegSlice)
 	println("sr3")
-	PrettySymPrintFrame(sre3.ArrImposter)
+	PrettySymPrintFrame(sre3.RegSlice)
 	println("sr4")
-	PrettySymPrintFrame(reg4.ArrImposter)
+	PrettySymPrintFrame(reg4.RegSlice)
 }
 
 func TestDescribeRegistersFromKey(t *testing.T) {
@@ -175,29 +175,29 @@ func TestSymRegistersSameAfterInitWithSameFrameNumber(t *testing.T) {
 	reg2 := make([]int, 22)
 	reg3 := make([]int, 23)
 	reg4 := make([]int, 17)
-	copy(reg1, sr1.ArrImposter[0])
-	copy(reg2, sr2.ArrImposter[0])
-	copy(reg3, sr3.ArrImposter[0])
+	copy(reg1, sr1.RegSlice[0])
+	copy(reg2, sr2.RegSlice[0])
+	copy(reg3, sr3.RegSlice[0])
 	copy(reg4, sr4.RegSlice)
 
-	sr1.ArrImposter[0][0] = 42
-	sr2.ArrImposter[0][0] = 42
-	sr3.ArrImposter[0][0] = 42
+	sr1.RegSlice[0][0] = 42
+	sr2.RegSlice[0][0] = 42
+	sr3.RegSlice[0][0] = 42
 	sr4.RegSlice[0] = 42
 
 	MakeRegisters()
 	InitializeRegisters()
 	SymInitializeRegisters()
 
-	if !reflect.DeepEqual(reg1, sr1.ArrImposter[0]) {
+	if !reflect.DeepEqual(reg1, sr1.RegSlice[0]) {
 		t.Log("reg1 and r1 are different, but should be equal")
 		t.Fail()
 	}
-	if !reflect.DeepEqual(reg2, sr2.ArrImposter[0]) {
+	if !reflect.DeepEqual(reg2, sr2.RegSlice[0]) {
 		t.Log("reg2 and r2 are different but should be equal")
 		t.Fail()
 	}
-	if !reflect.DeepEqual(reg3, sr3.ArrImposter[0]) {
+	if !reflect.DeepEqual(reg3, sr3.RegSlice[0]) {
 		t.Log("reg3 and r3 are different but should be equal")
 		t.Fail()
 	}
@@ -217,9 +217,9 @@ func TestFinalXorSomething(t *testing.T) {
 	SymInitializeRegisters()
 	// sr1.RegSlice[sr1.Length-1][sr1.Length-1] = 1
 
-	last_r1 := sr1.ArrImposter[sr1.Length-1]
-	last_r2 := sr2.ArrImposter[sr2.Length-1]
-	last_r3 := sr3.ArrImposter[sr3.Length-1]
+	last_r1 := sr1.RegSlice[sr1.Length-1]
+	last_r2 := sr2.RegSlice[sr2.Length-1]
+	last_r3 := sr3.RegSlice[sr3.Length-1]
 
 	v1 := len(last_r1) - 1 //18
 	v2 := len(last_r2) - 1
@@ -273,21 +273,21 @@ func TestSymClock(t *testing.T) {
 	// for i := 0; i < 19; i++ {
 	// 	Prints(reg.RegSlice[i], "")
 	// } <- her er der bare masser af nuller
-	Bit_entry(reg)
+	BitEntry(reg)
 	// for i := 0; i < 19; i++ {
 	// 	Prints(reg.RegSlice[i], "")
 	// } // <- her er der 1 taller diagonal
-	PrettySymPrintSliceBit(reg.ArrImposter, reg.set1)
+	PrettySymPrintSliceBit(reg.RegSlice, reg.SetToOne)
 	SymClock(reg)
 	SymClock(reg)
 	SymClock(reg)
 	for i := 0; i < 16; i++ {
 		SymClock(reg)
 	}
-	PrettySymPrintSliceBit(reg.ArrImposter, reg.set1)
+	PrettySymPrintSliceBit(reg.RegSlice, reg.SetToOne)
 	SymClock(reg)
 	// SymClock(reg)
-	PrettySymPrintSliceBit(reg.ArrImposter, reg.set1)
+	PrettySymPrintSliceBit(reg.RegSlice, reg.SetToOne)
 }
 
 func TestCompliance(t *testing.T) {
@@ -296,7 +296,7 @@ func TestCompliance(t *testing.T) {
 	orgReg := make([]int, 19)
 	copy(orgReg, reg.RegSlice)
 	Prints(orgReg, "Original reg")
-	Bit_entry(symReg)
+	BitEntry(symReg)
 
 	// make output keystream in both
 	reg1 := SimpleKeyStreamSym(symReg)
@@ -304,7 +304,7 @@ func TestCompliance(t *testing.T) {
 
 	Prints(reg1[0], "reg1[0")
 	Prints(reg1[1], "reg1[1]")
-	PrettySymPrintSliceBit(reg1[:20], symReg.set1)
+	PrettySymPrintSliceBit(reg1[:20], symReg.SetToOne)
 	Prints(reg2[:20], "res")
 
 	res := solveByGaussEliminationTryTwo(reg1, reg2)
@@ -332,10 +332,10 @@ func MakeLongIntSlice() []int {
 		res = append(res, i)
 	}
 
-	for i := 0; i < sr3.set1; i++ {
+	for i := 0; i < sr3.SetToOne; i++ {
 		res = append(res, i)
 	}
-	for i := sr3.set1 + 1; i < r3.Length; i++ {
+	for i := sr3.SetToOne + 1; i < r3.Length; i++ {
 		res = append(res, i)
 	}
 

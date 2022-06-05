@@ -25,8 +25,8 @@ func PrintAllRegisters() {
 // PrettyPrintSymRegister
 // a helping function that Prints symbolic registers.
 func PrettyPrintSymRegister(r SymRegister) {
-	rMatrix := r.ArrImposter
-	rBit := r.set1
+	rMatrix := r.RegSlice
+	rBit := r.SetToOne
 
 	PrettySymPrintSliceBit(rMatrix, rBit)
 }

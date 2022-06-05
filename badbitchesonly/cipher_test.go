@@ -57,15 +57,15 @@ func makeSmallReg() Register { //[0 0 0 0 0 0 0 0 0 0]
 
 func TestSimpleKeyStream(t *testing.T) {
 	r0 := SymRegister{Length: 10,
-		ArrImposter: make([][]int, 10),
-		Tabs:        []int{3, 5, 9}, // [0] = [3] ^ [5] ^ [9]
-		Majs:        []int{4, 7},
-		Ært:         6}
+		RegSlice: make([][]int, 10),
+		Taps:     []int{3, 5, 9}, // [0] = [3] ^ [5] ^ [9]
+		MajsTaps: []int{4, 7},
+		NegTap:   6}
 
 	print("rip1")
 	for i := 0; i < r0.Length; i++ {
-		r0.ArrImposter[i] = make([]int, r0.Length)
-		r0.ArrImposter[i][i] = 1
+		r0.RegSlice[i] = make([]int, r0.Length)
+		r0.RegSlice[i][i] = 1
 	}
 	print("rip")
 	key := SimpleKeyStreamSym(r0)
@@ -115,20 +115,20 @@ func TestClock(t *testing.T) {
 
 func TestSmallPrint(t *testing.T) {
 	r0 := SymRegister{Length: 10,
-		ArrImposter: make([][]int, 10),
-		Tabs:        []int{3, 5, 9}, // [0] = [3] ^ [5] ^ [9]
-		Majs:        []int{4, 7},
-		Ært:         6}
+		RegSlice: make([][]int, 10),
+		Taps:     []int{3, 5, 9}, // [0] = [3] ^ [5] ^ [9]
+		MajsTaps: []int{4, 7},
+		NegTap:   6}
 
 	for i := 0; i < r0.Length; i++ {
-		r0.ArrImposter[i] = make([]int, r0.Length+1)
+		r0.RegSlice[i] = make([]int, r0.Length+1)
 	}
 
-	r0.ArrImposter[8][8] = 1
-	r0.ArrImposter[4][10] = 1
-	r0.ArrImposter[1][1] = 1
-	r0.ArrImposter[5][5] = 1
-	r0.ArrImposter[3][3] = 1
+	r0.RegSlice[8][8] = 1
+	r0.RegSlice[4][10] = 1
+	r0.RegSlice[1][1] = 1
+	r0.RegSlice[5][5] = 1
+	r0.RegSlice[3][3] = 1
 	PrettyPrintSymRegister(r0)
 
 	SymClock(r0)
@@ -156,7 +156,7 @@ func TestSmallPrint(t *testing.T) {
 	SymClock(r0)
 	SymClock(r0)
 	SymClock(r0)
-	Printf("%+v \n", r0.ArrImposter)
+	Printf("%+v \n", r0.RegSlice)
 	PrettyPrintSymRegister(r0)
 	//Printf("%+v \n", r0.RegSlice)
 
@@ -401,15 +401,15 @@ func TestFinalXor(t *testing.T) {
 	//right now we just show that it takes the three registers and calculates the Majority and takes the last slice in each and xors it all together. returns a long array with all the stuff
 	r1 := SymMakeRegister(4, []int{1, 3}, []int{0, 2}, 3, 0)
 	for i := 0; i < 4; i++ {
-		r1.ArrImposter[i][i] = 1 // each entry in the diagonal set to 1 as x_i is only dependent on x_i when initialized
+		r1.RegSlice[i][i] = 1 // each entry in the diagonal set to 1 as x_i is only dependent on x_i when initialized
 	}
 	r2 := SymMakeRegister(5, []int{1, 3}, []int{2, 4}, 0, 0)
 	for i := 0; i < 5; i++ {
-		r2.ArrImposter[i][i] = 1 // each entry in the diagonal set to 1 as x_i is only dependent on x_i when initialized
+		r2.RegSlice[i][i] = 1 // each entry in the diagonal set to 1 as x_i is only dependent on x_i when initialized
 	}
 	r3 := SymMakeRegister(8, []int{3, 4, 6, 5}, []int{1, 2}, 0, 0)
 	for i := 0; i < 8; i++ {
-		r3.ArrImposter[i][i] = 1 // each entry in the diagonal set to 1 as x_i is only dependent on x_i when initialized
+		r3.RegSlice[i][i] = 1 // each entry in the diagonal set to 1 as x_i is only dependent on x_i when initialized
 	}
 
 	res := SymMakeFinalXOR(r1, r2, r3)
@@ -518,14 +518,14 @@ func TestSymMajorityOutput(t *testing.T) {
 	e := []int{1, 0, 1, 0}
 
 	r0 := SymRegister{Length: 4,
-		ArrImposter: make([][]int, 4),
-		Tabs:        []int{0, 0, 0},
-		Majs:        []int{0, 1},
-		Ært:         2}
+		RegSlice: make([][]int, 4),
+		Taps:     []int{0, 0, 0},
+		MajsTaps: []int{0, 1},
+		NegTap:   2}
 
-	r0.ArrImposter[0] = c
-	r0.ArrImposter[1] = d
-	r0.ArrImposter[2] = e
+	r0.RegSlice[0] = c
+	r0.RegSlice[1] = d
+	r0.RegSlice[2] = e
 
 	Printf("cd  %+v \n", SymMajorityMultiply(c, d))
 	Printf("de  %+v \n", SymMajorityMultiply(d, e))
@@ -543,7 +543,7 @@ func PrettySymPrint(symReg SymRegister) {
 	for i := 0; i < symReg.Length; i++ {
 		accString := "["
 		for j := 0; j < symReg.Length; j++ {
-			if symReg.ArrImposter[i][j] == 1 {
+			if symReg.RegSlice[i][j] == 1 {
 				str := strconv.Itoa(j)
 				accString += "x" + (str) + " ⨁ "
 			}

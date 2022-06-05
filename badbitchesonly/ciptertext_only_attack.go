@@ -6,8 +6,7 @@ import (
 )
 
 // CreateGMatrix
-// Creates a matrix with ones in the diagonal
-//
+// creates a matrix with ones in the diagonal
 func CreateGMatrix() [][]int {
 	// Make first slice: 184 columns
 	G := make([][]int, 456)
@@ -28,8 +27,7 @@ func CreateGMatrix() [][]int {
 }
 
 // CreateKgMatrix
-// Creates a matrix that multiplied with G returns 0
-//
+// creates a matrix that multiplied with G returns 0
 func CreateKgMatrix() [][]int {
 	// Make first slice: 184 columns
 	KG := make([][]int, 272)
@@ -37,11 +35,6 @@ func CreateKgMatrix() [][]int {
 	// Make 184 slices of length 456
 	for i := 0; i < 272; i++ {
 		row := make([]int, 456)
-
-		// Set diagonal to 1 after 184
-		// if i > 184 && i < 272 {
-		// 	row[i] = 1
-		// }
 		row[i+184] = 1
 		KG[i] = row
 	}
@@ -50,19 +43,14 @@ func CreateKgMatrix() [][]int {
 }
 
 // MultiplyMatrix
-// Takes a matrix A and a matrix B and multiplies them.
+// takes a matrix A and a matrix B and multiplies them.
 // Matrix A and B must have dimensions q x n and n x p.
-//
 func MultiplyMatrix(A [][]int, B [][]int) [][]int {
-	noRows := len(A) // m
-	// fmt.Printf("Number of rows in first matrix: %d\n", noRows)
+	noRows := len(A)   // m
 	noCol := len(A[0]) // n
-	// fmt.Printf("Number of col in first matrix: %d\n", noCol)
 
-	secNoRows := len(B) // p
-	// fmt.Printf("Number of rows in second matrix: %d\n", secNoRows)
+	secNoRows := len(B)   // p
 	secNoCol := len(B[0]) // q
-	// fmt.Printf("Number of columns in second matrix: %d\n", secNoCol)
 
 	if noCol != secNoRows {
 		fmt.Println("Error: The matrix cannot be multiplied")
@@ -91,7 +79,9 @@ func MultiplyMatrix(A [][]int, B [][]int) [][]int {
 	return res
 }
 
-func createRandomMessage(length int) []int {
+// CreatesRandomMessage
+// creates a random bit-slice of the given length
+func CreateRandomMessage(length int) []int {
 	msg := make([]int, length)
 	for i := 0; i < length; i++ {
 		msg[i] = rand.Intn(2) // returns int in [0,2)
@@ -119,8 +109,9 @@ func MatrixToSlice(matrix [][]int) []int {
 }
 
 /*
-Takes a K_G of size 272 x 456 and SymKeystream of 456*variables.
-Multiplies them to a 272*v matrix where the i'th row becomes xor of the rows in symkey for which K_G[i][j]==1
+	CalculateKgTimesSymKeyStream
+	takes a K_G of size 272 x 456 and SymKeystream of 456*variables.
+	Multiplies them to a 272*v matrix where the i'th row becomes XOR of the rows in symkey for which K_G[i][j]==1
 */
 func CalculateKgTimesSymKeyStream(Kg [][]int, symKeyStream [][]int) [][]int {
 	number_of_rows := len(Kg)
@@ -152,15 +143,17 @@ func CalculateKgTimesSymKeyStream(Kg [][]int, symKeyStream [][]int) [][]int {
 	return res
 }
 
-/* For number_of_frames = 6 returns 1368 long c.  */
+// CalculateXFrameCiphertext
+// For number_of_frames = 6 returns 1368 long c.
 func CalculateXFrameCiphertext(key []int, number_of_frames int) []int {
 	// create matrix used for error correction
 	G := CreateGMatrix()
+
 	// use error-correction on message
 	// 'error_corrected_msg' correspons to M in text
 	full_msg := make([][]int, 0)
 	for i := 0; i < number_of_frames/2; i++ {
-		error_corrected_msg := MultiplyMatrix(G, SliceToMatrix(createRandomMessage(184))) //456 x 1
+		error_corrected_msg := MultiplyMatrix(G, SliceToMatrix(CreateRandomMessage(184))) //456 x 1
 		full_msg = append(full_msg, error_corrected_msg...)
 
 	}
@@ -169,5 +162,6 @@ func CalculateXFrameCiphertext(key []int, number_of_frames int) []int {
 	for i := 0; i < len(c); i++ {
 		c[i] = full_msg[i][0] ^ key[i]
 	}
+
 	return c
 }

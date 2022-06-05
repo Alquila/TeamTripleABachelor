@@ -83,7 +83,7 @@ func TestMultiplyMatrix2(t *testing.T) {
 func TestCiphertextOnlyAttack(t *testing.T) {
 
 	// create message to encrypt
-	msg := createRandomMessage(184)
+	msg := CreateRandomMessage(184)
 	// make the message a slice slice/matrix
 	msgM := SliceToMatrix(msg)
 
@@ -93,8 +93,8 @@ func TestCiphertextOnlyAttack(t *testing.T) {
 	// use error-correction on message
 	// 'error_corrected_msg' correspons to M in text
 	error_corrected_msg := MultiplyMatrix(G, msgM)                                     //456 x 1
-	error_corrected_msg2 := MultiplyMatrix(G, SliceToMatrix(createRandomMessage(184))) //456 x 1
-	error_corrected_msg3 := MultiplyMatrix(G, SliceToMatrix(createRandomMessage(184))) //456 x 1
+	error_corrected_msg2 := MultiplyMatrix(G, SliceToMatrix(CreateRandomMessage(184))) //456 x 1
+	error_corrected_msg3 := MultiplyMatrix(G, SliceToMatrix(CreateRandomMessage(184))) //456 x 1
 	full_msg := append(error_corrected_msg, error_corrected_msg2...)
 	full_msg = append(full_msg, error_corrected_msg3...)
 
@@ -279,7 +279,7 @@ func TestTryAllCombinationsOfR4(t *testing.T) {
 			frame_influenced_bits := simulateClockingR4WithFrameDifference(original_frame_number, current_frame_number)
 			r4.RegSlice = XorSlice(frame_influenced_bits, r4_guess) //TODO check this for first frame
 			r4.RegSlice[10] = 1                                     //FIXME IM ASSUMING THIS NEEDS TO BE DONE AT THIS STAGE
-			key1 := makeSymKeyStream()                              //this clocks sr4 which has r4_guess as its array
+			key1 := MakeSymKeyStream()                              //this clocks sr4 which has r4_guess as its array
 			symKeyStream = append(symKeyStream, key1...)
 			current_frame_number++
 		} //TODO this part is not fully tested
