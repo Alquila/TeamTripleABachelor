@@ -67,15 +67,11 @@ func TestDoTheSimpleHack1(t *testing.T) {
 	keyStream := SimpleKeyStream(reg)
 
 	// use gauss to solve equations
-	//res := solveByGaussElimination(symKeyStream, keyStream)
 	res := SolveByGaussElimination(symKeyStream, keyStream)
 	print("Type is: " + res.ResType + "\n")
 	r1_res := PutConstantBackInRes(res.Multi[0], 15)
 
 	fmt.Printf("length of res is: %d\n", len(res.Solved))
-	// fmt.Printf("length of sym")
-	// fmt.Printf("Res er: %d\n", res)
-	// fmt.Printf("reg er: %d\n", orgReg)
 
 	// compare if found res is equal to init registers
 	if !reflect.DeepEqual(r1_res, orgReg) {
@@ -89,8 +85,8 @@ func TestDoTheSimpleHackSecondVersion(t *testing.T) {
 
 	// init one register, in both OG and sym version
 	symReg := InitOneSymRegister()
-	// BitEntry(symReg) REVIEW: I moved this - Am
 	reg := InitOneRegister()
+
 	// orgReg is init, has entry for each variable, including the one set to 1
 	orgReg := make([]int, 19)
 	copy(orgReg, reg.RegSlice)
@@ -103,12 +99,6 @@ func TestDoTheSimpleHackSecondVersion(t *testing.T) {
 	fmt.Printf("length of symKeyStream[0]: %d\n", len(symKeyStream[0]))
 	keyStream := SimpleKeyStreamWithMajorityFunc(reg)
 	fmt.Printf("length of KeyStream: %d\n", len(keyStream))
-
-	// make sym version into [][]int if not allready
-
-	// use gauss to solve equations
-	//res := solveByGaussElimination(symKeyStream, keyStream)
-	// fmt.Printf("symKeyStream: \n%d\n", symKeyStream)
 	res := SolveByGaussElimination(symKeyStream, keyStream)
 	fmt.Printf("Res Type: %v \n", res.ResType)
 
@@ -123,8 +113,6 @@ func TestDoTheSimpleHackSecondVersion(t *testing.T) {
 		fmt.Printf("reg er: %d\n", orgReg)
 		t.Log("The result is wrong :(")
 	}
-	// fmt.Printf("reg er: %d\n", orgReg)
-	// fmt.Printf("Res er: %d\n", res[0:19])
 }
 
 func TestFindDiffOfFrameNumbers(t *testing.T) {
@@ -146,15 +134,10 @@ func TestFindDiffOfFrameNumbers(t *testing.T) {
 func TestDescribeNewFrameNumberWithOldVar(t *testing.T) {
 	firstSymReg := InitOneSymRegister()
 
-	// Prints(firstSymReg.RegSlice[15], "række 15")
-	// Prints(firstSymReg.RegSlice[0], "række 0")
-	// Prints(firstSymReg.RegSlice[16], "række 16")
-
 	firstSymReg.RegSlice = DescribeNewFrameWithOldVariables(0, 1, firstSymReg)
 
 	BitEntry(firstSymReg)
 	res := firstSymReg.RegSlice
-	// fmt.Printf("res er: \n%d \n", res)
 	println("res er")
 	for i := 0; i < len(res); i++ {
 		Prints(res[i], "")
@@ -180,7 +163,6 @@ func TestDescribeNewFrameNumberWithOldVar(t *testing.T) {
 			shouldBe[i][i-1] = 1
 		}
 	}
-	// fmt.Printf("shouldBe: %d \n", shouldBe)
 	println("shouldBe er")
 	for i := 0; i < len(shouldBe); i++ {
 		Prints(shouldBe[i], "")
@@ -189,8 +171,7 @@ func TestDescribeNewFrameNumberWithOldVar(t *testing.T) {
 	for i := 0; i < len(res); i++ {
 		Prints(res[i], "")
 	}
-	// shouldBe[0] = []int{""}
-	// shouldBe[0]
+
 	if !reflect.DeepEqual(res, shouldBe) {
 		t.Fail()
 		t.Log("The result is not correct")
@@ -203,7 +184,6 @@ func TestDescribeNewFrameWithVariables8And15(t *testing.T) {
 	BitEntry(firstSymReg)
 
 	res := DescribeNewFrameWithOldVariables(8, 15, firstSymReg)
-	// fmt.Printf("res is: \n %d \n", res)
 	println("res er")
 	for i := 0; i < len(res); i++ {
 		Prints(res[i], "")
@@ -332,7 +312,6 @@ func TestMAKETEST(t *testing.T) {
 	/* init registers with key and framenumber*/
 	InitializeRegisters()
 	SetIndicesToOne()
-	// fmt.Printf("This is r1 after init: \n%v\n", r1.RegSlice)
 
 	/*save initial state registers*/
 	old_r1 := make([]int, r1.Length)
@@ -410,6 +389,7 @@ func TestMAKETEST(t *testing.T) {
 		keyStreamSym2[i] = SymMakeFinalXOR(sr1, sr2, sr3)
 	}
 	fmt.Printf("keystreamsym %d \n", len(keyStreamSym2[0]))
+
 	//Do it all again
 	current_frame_number++
 	InitializeRegisters()
@@ -442,21 +422,18 @@ func TestMAKETEST(t *testing.T) {
 
 	A := append(keyStreamSym1, keyStreamSym2...)
 	A = append(A, keyStreamSym3...)
-	// A = append(A, A3...)
 
 	b := append(keyStream1, keyStream2...)
 	b = append(b, keyStream3...)
 
 	x := SolveByGaussElimination(A, b)
 	println(x.ResType)
-	// Prints(x[0:20], "res 20xx")
 	println(len(x.Multi))
+
 	assert.Equal(t, true, VerifyKeyStream(x.Multi[0]), "VerifyKeyStream returned false")
-	// println(x.Multi[0])
+
 	r1_solved, r2_solved, r3_solved := MakeGaussResultToRegisters(x.Multi[0])
 
-	// after_init := []int{1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1}
-	// assert.Equal(t, after_init, old_r1)
 	assert.Equal(t, r1_solved[15], 1)
 	assert.Equal(t, r2_solved[16], 1)
 	assert.Equal(t, r3_solved[18], 1)
@@ -464,7 +441,6 @@ func TestMAKETEST(t *testing.T) {
 		t.Fail()
 		fmt.Printf("r1_solved er: %d\n", r1_solved)
 		fmt.Printf("old_r1 er   : %d\n", old_r1)
-		// fmt.Printf("x er: %d\n", x[0:19])
 	}
 
 	if !reflect.DeepEqual(r2_solved, old_r2) {
@@ -576,24 +552,6 @@ func TestPutConstantBackInRes(t *testing.T) {
 	// Prints(res, "")
 }
 
-// func TestMakeR4Guess(t *testing.T) { //outcommented becuase it doesn't really test anything, just to look in terminal
-
-// 	// number := 0
-
-// 	// for i := 0; i < int(math.Pow(2, 16)); i++ {
-// 	// 	r4 := MakeR4Guess(i)
-// 	// 	Prints(r4, strconv.Itoa(i))
-// 	// }
-// 	r4 := MakeR4Guess(0)
-// 	Prints(r4, strconv.Itoa(0))
-// 	Prints(PutConstantBackInRes(r4, 10), "with constant")
-
-// 	r4 = MakeR4Guess(int(math.Pow(2, 16)) - 1)
-// 	Prints(r4, strconv.Itoa(0))
-// 	Prints(PutConstantBackInRes(r4, 10), "with constant")
-
-// }
-
 func stringToIntArray(s string) []int {
 	strs := strings.Split(s, " ")
 	ary := make([]int, len(strs))
@@ -605,17 +563,13 @@ func stringToIntArray(s string) []int {
 
 func TestVerifyKeyStream(t *testing.T) {
 	key := MakeLongIntSlice()
-	// Prints(key, "key")
-	// fmt.Printf("len of key: %d \n", len(key))
 
 	// VerifyKeyStream(key)
 	fmt.Printf("%d \n", key[16])
 	fmt.Printf("%d \n", key[17])
 	fmt.Printf("%d \n", key[18+19])
 	fmt.Printf("%d \n", key[18+20])
-	// print(key[18+22+21+152+209])
 	fmt.Printf("%d \n", key[18+21+22+153+209])
-
 	//The above was for printing purpose only
 
 	vars := []int{0, 1, 1, 0, 1, 0}
@@ -650,14 +604,14 @@ func TestVerifyKeyStream(t *testing.T) {
 
 }
 
-func TestTryAllReg4(t *testing.T) {
+func TestKnownPlaintextAttack(t *testing.T) {
 	x := 33114
 	Prints(MakeR4Guess(x), "")
 	Prints(PutConstantBackInRes(MakeR4Guess(x), 10), "")
 	KnownPlaintextAttack()
 }
 
-func TestWhy(t *testing.T) {
+func TestFrames(t *testing.T) {
 	r4_sec_real := stringToIntArray("0 1 0 1 0 0 1 0 1 1 1 0 0 0 0 0 1")
 	r4_sec_fake := stringToIntArray("0 1 1 0 1 0 0 0 0 1 1 0 0 0 1 1 1")
 	r4_first_real := stringToIntArray("0 1 0 1 1 0 1 0 1 0 1 0 0 0 0 0 1")
@@ -673,14 +627,13 @@ func TestWhy(t *testing.T) {
 	current_frame_number = 43
 	diff := FindDifferenceOfFrameNumbers(original_frame_number, current_frame_number)
 	Prints(diff, "diff")
-	iiii := MakeR4()
+	r4Instance := MakeR4()
 	for i := 0; i < 22; i++ {
-		Clock(iiii)
-		iiii.RegSlice[0] = iiii.RegSlice[0] ^ diff[i]
-		// Prints(iiii.RegSlice, strconv.Itoa(i))
+		Clock(r4Instance)
+		r4Instance.RegSlice[0] = r4Instance.RegSlice[0] ^ diff[i]
 	}
-	Prints(iiii.RegSlice, "will this work ")
-	Prints(XorSlice(r4_first_real, iiii.RegSlice), "?")
+	Prints(r4Instance.RegSlice, "will this work ")
+	Prints(XorSlice(r4_first_real, r4Instance.RegSlice), "?")
 }
 
 func TestBinaryConverter(t *testing.T) {

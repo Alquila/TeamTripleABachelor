@@ -159,7 +159,7 @@ func SymMakeFinalXOR(r1 SymRegister, r2 SymRegister, r3 SymRegister) []int {
 	v2 := len(last_r2) - 1
 	v3 := len(last_r3) - 1
 
-	vars1 := maj_r1[0:v1] // REVIEW vars1 points to the 19 [vars1] entries of maj_1 The 18 variables, maj_r1[v1] vil være x_01 som vi ikke vil have med
+	vars1 := maj_r1[0:v1] // vars1 points to the 19 [vars1] entries of maj_1 The 18 variables, maj_r1[v1] vil være x_01 som vi ikke vil have med
 
 	start := make([]int, len(vars1))
 	copy(start, vars1)                     // start by res = [vars1] (without the bit)
@@ -201,7 +201,7 @@ func SymMajorityOutput(r SymRegister) []int {
 	ee := XorSlice(xy, xz)
 	long_slice := XorSlice(ee, yz) // This is a xor of normal and product variables //the last entry should be the bit entry
 	short_slice := XorSlice(x, y)  // This is only an XOR of the normal variables
-	//REVIEW the long and short slice both have a bit in the last entry. these should be XOR'ed and added to the end of the res slice
+	// the long and short slice both have a bit in the last entry. these should be XOR'ed and added to the end of the res slice
 	// XOR the "normal" variables in the start of the long slice [ vars | products ] ⨁ [ vars ]
 	for i := 0; i < len(short_slice)-1; i++ { // -1 fordi så undgås bit entry
 		long_slice[i] = long_slice[i] ^ short_slice[i]
@@ -246,18 +246,18 @@ func OverwriteXorSlice(short []int, long []int) {
 	is part of the expression
 */
 func SymMajorityMultiply(c []int, d []int) []int {
-	lenc := len(c) - 1              //REVIEW -1 fordi vi ikke vil loop over den konkrete bit til sidst
+	lenc := len(c) - 1              // -1 fordi vi ikke vil loop over den konkrete bit til sidst
 	leng := lenc * (lenc - 1) / 2   // for r1 : (18 * 17) / 2
-	res := make([]int, leng+lenc+1) //REVIEW +1 fordi der bliver lagt bit ind til sidst
+	res := make([]int, leng+lenc+1) // +1 fordi der bliver lagt bit ind til sidst
 	acc := 0
-	for i := 0; i < lenc; i++ { //REVIEW: SHOULD WE DO LENC -1 HERE ? - Amalie
-		res[i] = c[i]*d[i] ^ d[i]*c[lenc] ^ c[i]*d[lenc] //REVIEW d[lenc] er bit plads
+	for i := 0; i < lenc; i++ {
+		res[i] = c[i]*d[i] ^ d[i]*c[lenc] ^ c[i]*d[lenc] // d[lenc] er bit plads
 		for j := i + 1; j < lenc; j++ {
 			res[lenc+acc] = c[i]*d[j] ^ c[j]*d[i]
 			acc++
 		}
 	}
-	res[len(res)-1] = c[lenc] * d[lenc] //REVIEW sidste plads er bits ganget sammen
+	res[len(res)-1] = c[lenc] * d[lenc] // sidste plads er bits ganget sammen
 
 	return res
 }

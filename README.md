@@ -31,8 +31,8 @@ The module ``print_module.go`` contains multiple printing methods, these are use
 both for testing and for printing the output and result so it is easier to understand.
 
 
-To run the Plaintext Attack run:
-* ????
+To run the Known Plaintext Attack run:
+* There's two ways to run the attack. 
 
 To run the Ciphertext-only Attack run:
 * ????

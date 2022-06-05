@@ -258,15 +258,13 @@ func TestTryAllCombinationsOfR4(t *testing.T) {
 		symKeyStream := make([][]int, 0)
 
 		for i := 0; i < 6; i++ { //Make six frame long sym-keystream for the guess
-			r4 = MakeR4()
-			copy(r4.RegSlice, r4_guess) //TODO this is technically not needed anymore
 			frame_influenced_bits := SimulateClockingR4WithFrameDifference(original_frame_number, current_frame_number)
-			r4.RegSlice = XorSlice(frame_influenced_bits, r4_guess) //TODO check this for first frame
-			r4.RegSlice[10] = 1                                     //FIXME IM ASSUMING THIS NEEDS TO BE DONE AT THIS STAGE
-			key1 := MakeSymKeyStream()                              //this clocks sr4 which has r4_guess as its array
+			r4.RegSlice = XorSlice(frame_influenced_bits, r4_guess)
+			r4.RegSlice[10] = 1
+			key1 := MakeSymKeyStream() //this clocks sr4 which has r4_guess as its array
 			symKeyStream = append(symKeyStream, key1...)
 			current_frame_number++
-		} //TODO this part is not fully tested
+		}
 
 		/* Multiply KG with the SymbolicKeyStream to make KGK */
 		KGk := CalculateKgTimesSymKeyStream(KG, symKeyStream[:456])

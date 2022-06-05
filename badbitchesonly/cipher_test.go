@@ -157,25 +157,6 @@ func TestMakeSessionKey(t *testing.T) {
 	Printf("%+v \n", key)
 }
 
-/*func TestMakeFrameNumber(t *testing.T) { // REVIEW: denne test, tester ikke metoden i vores kode, det bør den måske istedet
-	f := 55
-
-	frameBit := make([]int, 22)
-
-	//LSB is at the 21'th index
-	// for i := 0; i < 22; i++ {
-	// 	frameBit[21-i] = (f >> i) & 1
-	// }
-
-	//opposite way - LSB is at the 0'th index
-	for i := 0; i < 22; i++ {
-		frameBit[i] = (f >> i) & 1
-	}
-
-	Printf("%+v \n", frameBit)
-	Printf("0'th bit is %v \n", frameBit[0])
-}*/
-
 func TestSetIndicesToOne(t *testing.T) {
 	MakeRegisters()
 	SetIndicesToOne()
@@ -198,7 +179,7 @@ func TestSetIndicesToOne(t *testing.T) {
 	}
 }
 
-func TestRegistersAreSameAfterInitWithSameFrameNumber(t *testing.T) { // TODO: test at initreg er forskellig når framenumber er forskellig :-)
+func TestRegistersAreSameAfterInitWithSameFrameNumber(t *testing.T) {
 	MakeRegisters()
 	current_frame_number = 22
 	MakeSessionKey()
@@ -212,7 +193,6 @@ func TestRegistersAreSameAfterInitWithSameFrameNumber(t *testing.T) { // TODO: t
 	copy(reg2, r2.RegSlice)
 	copy(reg3, r3.RegSlice)
 	copy(reg4, r4.RegSlice)
-	//TODO få amalie til at forklare den her test
 
 	Printf("First initialisation: \n")
 	PrintAllRegisters()
@@ -410,7 +390,7 @@ func TestFinalXor(t *testing.T) {
 }
 
 func TestKeyStreamSimple(t *testing.T) {
-	MakeSessionKey() // TODO snak om hvor vores loop skal være, som kalder MakeKeyStream for nye frames
+	MakeSessionKey()
 	current_frame_number = -1
 	x := MakeKeyStream()
 	Printf("%+v \n", x)
