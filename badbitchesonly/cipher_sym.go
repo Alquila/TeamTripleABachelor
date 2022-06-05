@@ -69,7 +69,6 @@ func SymClock(r SymRegister) {
 
 	//calculate the new bit before shifting all the numbers, using the feedback function
 	newbit := SymCalculateNewBit(r)
-	//print(newbit)
 
 	//shift all the numbers to the right, start at the end, copy from index before it
 	for i := r.Length - 1; i > 0; i-- { //stops after arr[1] = arr[0]
@@ -255,7 +254,6 @@ func SymMajorityMultiply(c []int, d []int) []int {
 		res[i] = c[i]*d[i] ^ d[i]*c[lenc] ^ c[i]*d[lenc] //REVIEW d[lenc] er bit plads
 		for j := i + 1; j < lenc; j++ {
 			res[lenc+acc] = c[i]*d[j] ^ c[j]*d[i]
-			//Printf("res[%d] = %d*%d ^ %d*%d = %d \n", lenc+acc, c[i], d[j], c[j], d[i], res[lenc+acc])
 			acc++
 		}
 	}

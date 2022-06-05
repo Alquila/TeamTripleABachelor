@@ -7,41 +7,6 @@ import (
 	"strconv"
 )
 
-// DoTheKnownPlainTextHack
-// first describes equations from three frame numbers with the same variable names as the base frame.
-// Solves the resulting system of equations using Gauss Elimination.
-// Returns solved R1, R2 and R3.
-func DoTheKnownPlainTextHack() ([]int, []int, []int) {
-	sr1.RegSlice = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr1)
-	sr2.RegSlice = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr2)
-	sr3.RegSlice = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr3)
-	b1, A1 := RunA5_2()
-
-	current_frame_number++
-	sr1.RegSlice = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr1)
-	sr2.RegSlice = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr2)
-	sr3.RegSlice = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr3)
-	b2, A2 := RunA5_2()
-
-	current_frame_number++
-	sr1.RegSlice = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr1)
-	sr2.RegSlice = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr2)
-	sr3.RegSlice = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr3)
-	b3, A3 := RunA5_2()
-
-	A := append(A1, A2...)
-	A = append(A, A3...)
-
-	b := append(b1, b2...)
-	b = append(b, b3...)
-
-	x := SolveByGaussElimination(A, b)
-
-	r1_solved, r2_solved, r3_solved := MakeGaussResultToRegisters(x.Multi[0])
-
-	return r1_solved, r2_solved, r3_solved
-}
-
 // MakeGaussResultToRegisters
 // receives a Gauss elimination result slice as input.
 // Returns the solved R1, R2 and R3.
@@ -122,7 +87,6 @@ func DescribeNewFrameWithOldVariables(original_framenum int, current_framenum in
 
 	// init the predicted new symReg
 	length := len(original_reg.RegSlice)
-	fmt.Println(length)
 
 	/*
 		Res is used to simulate what indices gets affected by the difference in frame number.

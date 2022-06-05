@@ -1,9 +1,5 @@
 package main
 
-import (
-	. "fmt"
-)
-
 // InitOneRegister
 // initialises a single Register, specifically R1.
 func InitOneRegister() Register {
@@ -50,45 +46,4 @@ func SimpleKeyStreamWithMajorityFunc(r Register) []int {
 	}
 
 	return keyStream
-}
-
-// MakePlaintext
-// This function used to be used for testing.
-func MakePlaintext() []int {
-	plaintext := []int{1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0}
-	return plaintext
-}
-
-// EncryptSimplePlaintext
-// used to be used for testing.
-// Runs streamcipher, the one with actual numbers, such that the plaintext is encrypted
-func EncryptSimplePlaintext(plaintext []int) []int {
-	key := MakeSimpleKeyStream()
-	Printf("This is the key-stream: %d \n", key)
-	res := make([]int, len(plaintext))
-	for i := range res {
-		res[i] = key[i] ^ plaintext[i]
-	}
-
-	return res
-}
-
-// MakeSimpleKeyStream
-// used for testing. Returns a simple keystream using only Register R1.
-func MakeSimpleKeyStream() []int {
-	// init R1
-	r1 = MakeR1()
-	r1.RegSlice[15] = 1
-
-	keyStream := make([]int, 50)
-
-	for i := 0; i < 101; i++ {
-		Clock(r1)
-		if i > 50 {
-			keyStream[i-51] = r1.RegSlice[18]
-		}
-	}
-
-	return keyStream
-
 }

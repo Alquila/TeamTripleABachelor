@@ -1,31 +1,5 @@
 package main
 
-func RunA5_2() ([]int, [][]int) {
-	keyStreamSym := make([][]int, 228)
-
-	keyStream := make([]int, 228)
-
-	/* Run A5/2 for 99 clocks and ignore output  */
-	for i := 0; i < 99; i++ {
-		// do the clock thingy and ignore
-		ClockingUnit(r4)
-		SymClockingUnit(r4)
-		Clock(r4)
-	}
-
-	/* Run A5/2 for 228 clocks and use outputs as key-stream */
-	for i := 0; i < 228; i++ {
-		// do the clock thingy and output
-		ClockingUnit(r4)
-		SymClockingUnit(r4)
-		Clock(r4)
-		keyStream[i] = MakeFinalXOR()
-		keyStreamSym[i] = SymMakeFinalXOR(sr1, sr2, sr3)
-	}
-
-	return keyStream, keyStreamSym
-}
-
 //Makes a r1 symregister with all 0's
 func InitOneSymRegister() SymRegister {
 	reg := SymMakeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14, 15) // equivalent to reg1

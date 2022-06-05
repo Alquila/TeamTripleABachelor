@@ -127,44 +127,6 @@ func TestDoTheSimpleHackSecondVersion(t *testing.T) {
 	// fmt.Printf("Res er: %d\n", res[0:19])
 }
 
-func TestPlaintextAttack(t *testing.T) {
-	//orgReg := []int{0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0}
-	//sr4.RegSlice = []int{0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1}
-	//orgReg := make([]int, 17) [0 0 0 1 1 1 1 1 0 0 0 0 0 0 0 1 1 1 0]
-	//copy(orgReg, r4.RegSlice)
-
-	session_key = make([]int, 64)
-	original_frame_number = 55
-	current_frame_number = 55
-
-	//MakeRegisters()
-	MakeR4()
-	//MakeRegisters()
-	SymInitializeRegisters()
-
-	sr1.RegSlice = make([][]int, r1.Length)
-	sr2.RegSlice = make([][]int, r2.Length)
-	sr3.RegSlice = make([][]int, r3.Length)
-	sr4.RegSlice = make([]int, r4.Length)
-	print(sr1.Length)
-
-	res1, _, _ := DoTheKnownPlainTextHack()
-
-	//fmt.Printf("len af res er: %d\n", len(res4)) // should be 656 as this is the number of unknown vars
-
-	// offset := r1.Length + r2.Length + r3.Length
-	// compare if found res is equal to init registers
-	if !reflect.DeepEqual(res1, sr1.RegSlice) {
-		t.Fail()
-		fmt.Printf("Res1 er   : %d\n", res1)
-		// fmt.Printf("reg er: %d\n", orgReg)
-		fmt.Printf("sr1.Arr er: %d\n", sr1.RegSlice)
-	}
-	// fmt.Printf("reg er: %d\n", orgReg)
-	// fmt.Printf("Res er: %d\n", res[offset:offset+17])
-
-}
-
 func TestFindDiffOfFrameNumbers(t *testing.T) {
 
 	res := FindDifferenceOfFrameNumbers(1, 2)
