@@ -101,7 +101,7 @@ func TestDoTheSimpleHackSecondVersion(t *testing.T) {
 	// make output keystream in both
 	symKeyStream := SimpleKeyStreamSymSecondVersion(symReg)
 	fmt.Printf("length of symKeyStream[0]: %d\n", len(symKeyStream[0]))
-	keyStream := SimpleKeyStreamSecondVersion(reg)
+	keyStream := SimpleKeyStreamWithMajorityFunc(reg)
 	fmt.Printf("length of KeyStream: %d\n", len(keyStream))
 
 	// make sym version into [][]int if not allready
