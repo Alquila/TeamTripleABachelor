@@ -7,43 +7,11 @@ import (
 	"strconv"
 )
 
-//"fmt"
-
-func idk() int {
-	return 42
-}
-
-func doTheSimpleHack() {
-	// init one register, in both OG and sym version
-	symReg := InitOneSymRegister()
-	reg := InitOneRegister()
-	orgReg := make([]int, 19)
-	copy(orgReg, reg.RegSlice)
-
-	// make output keystream in both
-	symKeyStream := SimpleKeyStreamSym(symReg)
-	keyStream := SimpleKeyStream(reg)
-
-	// make sym version into [][]int if not allready
-
-	// use gauss to solve equations
-	//res := solveByGaussElimination(symKeyStream, keyStream)
-	res := solveByGaussEliminationTryTwo(symKeyStream, keyStream)
-
-	// compare if found res is equal to init registers
-	if !reflect.DeepEqual(res.Solved, orgReg) {
-		fmt.Printf("This is fucking wrong\n")
-		fmt.Printf("Res er: %d\n", res.Solved)
-		fmt.Printf("reg er: %d\n", reg.RegSlice)
-	}
-}
-
+// DoTheKnownPlainTextHack
+// first describes equations from three frame numbers with the same variable names as the base frame.
+// Solves the resulting system of equations using Gauss Elimination.
+// Returns solved R1, R2 and R3.
 func DoTheKnownPlainTextHack() ([]int, []int, []int) {
-	// // Init all four Registers
-	// InitializeRegisters()
-	// SymInitializeRegisters()
-
-	// make stream cipher ?
 	sr1.RegSlice = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr1)
 	sr2.RegSlice = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr2)
 	sr3.RegSlice = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr3)
@@ -61,89 +29,66 @@ func DoTheKnownPlainTextHack() ([]int, []int, []int) {
 	sr3.RegSlice = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr3)
 	b3, A3 := RunA5_2()
 
-	// A := make([][]int, 684)
 	A := append(A1, A2...)
 	A = append(A, A3...)
-	// A = append(A, A3...)
 
 	b := append(b1, b2...)
 	b = append(b, b3...)
 
 	x := solveByGaussEliminationTryTwo(A, b)
 
-	// I think we should handle stuff here
-	// on index set_1, set it to 1 and move rest of slice one
-	// do this or each of the registers ?
-
 	r1_solved, r2_solved, r3_solved := MakeGaussResultToRegisters(x.Solved)
 
 	return r1_solved, r2_solved, r3_solved
 }
 
+// MakeGaussResultToRegisters
+// receives a Gauss elimination result slice as input.
+// Returns the solved R1, R2 and R3.
 func MakeGaussResultToRegisters(res []int) ([]int, []int, []int) {
 	offset := 0
 
-	r1_res := make([]int, r1.Length-1)
-	reg_range := r1.Length - 1
-	copy(r1_res, res[:reg_range])
-	offset = reg_range
-	// fmt.Printf("r1 range: %d. len of r1_res: %d \n", reg_range, len(r1_res))
-	// Prints(r1_res, "r1_res")
-	r2_res := make([]int, r2.Length-1)
-	reg_range += r2.Length - 1
-	copy(r2_res, res[offset:reg_range])
-	offset = reg_range
+	r1Res := make([]int, r1.Length-1)
+	regRange := r1.Length - 1
+	copy(r1Res, res[:regRange])
+	offset = regRange
 
-	r3_res := make([]int, r3.Length-1)
-	reg_range += r3.Length - 1
-	copy(r3_res, res[offset:reg_range])
-	offset = reg_range
+	r2Res := make([]int, r2.Length-1)
+	regRange += r2.Length - 1
+	copy(r2Res, res[offset:regRange])
+	offset = regRange
 
-	// Move r1
-	r1_res = putConstantBackInRes(r1_res, sr1.SetToOne)
-	r2_res = putConstantBackInRes(r2_res, sr2.SetToOne)
-	r3_res = putConstantBackInRes(r3_res, sr3.SetToOne)
+	r3Res := make([]int, r3.Length-1)
+	regRange += r3.Length - 1
+	copy(r3Res, res[offset:regRange])
+	offset = regRange
 
-	return r1_res, r2_res, r3_res
+	r1Res = PutConstantBackInRes(r1Res, sr1.SetToOne)
+	r2Res = PutConstantBackInRes(r2Res, sr2.SetToOne)
+	r3Res = PutConstantBackInRes(r3Res, sr3.SetToOne)
+
+	return r1Res, r2Res, r3Res
 }
 
-func putConstantBackInRes(arr []int, constantIndex int) []int {
-	arr_size := len(arr)
-	newarr := make([]int, arr_size+1)
-	copy(newarr, arr)
+// PutConstantBackInRes
+// takes an array and constant index as input and puts 1 in the given index and returns the new array.
+func PutConstantBackInRes(arr []int, constantIndex int) []int {
+	arrSize := len(arr)
+	newArray := make([]int, arrSize+1)
+	copy(newArray, arr)
 
-	for i := (arr_size); i > constantIndex-1; i-- {
-		newarr[i] = arr[i-1]
+	for i := arrSize; i > constantIndex-1; i-- {
+		newArray[i] = arr[i-1]
 	}
-	newarr[constantIndex] = 1
+	newArray[constantIndex] = 1
 
-	return newarr
+	return newArray
 }
 
-/*
-	Simulates how the frame difference influences the entries of a register.
-
-	@diff_arr is the frame difference slice
-	@register is the register
-*/
-func simulateClockingWithFrameDifference(diff_arr []int, register Register) []int {
-	he := make([]int, register.Length)
-
-	for i := 0; i < 22; i++ {
-		yas := 0
-		for j := 0; j < len(register.Taps); j++ {
-			yas = he[register.Taps[i]] ^ yas
-		}
-
-		he[0] = diff_arr[i] ^ yas
-	}
-
-	return he
-}
-
-//Creates a new r4 register and initialises it with the difference between the current and original frame number.
-//Returns the RegSlice of the register wich contains 1's in the place where the bits have been flipped with the new frame.
-func simulateClockingR4WithFrameDifference(original_frame_number int, current_frame int) []int {
+// SimulateClockingR4WithFrameDifference
+// creates a new r4 register and initialises it with the difference between the current and original frame number.
+// Returns the RegSlice of the register which contains 1's in the place where the bits have been flipped with the new frame.
+func SimulateClockingR4WithFrameDifference(original_frame_number int, current_frame int) []int {
 	fake_r4 := MakeR4()
 	diff := FindDifferenceOfFrameNumbers(original_frame_number, current_frame)
 	for i := 0; i < 22; i++ {
@@ -153,30 +98,22 @@ func simulateClockingR4WithFrameDifference(original_frame_number int, current_fr
 	return fake_r4.RegSlice
 }
 
-/**
-FindDifferenceOfFrameNumbers
-TRYING TO USE THE DIFFERENCE IN FRAMENUMBER TO
-SEE WETHER THE INDEX IN REGISTER SHOULD BE THE
-SAME OR DIFFERENT WHEN INITIALIZING IT
-*/
+//	FindDifferenceOfFrameNumbers
+//	trying to use the difference in frame number to
+//	see whether the index in a register should be the
+//	same or different when initialising it
 func FindDifferenceOfFrameNumbers(f1 int, f2 int) []int {
-
 	f1_bits := MakeFrameNumberToBits(f1)
 	f2_bits := MakeFrameNumberToBits(f2)
-	// fmt.Printf("f1 is: %d \n", f1_bits)
-	// fmt.Printf("f2 is: %d \n", f2_bits)
-
 	res := XorSlice(f1_bits, f2_bits)
-
 	return res
 }
 
-/**
-DescribeNewFrameWithOldVariable
-*	Describes the register after initialisation with framenumber 'f2' with the
-*	variables used in framenumber 'f1'.
-*	Also takes a register with 1 in diagonal ?
-*	The provided 'original_reg' should have the last entry as 'compliment' entry in the innermost slice
+/*
+	DescribeNewFrameWithOldVariables
+	Describes the register after initialisation with frame number 'f2' with the
+	variables used in frame number 'f1'.
+	The provided 'original_reg' should have the last entry as 'compliment' entry in the innermost slice
 */
 func DescribeNewFrameWithOldVariables(original_framenum int, current_framenum int, original_reg SymRegister) [][]int {
 
@@ -186,49 +123,47 @@ func DescribeNewFrameWithOldVariables(original_framenum int, current_framenum in
 	// init the predicted new symReg
 	length := len(original_reg.RegSlice)
 
-	/*	Res is used to simulate what indices gets
-		affected by the difference in frame number.
-		Res should be used to determine which indices need to have their
-		'constant' index = 1 after the initialisation process.
+	/*
+		Res is used to simulate what indices gets affected by the difference in frame number.
+		Res should be used to determine which indices need to have their 'constant'
+		index = 1 after the initialisation process.
 	*/
 	res := make([]int, length)
 
-	// what to go through every indice in frame-number-difference-array
+	// what to go through every index in frame-number-difference-array
 	for i := range diff {
 
-		// this is copied from cipher_sym.SymCalculateNewBit
 		// new bit is the bit that is placed at index 0
 		newbit := 0 // newbit is now zero
 
 		// do the feedback function
 		for j := range original_reg.Taps {
-			// takes the index corresponding to tab[i] in res and
-			// XOR with newbit
+			// takes the index corresponding to tap[i] in res and
+			// XORs with newbit
 			newbit = newbit ^ res[original_reg.Taps[j]]
 		}
 
-		// this is copied from cipher.Clock
 		// shift each entry one to the right
 		for j := len(res) - 1; j > 0; j-- {
 			res[j] = res[j-1]
 		}
 
-		// place the result of the feedback in the first entry in the
-		// resulting array
+		// place the result of the feedback in the first entry in the resulting array
 		res[0] = newbit
 
-		if diff[i] == 1 { //dvs forskellige frame number bits
+		if diff[i] == 1 {
 			// the 'newbit' at index 0 gets influenced by the i'th entry
-			// in current_framenum which differs from original_framenum
+			// in current_framenumber which differs from original_framenumber
 			res[0] = res[0] ^ 1
 		}
 	}
 
 	// this is the register to be returned describing the current
-	// frame with varibales from previous frame
+	// frame with variables from previous frame
 	newReg := make([][]int, length)
 	for i := range newReg { // for each entry in the outermost array
 		newReg[i] = make([]int, len(original_reg.RegSlice[0]))
+
 		// copy each 'expression'
 		copy(newReg[i], original_reg.RegSlice[i])
 	}
@@ -248,41 +183,39 @@ func DescribeNewFrameWithOldVariables(original_framenum int, current_framenum in
 	return newReg
 }
 
-//Returns the real r4 that made the keystream. Returns three frame long key. Returns fourth frame key
+// MakeRealKeyStreamFourFrames
+// Returns the real r4 that made the keystream.
+// Returns a three frame long key. Returns fourth frame key
 func MakeRealKeyStreamFourFrames(frame int) ([]int, []int, []int) {
 	original_frame_number = frame
 	current_frame_number = frame
 	key1 := MakeKeyStream()
-	// Prints(r4.RegSlice, "r4 after MakeKeyStream:     					")
 	r4_real := make([]int, 17)
 	copy(r4_real, r4_after_init.RegSlice)
 
 	current_frame_number++
 	key2 := MakeKeyStream()
-	// r4_second := r4.RegSlice
-	// Prints(r4_after_init.RegSlice, "r4 after second init:       ") //[0 1 0 1 0 0 1 0 1 1 1 0 0 0 0 0 1]
 	current_frame_number++
 	key3 := MakeKeyStream()
 
 	current_frame_number++
 	key4 := MakeKeyStream()
-	// Prints(r4_after_init.RegSlice, "r4 after third init:       ")
 
 	key := append(key1, key2...)
 	key = append(key, key3...)
 	return r4_real, key, key4
 }
 
-/*Makes a six frame long key stream and returns it along the initial r4 value. returns two extra frame for test.
-Returns r4_real, key, extra_key */
+// MakeRealKeyStreamSixFrames
+// makes a six frame long key stream and returns it along the initial r4 value.
+// Returns two extra frame for test. Returns r4_real, key, extra_key
 func MakeRealKeyStreamSixFrames(frame int) ([]int, []int, []int) {
 	original_frame_number = frame
 	current_frame_number = frame
 	key := make([]int, 0)
 	key1 := MakeKeyStream()
-	// Prints(r4.RegSlice, "r4 after MakeKeyStream:     					")
-	r4_real := make([]int, 17)
-	copy(r4_real, r4_after_init.RegSlice)
+	r4Real := make([]int, 17)
+	copy(r4Real, r4_after_init.RegSlice)
 	key = append(key, key1...)
 
 	for i := 0; i < 5; i++ {
@@ -292,23 +225,28 @@ func MakeRealKeyStreamSixFrames(frame int) ([]int, []int, []int) {
 	}
 
 	current_frame_number++
-	extra_key_stream := MakeKeyStream()
+	extraKeyStream := MakeKeyStream()
 	current_frame_number++
-	extra_key_stream2 := MakeKeyStream()
-	extra_key_stream = append(extra_key_stream, extra_key_stream2...)
+	extraKeyStream2 := MakeKeyStream()
+	extraKeyStream = append(extraKeyStream, extraKeyStream2...)
 
-	return r4_real, key, extra_key_stream
+	return r4Real, key, extraKeyStream
 }
 
-// CalculateRealIteration Splits r4's slice into the first [0,9] bits and the ]10, :] and converts this binary array to a decimal number
+// CalculateRealIteration
+// splits r4's slice into the first [0,9] bits and the [10, :]
+// and converts this binary array to a decimal number
 func CalculateRealIteration(r4 []int) int {
-	reeee := make([]int, 0)
-	reeee = append(reeee, r4[:10]...)
-	reeee = append(reeee, r4[11:]...)
-	real_iteration := convertBinaryToDecimal(reeee)
+	bitSlice := make([]int, 0)
+	bitSlice = append(bitSlice, r4[:10]...)
+	bitSlice = append(bitSlice, r4[11:]...)
+	real_iteration := ConvertBinaryToDecimal(bitSlice)
 	return real_iteration
 }
 
+// DescribeRegistersFromKey
+// creates a symbolic representation of the registers.
+// Returns a single matrix with all four symbolic registers.
 func DescribeRegistersFromKey() [][]int {
 	sre1 := SymMakeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14, 15)
 	sre2 := SymMakeRegister(22, []int{21, 20}, []int{9, 13}, 16, 16)
@@ -336,7 +274,7 @@ func DescribeRegistersFromKey() [][]int {
 		SymClock(sre2)
 		SymClock(sre3)
 		SymClock(reg4)
-		sre1.RegSlice[0][i] = 1 //should this be xor? <- no den påvirkes kun af den i'te bit én gang
+		sre1.RegSlice[0][i] = 1
 		sre2.RegSlice[0][i] = 1
 		sre3.RegSlice[0][i] = 1
 		reg4.RegSlice[0][i] = 1
@@ -349,104 +287,82 @@ func DescribeRegistersFromKey() [][]int {
 	symbolicDescription = append(symbolicDescription, reg4.RegSlice...)
 
 	return symbolicDescription
-
 }
 
-func TryAllReg4() {
+// KnownPlaintextAttack
+// Make 2^16 guesses and performs the Known Plaintext Attack.
+// Prints the result
+func KnownPlaintextAttack() {
 	/*
 		"For all possible 2^16 values of R4 solve the linearized system of equations that describe the output.
-		Most of the 2^16-1 wrong solutions will be found by inconsistensies in Gauss Elimination.
+		Most of the 2^16-1 wrong solutions will be found by inconsistencies in Gauss Elimination.
 		The solution of the equations will suggest the internal state of R1, R2, and R3.
-		If more than one consistent internal state exists then do trial encryptions."
+		If more than one consistent internal state exists then do trial encryptions." - E. Barkan, E. Biham, and N. Keller
 	*/
 
-	r4_found := make([][]int, 0) // append results to this boi
-	// solved := make([][]int, 0)
-	r4_guess := make([]int, 17)
+	r4Found := make([][]int, 0) // append results to this boi
+	r4Guess := make([]int, 17)
 
 	session_key = make([]int, 64) //all zero session key
-	// MakeSessionKey()              //Make a random session key
 	original_frame_number = 42
-	r4_real, real_key, r4_for_test := MakeRealKeyStreamFourFrames(original_frame_number)
-	//FIXME: we need to make a 4'th real key stream for testing if the found r4 values are correct
+	r4Real, realKey, r4ForTest := MakeRealKeyStreamFourFrames(original_frame_number)
 
-	// current_frame_number++
-
-	real_iteration := CalculateRealIteration(r4_real)
-	lower := real_iteration - 150
-	upper := real_iteration + 150
-	fmt.Printf("real: %d, lower: %d, upper: %d\n", real_iteration, lower, upper)
-	//[0 1 0 1 1 0 1 0 1 0 1 0 0 0 0 0 1] <- dette er R4 som vi skal frem til når der ikke er noget random
-	//[0 1 0 1 1 0 1 0 1 0 1 0 0 0 0 0 1] <- 33114 omgang
+	realIteration := CalculateRealIteration(r4Real)
+	lower := realIteration - 150
+	upper := realIteration + 150
+	fmt.Printf("real: %d, lower: %d, upper: %d\n", realIteration, lower, upper)
 
 	guesses := int(math.Pow(2, 16))
 	println(guesses)
-	// for i := lower; i < upper; i++ {
-	for i := 0; i < guesses; i++ { //FIXME ind og udkommenter de to headers her for at skifte -AK
+	for i := lower; i < upper; i++ {
+		// for i := 0; i < guesses; i++ {
 		if i%100 == 0 {
 			fmt.Printf("iteration %d \n", i)
 		}
-		if i == real_iteration {
-			fmt.Printf("iteration %d\n", real_iteration)
+		if i == realIteration {
+			fmt.Printf("iteration %d\n", realIteration)
 		}
-		if i == real_iteration+1 {
-			fmt.Printf("iteration %d\n", real_iteration+1)
+		if i == realIteration+1 {
+			fmt.Printf("iteration %d\n", realIteration+1)
 		}
-		original_frame_number = 42 //reset the framenumber for the symbolic version
+		original_frame_number = 42 // reset the frame number for the symbolic version
 		current_frame_number = 42
 
-		r4_guess = MakeR4Guess(i) //for all possible value of r4 we need three frames
-		r4_guess = putConstantBackInRes(r4_guess, 10)
-		// Prints(r4_guess, "r4_guess")
+		r4Guess = MakeR4Guess(i) // for all possible value of r4 we need three frames
+		r4Guess = PutConstantBackInRes(r4Guess, 10)
 
-		//do this such that r4 guess can be copied into sr4 in SymSetRegisters()
+		// do this such that r4 guess can be copied into sr4 in SymSetRegisters()
 		r4 = MakeR4()
-		copy(r4.RegSlice, r4_guess)
-		// Prints(r4.RegSlice, "r4_guess1 ")
-		key1 := MakeSymKeyStream() //this clocks sr4 which has r4_guess as its array
-		// Prints(sr4.RegSlice, "sr4 after makeSymkey  						")
+		copy(r4.RegSlice, r4Guess)
+		key1 := MakeSymKeyStream() // this clocks sr4 which has r4Guess as its array
 
 		current_frame_number++
 
-		//update r4_guess with new frame value //we want it to be clean right..??
-		// Prints(r4_guess, "r4_guess")
+		// update r4Guess with new frame value
 		r4 = MakeR4()
-		// fake_r4 := MakeR4()
-		copy(r4.RegSlice, r4_guess)
+		copy(r4.RegSlice, r4Guess)
 
-		frame_influenced_bits := simulateClockingR4WithFrameDifference(original_frame_number, current_frame_number)
-		r4.RegSlice = XorSlice(frame_influenced_bits, r4_guess)
+		frameInfluencedBits := SimulateClockingR4WithFrameDifference(original_frame_number, current_frame_number)
+		r4.RegSlice = XorSlice(frameInfluencedBits, r4Guess)
 
-		// diff := FindDifferenceOfFrameNumbers(original_frame_number, current_frame_number)
-		// for i := 0; i < 22; i++ {
-		// 	Clock(fake_r4)
-		// 	fake_r4.RegSlice[0] = fake_r4.RegSlice[0] ^ diff[i]
-		// } //fake_r4.RegSlice er nu clocked således at det er [...1..] de steder hvor diff påvirker indgangene
-		// r4.RegSlice = XorSlice(fake_r4.RegSlice, r4.RegSlice)
-		// fake_r4.RegSlice[10] = 1 //FIXME
 		r4.RegSlice[10] = 1
-		//FIXME
-		//FIXME
-		//FIXME
 
-		//we want this -> [0 1 0 1 0 0 1 0 1 1 1 0 0 0 0 0 1]
-		// Prints(r4.RegSlice, "sr4_guess init ")
-		key2 := MakeSymKeyStream() //this will now copy the updated r4_arrimposter into sr4
-		// Prints(r4_second, "r4_second ")
-		// Prints(sr4.RegSlice, "sr4_after2")
+		key2 := MakeSymKeyStream() //this will now copy the updated r4_regSlice into sr4
 
 		current_frame_number++
 		r4 = MakeR4()
-		fake_r4 := MakeR4()
-		copy(r4.RegSlice, r4_guess)
+		fakeR4 := MakeR4()
+		copy(r4.RegSlice, r4Guess)
 		diff := FindDifferenceOfFrameNumbers(original_frame_number, current_frame_number)
+
+		//fakeR4.RegSlice clockes således at det er [...1..] de steder hvor diff påvirker indgangene
 		for i := 0; i < 22; i++ {
-			Clock(fake_r4)
-			fake_r4.RegSlice[0] = fake_r4.RegSlice[0] ^ diff[i]
-		} //fake_r4.RegSlice er nu clocked således at det er [...1..] de steder hvor diff påvirker indgangene
-		r4.RegSlice = XorSlice(fake_r4.RegSlice, r4.RegSlice)
+			Clock(fakeR4)
+			fakeR4.RegSlice[0] = fakeR4.RegSlice[0] ^ diff[i]
+		}
+
+		r4.RegSlice = XorSlice(fakeR4.RegSlice, r4.RegSlice)
 		r4.RegSlice[10] = 1
-		//Prints(r4.RegSlice, " sr4 after third")
 		key3 := MakeSymKeyStream()
 		current_frame_number++
 
@@ -454,89 +370,69 @@ func TryAllReg4() {
 		key = append(key, key3...)
 
 		// this returns a gauss struct
-		gauss := solveByGaussEliminationTryTwo(key, real_key)
+		gauss := solveByGaussEliminationTryTwo(key, realKey)
 
 		if gauss.ResType == Error {
 			continue
 		} else if gauss.ResType == Multi {
 			fmt.Printf("found multi in %d of lenght %d \n", i, len(gauss.Multi))
 			for i := 0; i < len(gauss.Multi); i++ {
-				if VerifyKeyStream(gauss.Multi[i]) { ///what do we do here
-					r4_found = append(r4_found, r4_guess)
-					// fmt.Printf("found in ")
-					// solved = append(solved, gauss.Multi[i])
-					// solved = append(solved, []int{42})
-
+				if VerifyKeyStream(gauss.Multi[i]) {
+					// If a solution is verified it is added to a list of verified guesses
+					r4Found = append(r4Found, r4Guess)
 				}
 			}
 		}
-		//init sr1 sr2 sr3
-		//make first sym-keystream based on r4 guess and symbol registers
-		//key1 := MakeSymKeyStream()
-		//framenumber ++
-		//init sr1 sr2 sr3 again with the new framenumber
-		//init r4_guess with the new frame number
-		//key2 := MakeSymKeyStream()
-		//framenumber ++
-		//init sr1 sr2 sr3 again with the new framenumber
-		//init r4_guess with the new frame number
-		//key3 := MakeSymKeyStream()
-
-		// gauss: based on response add to found
 	}
 
-	// FIXME: this might not work ?
 	// 'trial encryptions'
-	correct_r4 := make([]int, len(r4_guess))
-	number_of_valid_r4 := len(r4_found)
-	if number_of_valid_r4 <= 0 {
-		fmt.Printf("We didn't find any at all \n")
-	} else if number_of_valid_r4 > 1 {
+	correctR4 := make([]int, len(r4Guess))
+	numberOfValidR4 := len(r4Found)
+	if numberOfValidR4 <= 0 {
+		fmt.Printf("No solutions were found \n")
+	} else if numberOfValidR4 > 1 {
 		// we have multiple plausible solutions to r4
-		// somehow try them all and se what works
-		for i := 0; i > number_of_valid_r4; i++ {
-			r4.RegSlice = r4_found[i] // is this how its supposed to happend?
-			//what should frame_number be ? original + 4
+		for i := 0; i > numberOfValidR4; i++ {
+			r4.RegSlice = r4Found[i]
+			// We make an extra keystream with frame number: base frame + 4
 			current_frame_number = original_frame_number + 4
 			ks := MakeKeyStream()
-			if reflect.DeepEqual(ks, r4_for_test) {
-				fmt.Printf("This should be the right one: %d\n", r4_for_test)
-				correct_r4 = r4_found[i]
+			if reflect.DeepEqual(ks, r4ForTest) {
+				fmt.Printf("This is the right one: %d\n", r4ForTest)
+				correctR4 = r4Found[i]
 				break
 			}
-
 		}
 	} else {
-		correct_r4 = r4_found[0]
+		correctR4 = r4Found[0]
 	}
 
-	fmt.Printf("This is original r4:       %d\n", r4_real)
-	for i := range r4_found {
-		fmt.Printf("This is %d'th found r4:    %d\n", i, r4_found[i])
-		// fmt.Printf("This is %d'th found solved:  %d \n", i, solved[i])
+	fmt.Printf("This is original r4:       %d\n", r4Real)
+	for i := range r4Found {
+		fmt.Printf("This is %d'th found r4:    %d\n", i, r4Found[i])
 	}
 	fmt.Println("Have we found the right r4?")
-	// for i := range r4_found {
-	if reflect.DeepEqual(correct_r4, r4_real) { // 'correct_r4' used to be 'r4_found[i]'
+	if reflect.DeepEqual(correctR4, r4Real) {
 		fmt.Println("Fuck yes we found it gutterne")
+	} else {
+		fmt.Println("RIP we dit not")
 	}
-	// }
-
 }
 
 func MakeR4Guess(number int) []int {
-	r4_bit := make([]int, 16)
+	r4Bit := make([]int, 16)
 
 	for i := 0; i < 16; i++ {
-		r4_bit[i] = (number >> i) & 1 // index 0 becomes least significant bit
+		r4Bit[i] = (number >> i) & 1 // index 0 becomes least significant bit
 	}
 
-	return r4_bit
+	return r4Bit
 }
 
-//VerifyKeyStream compares the found vars with the products that involves them and check that they match up.
+// VerifyKeyStream
+// compares the found vars with the products that involves them and check that they match up.
 func VerifyKeyStream(key []int) bool {
-	//[vars1 | vars2 | vars3 | prod1 | prod2 | prod3 | b ]
+	// [vars1 | vars2 | vars3 | prod1 | prod2 | prod3 | b ]
 	vars1_len := r1.Length - 1
 	vars2_len := r2.Length - 1
 	vars3_len := r3.Length - 1
@@ -544,25 +440,21 @@ func VerifyKeyStream(key []int) bool {
 	prod1_len := vars1_len * (vars1_len - 1) / 2
 	prod2_len := vars2_len * (vars2_len - 1) / 2
 	prod3_len := vars3_len * (vars3_len - 1) / 2
-	// fmt.Printf("vars1_len : %d  vars2_len %d, vars3_len: %d, prod1_len: %d, prod2: %d, prod3: %d \n", vars1_len, vars2_len, vars3_len, prod1_len, prod2_len, prod3_len)
+
 	prod1 := key[vars1_len+vars2_len+vars3_len : vars1_len+vars2_len+vars3_len+prod1_len]
 	prod2 := key[vars1_len+vars2_len+vars3_len+prod1_len : vars1_len+vars2_len+vars3_len+prod1_len+prod2_len]
 	prod3 := key[vars1_len+vars2_len+vars3_len+prod1_len+prod2_len : vars1_len+vars2_len+vars3_len+prod1_len+prod2_len+prod3_len]
-	// Prints(prod1, "prod1")
-	// print("\n")
-	// Prints(prod2, "prod2")
-	// print("\n")
-	// Prints(prod3, "prod3")
 
-	helper(key[0:vars1_len], prod1)
-	helper(key[vars1_len:vars1_len+vars2_len], prod2)
-	helper(key[vars1_len+vars2_len:vars1_len+vars2_len+vars3_len], prod3)
+	VerifiesProducts(key[0:vars1_len], prod1)
+	VerifiesProducts(key[vars1_len:vars1_len+vars2_len], prod2)
+	VerifiesProducts(key[vars1_len+vars2_len:vars1_len+vars2_len+vars3_len], prod3)
 
 	return true
-
 }
 
-func helper(vars []int, prods []int) bool {
+// VerifiesProducts
+// checks if products in solved solutions fits the found variables.
+func VerifiesProducts(vars []int, prods []int) bool {
 	acc := 0
 	for i := 0; i < len(vars); i++ {
 		var_1 := vars[i]
@@ -571,8 +463,6 @@ func helper(vars []int, prods []int) bool {
 			if var_2*var_1 != prods[acc] {
 				return false
 			}
-			// fmt.Printf("var1: %d * var2: %d = prod1[%d]: %d \n", var_1, var_2, acc, prods[acc])
-			// fmt.Printf(" %d * %d = %d \n", var_1, var_2, prods[acc])
 			acc++ //acc runs over the index in prod1
 		}
 	}
@@ -580,31 +470,12 @@ func helper(vars []int, prods []int) bool {
 	return true
 }
 
-func convertBinaryToDecimal(number []int) int {
+// ConvertBinaryToDecimal
+// Returns an integer corresponding to the input bit slice
+func ConvertBinaryToDecimal(number []int) int {
 	bin_num := ""
-	// Prints(number, "reee")
 
 	for i := len(number) - 1; i >= 0; i-- {
-		// println(i)
-		// println(number[i])
-		bin_num = bin_num + strconv.Itoa(number[i])
-	}
-
-	num, err := strconv.ParseInt(bin_num, 2, 64)
-
-	if err != nil {
-		panic(err)
-	}
-	return int(num)
-}
-
-func convertBinaryToDecimal2(number []int) int {
-	bin_num := ""
-	// Prints(number, "reee")
-
-	for i := 0; i < len(number); i++ {
-		// println(i)
-		// println(number[i])
 		bin_num = bin_num + strconv.Itoa(number[i])
 	}
 
@@ -617,6 +488,7 @@ func convertBinaryToDecimal2(number []int) int {
 }
 
 func RetrieveSessionKey(registers []int) []int {
+	// FIXME: ???
 
 	skey := make([]int, 0)
 
@@ -629,53 +501,3 @@ func RetrieveSessionKey(registers []int) []int {
 
 	return skey
 }
-
-// 	for i := 0; i < 2; i++ {
-// 		r4_guess[0] = i
-// 		for i := 0; i < 2; i++ {
-// 			r4_guess[1] = i
-// 			for i := 0; i < 2; i++ {
-// 				r4_guess[2] = i
-// 				for i := 0; i < 2; i++ {
-// 					r4_guess[3] = i
-// 					for i := 0; i < 2; i++ {
-// 						r4_guess[4] = i
-// 						for i := 0; i < 2; i++ {
-// 							r4_guess[5] = i
-// 							for i := 0; i < 2; i++ {
-// 								r4_guess[6] = i
-// 								for i := 0; i < 2; i++ {
-// 									r4_guess[7] = i
-// 									for i := 0; i < 2; i++ {
-// 										r4_guess[8] = i
-// 										for i := 0; i < 2; i++ {
-// 											r4_guess[9] = i
-// 											for i := 0; i < 2; i++ {
-// 												r4_guess[11] = i
-// 												for i := 0; i < 2; i++ {
-// 													r4_guess[12] = i
-// 													for i := 0; i < 2; i++ {
-// 														r4_guess[13] = i
-// 														for i := 0; i < 2; i++ {
-// 															r4_guess[14] = i
-// 															for i := 0; i < 2; i++ {
-// 																r4_guess[15] = i
-// 																for i := 0; i < 2; i++ {
-// 																	r4_guess[16] = i
-// 																	//do the gauss or whatever
-// 																}
-// 															}
-// 														}
-// 													}
-// 												}
-// 											}
-// 										}
-// 									}
-// 								}
-// 							}
-// 						}
-// 					}
-// 				}
-// 			}
-// 		}
-// 	}

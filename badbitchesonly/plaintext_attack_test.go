@@ -70,7 +70,7 @@ func TestDoTheSimpleHack1(t *testing.T) {
 	//res := solveByGaussElimination(symKeyStream, keyStream)
 	res := solveByGaussEliminationTryTwo(symKeyStream, keyStream)
 	print("Type is: " + res.ResType + "\n")
-	r1_res := putConstantBackInRes(res.Solved, 15)
+	r1_res := PutConstantBackInRes(res.Solved, 15)
 
 	fmt.Printf("length of res is: %d\n", len(res.Solved))
 	// fmt.Printf("length of sym")
@@ -112,7 +112,7 @@ func TestDoTheSimpleHackSecondVersion(t *testing.T) {
 	res := solveByGaussEliminationTryTwo(symKeyStream, keyStream)
 	fmt.Printf("Res Type: %v \n", res.ResType)
 
-	r1_res := putConstantBackInRes(res.Solved[0:18], 15)
+	r1_res := PutConstantBackInRes(res.Solved[0:18], 15)
 
 	fmt.Printf("længden af res er: %d\n", len(res.Solved))
 
@@ -584,11 +584,11 @@ func TestPutConstantBackInRes(t *testing.T) {
 	arr := make([]int, 10)
 
 	assert.Equal(t, arr[2], 0)
-	arr = putConstantBackInRes(arr, 2)
+	arr = PutConstantBackInRes(arr, 2)
 	assert.Equal(t, arr[2], 1)
 
 	assert.Equal(t, arr[5], 0)
-	arr = putConstantBackInRes(arr, 5)
+	arr = PutConstantBackInRes(arr, 5)
 	assert.Equal(t, arr[5], 1)
 
 	MakeRegisters()
@@ -603,7 +603,7 @@ func TestPutConstantBackInRes(t *testing.T) {
 		res = append(res, i)
 	}
 	// Prints(res, "")
-	res = putConstantBackInRes(res, 15)
+	res = PutConstantBackInRes(res, 15)
 	assert.Equal(t, []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 1, 16, 17, 18}, res)
 	// Prints(res, "")
 }
@@ -618,11 +618,11 @@ func TestPutConstantBackInRes(t *testing.T) {
 // 	// }
 // 	r4 := MakeR4Guess(0)
 // 	Prints(r4, strconv.Itoa(0))
-// 	Prints(putConstantBackInRes(r4, 10), "with constant")
+// 	Prints(PutConstantBackInRes(r4, 10), "with constant")
 
 // 	r4 = MakeR4Guess(int(math.Pow(2, 16)) - 1)
 // 	Prints(r4, strconv.Itoa(0))
-// 	Prints(putConstantBackInRes(r4, 10), "with constant")
+// 	Prints(PutConstantBackInRes(r4, 10), "with constant")
 
 // }
 
@@ -652,7 +652,7 @@ func TestVerifyKeyStream(t *testing.T) {
 
 	vars := []int{0, 1, 1, 0, 1, 0}
 	prods := []int{0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0}
-	res := helper(vars, prods)
+	res := VerifiesProducts(vars, prods)
 	if !res {
 		t.Fail()
 		t.Log("The products did not macth the vars")
@@ -685,8 +685,8 @@ func TestVerifyKeyStream(t *testing.T) {
 func TestTryAllReg4(t *testing.T) {
 	x := 33114
 	Prints(MakeR4Guess(x), "")
-	Prints(putConstantBackInRes(MakeR4Guess(x), 10), "")
-	TryAllReg4()
+	Prints(PutConstantBackInRes(MakeR4Guess(x), 10), "")
+	KnownPlaintextAttack()
 }
 
 func TestWhy(t *testing.T) {
@@ -718,15 +718,15 @@ func TestWhy(t *testing.T) {
 func TestBinaryConverter(t *testing.T) {
 	x := 33114
 	slice := (MakeR4Guess(x))
-	intt := convertBinaryToDecimal(slice)
+	intt := ConvertBinaryToDecimal(slice)
 	assert.Equal(t, x, intt)
 
 	slice = MakeR4Guess(10)
-	intt = convertBinaryToDecimal(slice)
+	intt = ConvertBinaryToDecimal(slice)
 	assert.Equal(t, 10, intt)
 
 	slice = MakeR4Guess(15)
-	intt = convertBinaryToDecimal(slice)
+	intt = ConvertBinaryToDecimal(slice)
 	assert.Equal(t, 15, intt)
 
 }
