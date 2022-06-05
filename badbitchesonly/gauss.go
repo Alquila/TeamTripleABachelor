@@ -116,20 +116,19 @@ func solveByGaussEliminationTryTwo(A [][]int, b []int) GaussRes {
 // type ResType string
 
 type GaussRes struct {
-	ResType string //Can be "Error" , "EmptyCol", "Multi"
+	ResType string // Can be "Error", "EmptyCol", "Multi", "Valid", "DepVar", "Both"
 	TempRes [][]int
-	ColNo   []int   //index of empty columns
-	DepCol  []int   //index of dependent columns
-	Solved  []int   //After backsubstitution
-	Multi   [][]int //Multiple solutions
+	ColNo   []int   // index of empty columns
+	DepCol  []int   // index of dependent columns
+	Solved  []int   // After backsubstitution
+	Multi   [][]int // Multiple solutions
 }
 
 const (
-	Request  string = ""
 	Error    string = "Error"
-	EmptyCol string = "EmptyCol"
-	Multi    string = "Multi"
 	Valid    string = "Valid"
+	Multi    string = "Multi"
+	EmptyCol string = "EmptyCol"
 	DepVar   string = "DepVar"
 	Both     string = "Both"
 )
@@ -297,7 +296,6 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 	return res
 }
 
-// https://www.codegrepper.com/code-examples/python/gauss+elimination+python+numpy
 func backSubstitution(gaussRes GaussRes) GaussRes {
 	augMatrix := gaussRes.TempRes
 	lengthy := len(augMatrix[0])
@@ -430,8 +428,8 @@ func HandleDepVar(gauss GaussRes) GaussRes {
 }
 
 // Taken from https://stackoverflow.com/questions/10485743/contains-method-for-a-slice
-/** contains
-Takes a list an an integer returns bool
+/* contains
+Takes a list of integer returns bool
 */
 func contains(s []int, e int) bool {
 	for _, a := range s {
@@ -442,9 +440,7 @@ func contains(s []int, e int) bool {
 	return false
 }
 
-/** MakeBitSlice
-Takes an integer and outputs a slice of slices with all possible compinations
-*/
+//MakeBitSlice takes an integer and outputs a slice of slices with all possible combinations
 func MakeBitSlice(number int) [][]int {
 	bitSlice := make([][]int, 0)
 	noOfDiffComb := int(math.Pow(2, float64(number)))

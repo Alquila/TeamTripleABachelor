@@ -41,7 +41,7 @@ func SymMakeRegister(length int, tabs []int, major_idx []int, compliment_idx int
 	return reg
 }
 
-//Make weird I matrix
+// Bit_entry Make weird I matrix
 func Bit_entry(reg SymRegister) {
 	// reg.ArrImposter[reg.bit_entry] = make([]int, reg.Length)
 	// reg.ArrImposter[reg.bit_entry][reg.Length-1] = 1
@@ -245,7 +245,7 @@ func OverwriteXorSlice(short []int, long []int) {
 
 /*
 	multiplies two decision vectors with result being c[i]d[j] ^ c[j]d[i] for i /= j and result = c[i]d[j] for i=j.
-	res slice has lenght len(c)*(len(c)-1)/2 + len(c).  c and d are assumed to be same lenght.
+	res slice has length len(c)*(len(c)-1)/2 + len(c).  c and d are assumed to be same length.
 	The original len(c) variables will be in the first len(c) indexes of result
 	The slice should be the full slice including the last bit index
 
@@ -279,7 +279,7 @@ func makeSymKeyStream() [][]int {
 	return ClockForKey(sr4)
 }
 
-//Does the 99 + 228 clocking rounds based on the given register. Returns the 228 bit keystream
+// ClockForKey Does the 99 + 228 clocking rounds based on the given register. Returns the 228 bit keystream
 func ClockForKey(r Register) [][]int {
 	keyStream := make([][]int, 228)
 
@@ -298,6 +298,12 @@ func ClockForKey(r Register) [][]int {
 	return keyStream
 
 }
+
+/*
+###########################################################
+#### THIS IS WHERE THE SIMPLE CIPHER SYM STREAM EXISTS ####
+###########################################################
+*/
 
 func MakeTwoKeyStream() ([]int, [][]int) {
 	// all registers contain 0s
@@ -345,12 +351,6 @@ func RunA5_2() ([]int, [][]int) {
 
 	return keyStream, keyStreamSym
 }
-
-/*
-###########################################################
-#### THIS IS WHERE THE SIMPLE CIPHER SYM STREAM EXISTS ####
-###########################################################
-*/
 
 //Makes a r1 symregister with all 0's
 func InitOneSymRegister() SymRegister {

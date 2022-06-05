@@ -300,6 +300,7 @@ func MakeRealKeyStreamSixFrames(frame int) ([]int, []int, []int) {
 	return r4_real, key, extra_key_stream
 }
 
+// CalculateRealIteration Splits r4's slice into the first [0,9] bits and the ]10, :] and converts this binary array to a decimal number
 func CalculateRealIteration(r4 []int) int {
 	reeee := make([]int, 0)
 	reeee = append(reeee, r4[:10]...)

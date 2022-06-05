@@ -273,7 +273,7 @@ func TestCalculateNewBit(t *testing.T) {
 	a1[16] = 0
 	a1[17] = 1
 	a1[18] = 0 //set the tap indexes to concrete values 1 ⨁ 0 ⨁ 1 ⨁ 0 = 0
-	res := calculateNewBit(r1)
+	res := feedbackFunction(r1)
 	if res != 0 {
 		t.Fail()
 	}
@@ -282,7 +282,7 @@ func TestCalculateNewBit(t *testing.T) {
 	a1[16] = 0
 	a1[17] = 1
 	a1[18] = 1 //set the tap indexes to concrete values 1 ⨁ 0 ⨁ 1 ⨁ 1 = 1
-	res = calculateNewBit(r1)
+	res = feedbackFunction(r1)
 	if res != 1 {
 		t.Fail()
 	}
@@ -290,14 +290,14 @@ func TestCalculateNewBit(t *testing.T) {
 	a2 := r2.ArrImposter
 	a2[20] = 0
 	a2[21] = 0 //set the tap indexes to concrete values  0 ⨁ 0 = 0
-	res = calculateNewBit(r2)
+	res = feedbackFunction(r2)
 	if res != 0 {
 		t.Fail()
 	}
 
 	a2[20] = 1
 	a2[21] = 0 //set the tap indexes to concrete values 1 ⨁ 0 = 1
-	res = calculateNewBit(r2)
+	res = feedbackFunction(r2)
 	if res != 1 {
 		t.Fail()
 	}
@@ -307,7 +307,7 @@ func TestCalculateNewBit(t *testing.T) {
 	a3[21] = 1
 	a3[20] = 0
 	a3[7] = 1 //set the tap indexes to concrete values 0 ⨁ 1 ⨁ 0 ⨁ 1 = 0
-	res = calculateNewBit(r3)
+	res = feedbackFunction(r3)
 	if res != 0 {
 		t.Fail()
 	}
@@ -316,7 +316,7 @@ func TestCalculateNewBit(t *testing.T) {
 	a3[21] = 1
 	a3[20] = 0
 	a3[7] = 1 //set the tap indexes to concrete values 1 ⨁ 1 ⨁ 0 ⨁ 1 = 1
-	res = calculateNewBit(r3)
+	res = feedbackFunction(r3)
 	if res != 1 {
 		t.Fail()
 	}

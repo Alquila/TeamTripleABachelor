@@ -113,12 +113,12 @@ func clockingUnit(r4 Register) {
 	}
 }
 
-//Move all the bits to the right, rightmost bit is discarded!!!, input bit is specified by the taps of the register
+// Clock Move all the bits to the right, rightmost bit is discarded!!!, input bit is specified by the taps of the register
 func Clock(r Register) {
 	arr := r.ArrImposter
 
 	//calculate the new bit before shifting all the numbers, using the feedback function
-	newbit := calculateNewBit(r)
+	newbit := feedbackFunction(r)
 	//print(newbit)
 	//call majorityOutput?
 
@@ -133,7 +133,7 @@ func Clock(r Register) {
 }
 
 //calculates the newbit by taking xor of all the tab indexes
-func calculateNewBit(r Register) int {
+func feedbackFunction(r Register) int {
 	arr := r.ArrImposter
 
 	//calculate the new bit before shifting all the numbers
