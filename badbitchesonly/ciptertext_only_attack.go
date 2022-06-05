@@ -42,43 +42,6 @@ func CreateKgMatrix() [][]int {
 	return KG
 }
 
-// MultiplyMatrix
-// takes a matrix A and a matrix B and multiplies them.
-// Matrix A and B must have dimensions q x n and n x p.
-func MultiplyMatrix(A [][]int, B [][]int) [][]int {
-	noRows := len(A)   // m
-	noCol := len(A[0]) // n
-
-	secNoRows := len(B)   // p
-	secNoCol := len(B[0]) // q
-
-	if noCol != secNoRows {
-		fmt.Println("Error: The matrix cannot be multiplied")
-		fmt.Printf("Dimensions are %d x %d * %d x %d\n", noRows, noCol, secNoRows, secNoCol)
-	}
-
-	// Create result matrix after multiplication
-	res := make([][]int, noRows)
-
-	// Initialize inner slices
-	for i := 0; i < noRows; i++ {
-		res[i] = make([]int, secNoCol)
-	}
-
-	midRes := 0
-	for i := 0; i < noRows; i++ {
-		for j := 0; j < secNoCol; j++ {
-			for k := 0; k < secNoRows; k++ {
-				midRes = midRes ^ (A[i][k] * B[k][j])
-			}
-			res[i][j] = midRes
-			midRes = 0
-		}
-	}
-
-	return res
-}
-
 // CreatesRandomMessage
 // creates a random bit-slice of the given length
 func CreateRandomMessage(length int) []int {
@@ -88,24 +51,6 @@ func CreateRandomMessage(length int) []int {
 	}
 
 	return msg
-}
-
-func SliceToMatrix(slice []int) [][]int {
-	lenght := len(slice)
-	res := make([][]int, 0)
-	for i := 0; i < lenght; i++ {
-		res = append(res, []int{slice[i]})
-	}
-	return res
-}
-
-func MatrixToSlice(matrix [][]int) []int {
-	length := len(matrix)
-	res := make([]int, 0)
-	for i := 0; i < length; i++ {
-		res = append(res, matrix[i][0])
-	}
-	return res
 }
 
 /*
@@ -164,4 +109,59 @@ func CalculateXFrameCiphertext(key []int, number_of_frames int) []int {
 	}
 
 	return c
+}
+
+// MultiplyMatrix
+// takes a matrix A and a matrix B and multiplies them.
+// Matrix A and B must have dimensions q x n and n x p.
+func MultiplyMatrix(A [][]int, B [][]int) [][]int {
+	noRows := len(A)   // m
+	noCol := len(A[0]) // n
+
+	secNoRows := len(B)   // p
+	secNoCol := len(B[0]) // q
+
+	if noCol != secNoRows {
+		fmt.Println("Error: The matrix cannot be multiplied")
+		fmt.Printf("Dimensions are %d x %d * %d x %d\n", noRows, noCol, secNoRows, secNoCol)
+	}
+
+	// Create result matrix after multiplication
+	res := make([][]int, noRows)
+
+	// Initialize inner slices
+	for i := 0; i < noRows; i++ {
+		res[i] = make([]int, secNoCol)
+	}
+
+	midRes := 0
+	for i := 0; i < noRows; i++ {
+		for j := 0; j < secNoCol; j++ {
+			for k := 0; k < secNoRows; k++ {
+				midRes = midRes ^ (A[i][k] * B[k][j])
+			}
+			res[i][j] = midRes
+			midRes = 0
+		}
+	}
+
+	return res
+}
+
+func MatrixToSlice(matrix [][]int) []int {
+	length := len(matrix)
+	res := make([]int, 0)
+	for i := 0; i < length; i++ {
+		res = append(res, matrix[i][0])
+	}
+	return res
+}
+
+func SliceToMatrix(slice []int) [][]int {
+	length := len(slice)
+	res := make([][]int, 0)
+	for i := 0; i < length; i++ {
+		res = append(res, []int{slice[i]})
+	}
+	return res
 }
