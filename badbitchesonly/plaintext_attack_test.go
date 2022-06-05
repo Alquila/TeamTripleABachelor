@@ -68,9 +68,9 @@ func TestDoTheSimpleHack1(t *testing.T) {
 
 	// use gauss to solve equations
 	//res := solveByGaussElimination(symKeyStream, keyStream)
-	res := solveByGaussEliminationTryTwo(symKeyStream, keyStream)
+	res := SolveByGaussElimination(symKeyStream, keyStream)
 	print("Type is: " + res.ResType + "\n")
-	r1_res := PutConstantBackInRes(res.Solved, 15)
+	r1_res := PutConstantBackInRes(res.Multi[0], 15)
 
 	fmt.Printf("length of res is: %d\n", len(res.Solved))
 	// fmt.Printf("length of sym")
@@ -109,10 +109,10 @@ func TestDoTheSimpleHackSecondVersion(t *testing.T) {
 	// use gauss to solve equations
 	//res := solveByGaussElimination(symKeyStream, keyStream)
 	// fmt.Printf("symKeyStream: \n%d\n", symKeyStream)
-	res := solveByGaussEliminationTryTwo(symKeyStream, keyStream)
+	res := SolveByGaussElimination(symKeyStream, keyStream)
 	fmt.Printf("Res Type: %v \n", res.ResType)
 
-	r1_res := PutConstantBackInRes(res.Solved[0:18], 15)
+	r1_res := PutConstantBackInRes(res.Multi[0][0:18], 15)
 
 	fmt.Printf("længden af res er: %d\n", len(res.Solved))
 
@@ -137,10 +137,16 @@ func TestPlaintextAttack(t *testing.T) {
 	original_frame_number = 55
 	current_frame_number = 55
 
+	//MakeRegisters()
+	MakeR4()
+	//MakeRegisters()
+	SymInitializeRegisters()
+
 	sr1.RegSlice = make([][]int, r1.Length)
 	sr2.RegSlice = make([][]int, r2.Length)
 	sr3.RegSlice = make([][]int, r3.Length)
 	sr4.RegSlice = make([]int, r4.Length)
+	print(sr1.Length)
 
 	res1, _, _ := DoTheKnownPlainTextHack()
 
@@ -479,7 +485,7 @@ func TestMAKETEST(t *testing.T) {
 	b := append(keyStream1, keyStream2...)
 	b = append(b, keyStream3...)
 
-	x := solveByGaussEliminationTryTwo(A, b)
+	x := SolveByGaussElimination(A, b)
 	println(x.ResType)
 	// Prints(x[0:20], "res 20xx")
 	println(len(x.Multi))

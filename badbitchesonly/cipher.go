@@ -170,6 +170,7 @@ func InitializeRegisters() {
 	r2.RegSlice = make([]int, r2.Length)
 	r3.RegSlice = make([]int, r3.Length)
 	r4.RegSlice = make([]int, r4.Length)
+	print(r1.Length)
 
 	// Clock all registers 64 times and XOR with the session key
 	for i := 0; i < 64; i++ {
@@ -233,7 +234,7 @@ func MakeFinalXOR() int {
 // runs for 99 clocks, then runs for 228 clocks and returns the key stream
 func MakeKeyStream() []int {
 
-	// all registers contains 0s
+	// all registers Contains 0s
 	MakeRegisters()
 
 	keyStream := make([]int, 228)

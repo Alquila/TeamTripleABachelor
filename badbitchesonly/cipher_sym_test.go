@@ -25,19 +25,14 @@ func TestConstPrettyPrint(t *testing.T) {
 }
 
 func TestHowFrames(t *testing.T) {
-	// reg1 := SymMakeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14, 15)
 	reg1 := SymMakeRegister(17, []int{16, 11}, []int{12, 15}, 14, 10)
-	// ree := make([][]int, 19)
 	for i := 0; i < 17; i++ {
 		reg1.RegSlice[i] = make([]int, 22)
-		// ree[i][i] = 1
 	}
-	// PrintMatrix(reg1.RegSlice)
 
 	for i := 0; i < 22; i++ {
 		SymClock(reg1)
-		reg1.RegSlice[0][i] = 1 //should this be xor?
-		// ree[i][i] = 1
+		reg1.RegSlice[0][i] = 1
 	}
 
 	PrintMatrix(reg1.RegSlice)
@@ -72,7 +67,7 @@ func TestDescribeRegistersFromFrame(t *testing.T) {
 		SymClock(sre2)
 		SymClock(sre3)
 		SymClock(reg4)
-		sre1.RegSlice[0][i] = 1 //should this be xor? <- no den påvirkes kun af den i'te bit én gang
+		sre1.RegSlice[0][i] = 1
 		sre2.RegSlice[0][i] = 1
 		sre3.RegSlice[0][i] = 1
 		reg4.RegSlice[0][i] = 1
@@ -88,55 +83,13 @@ func TestDescribeRegistersFromFrame(t *testing.T) {
 }
 
 func TestDescribeRegistersFromKey(t *testing.T) {
-	// sre1 := SymMakeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14, 15)
-	// sre2 := SymMakeRegister(22, []int{21, 20}, []int{9, 13}, 16, 16)
-	// sre3 := SymMakeRegister(23, []int{22, 21, 20, 7}, []int{16, 18}, 13, 18)
-
-	// for i := 0; i < sre1.Length; i++ {
-	// 	sre1.RegSlice[i] = make([]int, 64)
-	// }
-
-	// for i := 0; i < sre2.Length; i++ {
-	// 	sre2.RegSlice[i] = make([]int, 64)
-	// }
-
-	// for i := 0; i < sre3.Length; i++ {
-	// 	sre3.RegSlice[i] = make([]int, 64)
-	// }
-
-	// reg4 := SymMakeRegister(17, []int{16, 11}, []int{12, 15}, 14, 10)
-	// for i := 0; i < 17; i++ {
-	// 	reg4.RegSlice[i] = make([]int, 64)
-	// }
-
-	// for i := 0; i < 64; i++ {
-	// 	SymClock(sre1)
-	// 	SymClock(sre2)
-	// 	SymClock(sre3)
-	// 	SymClock(reg4)
-	// 	sre1.RegSlice[0][i] = 1 //should this be xor? <- no den påvirkes kun af den i'te bit én gang
-	// 	sre2.RegSlice[0][i] = 1
-	// 	sre3.RegSlice[0][i] = 1
-	// 	reg4.RegSlice[0][i] = 1
-	// }
-
-	// println("sr1")
-	// PrettySymPrintFrame(sre1.RegSlice)
-	// println("sr2")
-	// PrettySymPrintFrame(sre2.RegSlice)
-	// println("sr3")
-	// PrettySymPrintFrame(sre3.RegSlice)
-	// println("sr4")
-	// PrettySymPrintFrame(reg4.RegSlice)
-
 	sym := DescribeRegistersFromKey()
 	PrettySymPrintFrame(sym)
 	fmt.Printf("dims %d x %d of sym \n", len(sym), len(sym[0])) //81 x 64
 	PrintMatrix(sym)
-
 }
 
-func TestRetrieveSessionKey(t *testing.T) {
+/*func TestRetrieveSessionKey(t *testing.T) {
 	session_key = stringToIntArray("0 0 0 0 0 1 1 0 1 1 0 1 0 1 0 1 0 1 0 1 0 1 1 1 1 0 0 0 0 1 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 1 0 0")
 	real_ses := make([]int, 64)
 	copy(real_ses, session_key)
@@ -156,12 +109,11 @@ func TestRetrieveSessionKey(t *testing.T) {
 	res := RetrieveSessionKey(all_reg)
 	println(len(res))
 	if !reflect.DeepEqual(res, real_ses) {
-		// fmt.Println("res was not complete %v", )
 		Prints(res, "res was: ")
 		t.Fail()
 	}
 
-}
+}*/
 
 func TestSymRegistersSameAfterInitWithSameFrameNumber(t *testing.T) {
 	current_frame_number = 22
@@ -215,7 +167,6 @@ func TestFinalXorSomething(t *testing.T) {
 	MakeRegisters()
 	InitializeRegisters()
 	SymInitializeRegisters()
-	// sr1.RegSlice[sr1.Length-1][sr1.Length-1] = 1
 
 	last_r1 := sr1.RegSlice[sr1.Length-1]
 	last_r2 := sr2.RegSlice[sr2.Length-1]
@@ -230,8 +181,6 @@ func TestFinalXorSomething(t *testing.T) {
 	maj_r3 := SymMajorityOutput(sr3)
 
 	bit_entry1 := len(maj_r1) - 1
-	// bit_entry2 := len(maj_r2) - 1
-	// bit_entry3 := len(maj_r3) - 1
 
 	res := SymMakeFinalXOR(sr1, sr2, sr3)
 
@@ -270,14 +219,9 @@ func TestFinalXorLenght(t *testing.T) {
 
 func TestSymClock(t *testing.T) {
 	reg := InitOneSymRegister()
-	// for i := 0; i < 19; i++ {
-	// 	Prints(reg.RegSlice[i], "")
-	// } <- her er der bare masser af nuller
 	BitEntry(reg)
-	// for i := 0; i < 19; i++ {
-	// 	Prints(reg.RegSlice[i], "")
-	// } // <- her er der 1 taller diagonal
 	PrettySymPrintSliceBit(reg.RegSlice, reg.SetToOne)
+
 	SymClock(reg)
 	SymClock(reg)
 	SymClock(reg)
@@ -286,7 +230,6 @@ func TestSymClock(t *testing.T) {
 	}
 	PrettySymPrintSliceBit(reg.RegSlice, reg.SetToOne)
 	SymClock(reg)
-	// SymClock(reg)
 	PrettySymPrintSliceBit(reg.RegSlice, reg.SetToOne)
 }
 
@@ -307,7 +250,7 @@ func TestCompliance(t *testing.T) {
 	PrettySymPrintSliceBit(reg1[:20], symReg.SetToOne)
 	Prints(reg2[:20], "res")
 
-	res := solveByGaussEliminationTryTwo(reg1, reg2)
+	res := SolveByGaussElimination(reg1, reg2)
 	Prints(res.Solved, "gauss")
 	Prints(orgReg, "Original reg")
 
@@ -339,78 +282,14 @@ func MakeLongIntSlice() []int {
 		res = append(res, i)
 	}
 
-	// Prints(res, "res before products")
-
 	//lol the first 0-x products just becomes x
 	prod1 := stringToIntArray("01 02 03 04 05 06 07 08 09 010 011 012 013 014 016 017 018 12 13 14 15 16 17 18 19 110 111 112 113 114 116 117 118 23 24 25 26 27 28 29 210 211 212 213 214 216 217 218 34 35 36 37 38 39 310 311 312 313 314 316 317 318 45 46 47 48 49 410 411 412 413 414 416 417 418 56 57 58 59 510 511 512 513 514 516 517 518 67 68 69 610 611 612 613 614 616 617 618 78 79 710 711 712 713 714 716 717 718 89 810 811 812 813 814 816 817 818 910 911 912 913 914 916 917 918 1011 1012 1013 1014 1016 1017 1018 1112 1113 1114 1116 1117 1118 1213 1214 1216 1217 1218 1314 1316 1317 1318 1416 1417 1418 1617 1618 1718")
 	prod2 := stringToIntArray("01 02 03 04 05 06 07 08 09 010 011 012 013 014 015 017 018 019 020 021 12 13 14 15 16 17 18 19 110 111 112 113 114 115 117 118 119 120 121 23 24 25 26 27 28 29 210 211 212 213 214 215 217 218 219 220 221 34 35 36 37 38 39 310 311 312 313 314 315 317 318 319 320 321 45 46 47 48 49 410 411 412 413 414 415 417 418 419 420 421 56 57 58 59 510 511 512 513 514 515 517 518 519 520 521 67 68 69 610 611 612 613 614 615 617 618 619 620 621 78 79 710 711 712 713 714 715 717 718 719 720 721 89 810 811 812 813 814 815 817 818 819 820 821 910 911 912 913 914 915 917 918 919 920 921 1011 1012 1013 1014 1015 1017 1018 1019 1020 1021 1112 1113 1114 1115 1117 1118 1119 1120 1121 1213 1214 1215 1217 1218 1219 1220 1221 1314 1315 1317 1318 1319 1320 1321 1415 1417 1418 1419 1420 1421 1517 1518 1519 1520 1521 1718 1719 1720 1721 1819 1820 1821 1920 1921 2021")
 	prod3 := stringToIntArray("01 02 03 04 05 06 07 08 09 010 011 012 013 014 015 016 017 019 020 021 022 12 13 14 15 16 17 18 19 110 111 112 113 114 115 116 117 119 120 121 122 23 24 25 26 27 28 29 210 211 212 213 214 215 216 217 219 220 221 222 34 35 36 37 38 39 310 311 312 313 314 315 316 317 319 320 321 322 45 46 47 48 49 410 411 412 413 414 415 416 417 419 420 421 422 56 57 58 59 510 511 512 513 514 515 516 517 519 520 521 522 67 68 69 610 611 612 613 614 615 616 617 619 620 621 622 78 79 710 711 712 713 714 715 716 717 719 720 721 722 89 810 811 812 813 814 815 816 817 819 820 821 822 910 911 912 913 914 915 916 917 919 920 921 922 1011 1012 1013 1014 1015 1016 1017 1019 1020 1021 1022 1112 1113 1114 1115 1116 1117 1119 1120 1121 1122 1213 1214 1215 1216 1217 1219 1220 1221 1222 1314 1315 1316 1317 1319 1320 1321 1322 1415 1416 1417 1419 1420 1421 1422 1516 1517 1519 1520 1521 1522 1617 1619 1620 1621 1622 1719 1720 1721 1722 1920 1921 1922 2021 2022 2122")
 
 	res = append(res, prod1...)
-	// Prints(res, "res after prod1")
 	res = append(res, prod2...)
 	res = append(res, prod3...)
 
 	return res
 }
-
-// func TestTest(*testing.T) {
-// 	p := []int{1, 2, 3, 4}
-
-// 	w, err := os.Create("output.txt")
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	defer w.Close()
-
-// 	wri := bufio.NewWriter(w)
-
-// 	encoder := gob.NewEncoder(wri)
-// 	err = encoder.Encode(p)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	fi, err := os.Open("output.txt")
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	// close fi on exit and check for its returned error
-// 	defer func() {
-// 		if err := fi.Close(); err != nil {
-// 			panic(err)
-// 		}
-// 	}()
-
-// 	// rea := bufio.NewReader(fi)
-
-// 	// decoder := gob.NewDecoder(rea)
-// 	// p = []int{}
-
-// 	// err = decoder.Decode(&p)
-// 	// if err != nil {
-// 	// 	panic(err)
-// 	// }
-// 	// Prints(p, "")
-// }
-
-// func TestTest2(t *testing.T) {
-// 	file, _ := os.Create("user.gob")
-
-// 	p := []int{1, 2, 3, 4}
-
-// 	defer file.Close()
-
-// 	encoder := gob.NewEncoder(file)
-
-// 	encoder.Encode(p)
-
-// 	decoder := gob.NewDecoder(file)
-// 	q := []int{}
-
-// 	err := decoder.Decode(&q)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	Prints(p, "")
-// }

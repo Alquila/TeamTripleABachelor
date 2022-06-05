@@ -14,7 +14,6 @@ import (
 func TestCreate_G_matrix(t *testing.T) {
 	G := CreateGMatrix()
 
-	// fmt.Printf("G Matrix: %d \n", G)
 	for i := 0; i < 184; i++ {
 		if G[i][i] != 1 {
 			t.Fail()
@@ -108,14 +107,11 @@ func TestCiphertextOnlyAttack(t *testing.T) {
 	keyStream := make([]int, 0)      // append to this, assert that the length is rigth
 	symKeyStream := make([][]int, 0) // same here <3
 
-	// how many frames do we need ?
 	for i := 0; i < 6; i++ {
-		// handle new frame variables ?
 		newKeyStream := MakeKeyStream()
 		SymInitializeRegisters()
 		copy(sr4.RegSlice, r4_after_init.RegSlice)
 		newSymKeyStream := ClockForKey(sr4)
-		// assert.Equal(t, sr4.RegSlice, r4.RegSlice)
 		keyStream = append(keyStream, newKeyStream...)
 		symKeyStream = append(symKeyStream, newSymKeyStream...)
 		current_frame_number++
@@ -155,26 +151,18 @@ func TestCiphertextOnlyAttack(t *testing.T) {
 	full_KGC := append(KG_C, KG_C2...)
 	full_KGC = append(full_KGC, KG_C3...)
 
-	// rii := SliceToMatrix(c)
-	// fmt.Printf("c %d x %d\n", len(rii), len(rii[0]))
-	// hmmm := MultiplyMatrix(append(append(KG, KG...), KG...), rii)
-	// assert.Equal(t, full_KGC, hmmm)
-
 	/* Multiply KG with the SymbolicKeyStream to make KGK */
 	KGk := CalculateKgTimesSymKeyStream(KG, symKeyStream[:456])
 	KGk2 := CalculateKgTimesSymKeyStream(KG, symKeyStream[456:912]) //
 	KGk3 := CalculateKgTimesSymKeyStream(KG, symKeyStream[912:])    //
 	fmt.Printf("dims of K_g*k:  %d x %d \n", len(KGk), len(KGk[0])) //272 x 657
-	// fmt.Printf("dims of K_g*k2: %d x %d \n", len(KGk2), len(KGk2[0])) //272 x 657
 	full_KGk := append(KGk, KGk2...)
 	full_KGk = append(full_KGk, KGk3...)
 	fmt.Printf("dims of K_g*k4: %d x %d \n", len(full_KGk), len(full_KGk[0])) //816 x 657
 	fmt.Printf("dims of full K_G*C:  %d x 1 \n", len(full_KGC))               //816 x1
 
 	/* Try to solve KG*k = KG*C for V_f*/
-	x := solveByGaussEliminationTryTwo(full_KGk, full_KGC)
-	// Prints(full_KGC[:60], "")
-	// PrintMatrix(full_KGk[:60][:60])
+	x := SolveByGaussElimination(full_KGk, full_KGC)
 	println(x.ResType)
 	fmt.Printf("Size of multi %d\n", len(x.Multi))
 	fmt.Printf("Verifykeystream: %v\n", VerifyKeyStream(x.Multi[0]))
@@ -182,11 +170,6 @@ func TestCiphertextOnlyAttack(t *testing.T) {
 	Prints(r1_solved, "r1")
 	Prints(r2_solved, "r2")
 	Prints(r3_solved, "r3")
-
-	// if reflect.DeepEqual(r1_solved, r2_solved) {
-	// t.Fails
-
-	// }
 
 }
 
@@ -255,7 +238,8 @@ func TestTryAllCombinationsOfR4(t *testing.T) {
 
 	guesses := int(math.Pow(2, 16))
 	println(guesses)
-	for i := 0; i < guesses; i++ {
+	for i := lower; i < upper; i++ {
+		//for i := 0; i < guesses; i++ {
 		if i%100 == 0 {
 			fmt.Printf("iteration %d \n", i)
 		}
@@ -291,7 +275,7 @@ func TestTryAllCombinationsOfR4(t *testing.T) {
 		full_KGk := append(KGk, KGk2...)
 		full_KGk = append(full_KGk, KGk3...)
 
-		x := solveByGaussEliminationTryTwo(full_KGk, full_KGC)
+		x := SolveByGaussElimination(full_KGk, full_KGC)
 		println(x.ResType)
 
 		if x.ResType == Multi {
@@ -314,6 +298,7 @@ func TestTryAllCombinationsOfR4(t *testing.T) {
 	fmt.Printf("This is r4_bin: %v\n", r4_bin)
 	fmt.Printf("This is bin_key: %v\n", bin_key[:2])
 	fmt.Printf("This is key_for_test: %v\n", key_for_test[:2])
+
 }
 
 func TestCalculateXFramCiphertext(t *testing.T) {

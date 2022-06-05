@@ -71,20 +71,15 @@ func TestSimpleKeyStream(t *testing.T) {
 	key := SimpleKeyStreamSym(r0)
 	Println("rip3")
 	for i := 0; i < 228; i++ {
-		// PrettyPrintSymRegister()
 		for i := 0; i < r0.Length; i++ {
 			accString := "["
 			for j := 0; j < r0.Length; j++ {
 				if key[i][j] == 1 {
 					str := strconv.Itoa(j)
 					accString += "x" + (str) + " ⨁ "
-					// accString += " x" + (str) + " xor "
 				}
 			}
-			// accString = strings.TrimRight(accString, " xor ")
 			accString = strings.TrimRight(accString, "⨁ ")
-			//Printf("xor)
-			//Printf("")
 			accString += " ]"
 			print(accString)
 		}
@@ -132,19 +127,10 @@ func TestSmallPrint(t *testing.T) {
 	PrettyPrintSymRegister(r0)
 
 	SymClock(r0)
-	//Printf("%+v \n", r0.RegSlice)
-	//println(" 1st clock")
-	//PrettyPrintSymRegister(r0)
 	SymClock(r0)
-	//println(" 2nd clock")
-	//PrettyPrintSymRegister(r0)
-	//Printf("%+v \n", r0.RegSlice)
 	SymClock(r0)
-	//Printf("%+v \n", r0.RegSlice)
 	SymClock(r0)
-	//Printf("%+v \n", r0.RegSlice)
 	SymClock(r0)
-	//Printf("%+v \n", r0.RegSlice)
 	SymClock(r0)
 	SymClock(r0)
 	SymClock(r0)
@@ -158,7 +144,6 @@ func TestSmallPrint(t *testing.T) {
 	SymClock(r0)
 	Printf("%+v \n", r0.RegSlice)
 	PrettyPrintSymRegister(r0)
-	//Printf("%+v \n", r0.RegSlice)
 
 }
 
@@ -172,10 +157,7 @@ func TestMakeSessionKey(t *testing.T) {
 	Printf("%+v \n", key)
 }
 
-//Generate a random array of length n
-//Println(rand.Perm(64))
-
-func TestMakeFrameNumber(t *testing.T) { // REVIEW: denne test, tester ikke metoden i vores kode, det bør den måske istedet
+/*func TestMakeFrameNumber(t *testing.T) { // REVIEW: denne test, tester ikke metoden i vores kode, det bør den måske istedet
 	f := 55
 
 	frameBit := make([]int, 22)
@@ -192,9 +174,9 @@ func TestMakeFrameNumber(t *testing.T) { // REVIEW: denne test, tester ikke meto
 
 	Printf("%+v \n", frameBit)
 	Printf("0'th bit is %v \n", frameBit[0])
-}
+}*/
 
-func TestSetIndiciesToOne(t *testing.T) {
+func TestSetIndicesToOne(t *testing.T) {
 	MakeRegisters()
 	SetIndicesToOne()
 	PrintAllRegisters()
@@ -240,7 +222,6 @@ func TestRegistersAreSameAfterInitWithSameFrameNumber(t *testing.T) { // TODO: t
 	r3.RegSlice[6] = 42
 	r4.RegSlice[6] = 42
 
-	//PrintAllRegisters()
 	InitializeRegisters()
 	SetIndicesToOne()
 	Printf("Initialise registers again: \n")
@@ -397,8 +378,6 @@ func TestClockingUnit(t *testing.T) {
 }
 
 func TestFinalXor(t *testing.T) {
-	//hooow to teeeeest
-	//right now we just show that it takes the three registers and calculates the Majority and takes the last slice in each and xors it all together. returns a long array with all the stuff
 	r1 := SymMakeRegister(4, []int{1, 3}, []int{0, 2}, 3, 0)
 	for i := 0; i < 4; i++ {
 		r1.RegSlice[i][i] = 1 // each entry in the diagonal set to 1 as x_i is only dependent on x_i when initialized
@@ -428,23 +407,6 @@ func TestFinalXor(t *testing.T) {
 	// r1 Majority[1 0 1 0 0 1 1 0 0 1]
 	// r2 Majority[0 0 1 0 1 0 1 0 1 0 0 0 0 1 0]
 	// r3 Majority[0 1 1 0 0 0 0 0 1 1 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
-
-	// last_r1 := r1.RegSlice[r1.Length-1]
-	// last_r2 := r2.RegSlice[r2.Length-1]
-	// last_r3 := r3.RegSlice[r3.Length-1]
-	// Prints(last_r1, "last r1")
-	// Prints(last_r2, "last r2")
-	// Prints(last_r3, "last r3")
-	/*
-			last r1[0 0 0 1]
-			last r2[0 0 0 0 1]
-			last r3[0 0 0 0 0 0 0 1]
-
-		result[1 0 1 1 0 1 1 0 0 1 0 0 1 0 0 0 1 0 1 0 0 0 0 1 0 0 1 1 0 0 0 0 1 1 1 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
-		lenght 61
-
-	*/
-
 }
 
 func TestKeyStreamSimple(t *testing.T) {
@@ -485,7 +447,6 @@ func TestSymaa(t *testing.T) {
 	d := []string{"0", "1", "2", "3", "b"}
 
 	res := Symaaa(c, d)
-	// print(res)
 	Printf("%+v \n", res)
 	Printf("lenght: %d \n", len(res))
 }
@@ -494,14 +455,12 @@ func TestSymaa19(t *testing.T) {
 	c := []string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "19", "20", "21", "22", "a"}
 	d := []string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "19", "20", "21", "22", "b"}
 	res := Symaaa(c, d)
-	// print(res)
 	Printf("%+v \n", res)
 	Printf("lenght: %d \n", len(res))
 
 }
 
 func TestSymMajorityMultiply(t *testing.T) {
-
 	c := []int{0, 1, 0, 1, 1}
 	d := []int{0, 1, 1, 0, 1}
 
@@ -555,8 +514,6 @@ func PrettySymPrint(symReg SymRegister) {
 	Println()
 
 }
-
-//works on slice_slice
 
 func TestInitOneSymRegister(t *testing.T) {
 	reg := InitOneSymRegister()

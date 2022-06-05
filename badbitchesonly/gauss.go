@@ -1,122 +1,11 @@
 package main
 
 import (
-	"errors"
-	"fmt"
-	"log"
 	"math"
 )
 
-type testCase struct {
-	a [][]int
-	b []int
-	x []int
-}
-
-func Abs(x int) int {
-	if x < 0 {
-		return -x
-	}
-	return x
-}
-
-var tc = testCase{
-	a: [][]int{
-		{1, 0, 0, 1, 0, 0},
-		{1, 0, 0, 0, 0, 0},
-		{1, 1, 1, 1, 0, 1},
-		{0, 1, 0, 0, 1, 0},
-		{0, 1, 1, 1, 0, 0},
-		{0, 1, 1, 0, 1, 0}},
-	b: []int{1, 0, 0, 0, 0, 0},
-	x: []int{1, 1, 0, 1, 0, 1},
-}
-
-// result from above test case turns out to be correct to this tolerance.
-var ε = 0
-
-func gaussmain() {
-	x, err := GaussPartial(tc.a, tc.b)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(x)
-	for i, xi := range x {
-		if Abs(tc.x[i]-xi) > ε {
-			log.Println("out of tolerance")
-			log.Fatal("expected", tc.x)
-		}
-	}
-}
-
-func GaussPartial(a0 [][]int, b0 []int) ([]int, error) {
-	m := len(b0)
-	a := make([][]int, m)
-	for i, ai := range a0 {
-		row := make([]int, m+1)
-		copy(row, ai)
-		row[m] = b0[i]
-		a[i] = row
-	}
-	for k := range a {
-		iMax := 0
-		max := -1
-		for i := k; i < m; i++ {
-			row := a[i]
-			// compute scale factor s = max abs in row
-			s := -1
-			for j := k; j < m; j++ {
-				x := Abs(row[j])
-				if x > s {
-					s = x
-				}
-			}
-			// scale the abs used to pick the pivot.
-			if abs := Abs(row[k]) / s; abs > max {
-				iMax = i
-				max = abs
-			}
-		}
-		if a[iMax][k] == 0 {
-			return nil, errors.New("singular")
-		}
-		a[k], a[iMax] = a[iMax], a[k]
-		for i := k + 1; i < m; i++ {
-			for j := k + 1; j <= m; j++ {
-				a[i][j] -= a[k][j] * (a[i][k] / a[k][k])
-			}
-			a[i][k] = 0
-		}
-	}
-	x := make([]int, m)
-	for i := m - 1; i >= 0; i-- {
-		x[i] = a[i][m]
-		for j := i + 1; j < m; j++ {
-			x[i] -= a[i][j] * x[j]
-		}
-		x[i] /= a[i][i]
-	}
-	return x, nil
-}
-
-func solveByGaussEliminationTryTwo(A [][]int, b []int) GaussRes {
-	augmentMatrix := makeAugmentedMatrix(A, b)
-	afterGauss := gaussEliminationPart2(augmentMatrix)
-	if afterGauss.ResType == "Error" {
-		// Do nothing
-	} else {
-		GaussResAfterBack := backSubstitution(afterGauss)
-		return GaussResAfterBack
-	}
-	// fmt.Printf("Gauss: %d\n", solution)
-	// fmt.Printf("Gauss lenght: %d\n", len(solution))
-	return afterGauss
-}
-
-// type ResType string
-
 type GaussRes struct {
-	ResType string // Can be "Error", "EmptyCol", "Multi", "Valid", "DepVar", "Both"
+	ResType string
 	TempRes [][]int
 	ColNo   []int   // index of empty columns
 	DepCol  []int   // index of dependent columns
@@ -133,13 +22,29 @@ const (
 	Both     string = "Both"
 )
 
-func makeAugmentedMatrix(A [][]int, b []int) [][]int {
+// SolveByGaussElimination
+// Takes a matrix A and a vector b and solves Ax = b for x
+// The function returns a GaussRes struct with the solution.
+// If no valid solution existed GaussRes.ResType returns Error.
+func SolveByGaussElimination(A [][]int, b []int) GaussRes {
+	augmentMatrix := MakeAugmentedMatrix(A, b)
+	afterGauss := GaussElimination(augmentMatrix)
+	if afterGauss.ResType == "Error" {
+		// Do nothing
+	} else {
+		GaussResAfterBack := BackSubstitution(afterGauss)
+		return GaussResAfterBack
+	}
+	return afterGauss
+}
+
+// MakeAugmentedMatrix
+// Takes a matrix A and a vector b as input and
+// returns the composed matrix of the two.
+func MakeAugmentedMatrix(A [][]int, b []int) [][]int {
 	amountOfRows := len(A)    // this is row
 	amountOfVars := len(A[0]) // this is column
 	augMa := make([][]int, amountOfRows)
-	//fmt.Printf("Amount of rows of A %d\n", amountOfRows)
-	//fmt.Printf("Amount of vars of A: %d\n", amountOfVars)
-	//fmt.Printf("length of b: %d \n", len(b))
 
 	for i := 0; i < amountOfRows; i++ {
 		augMa[i] = make([]int, amountOfVars+1) //@Amalie hvor lange skal de være
@@ -155,8 +60,9 @@ func makeAugmentedMatrix(A [][]int, b []int) [][]int {
 	return augMa
 }
 
-// https://stackoverflow.com/questions/11483925/how-to-implementing-gaussian-elimination-for-binary-equations
-func gaussEliminationPart2(augMa [][]int) GaussRes {
+// GaussElimination
+// Takes an augemnted matrix as input and returns a matrix in echelon form.
+func GaussElimination(augMa [][]int) GaussRes {
 	// Initialize GaussStruct
 	res := GaussRes{
 		ResType: Valid,
@@ -168,11 +74,6 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 	noUnknownVars := len(augMa[0]) - 2 // n is number of unknowns
 	noEquations := len(augMa)
 	freeVar := make([]int, 0)
-	// fmt.Printf("len of unknown variable %d \n", noUnknownVars)
-	// fmt.Printf("len of equations %d \n", noEquations)
-	// for i := noUnknownVars; i < noEquations; i++ {
-	// 	Prints(augMa[i], strconv.Itoa(i))
-	// }
 	for i := 0; i < noUnknownVars; i++ {
 		s := i
 		if augMa[i][i] == 0 {
@@ -205,14 +106,9 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 							}
 							freeVar = append(freeVar, i)
 							res.DepCol = append(res.DepCol, i)
-							//fmt.Printf("dependent var at [%d][%d] \n", j, i)
-							//Prints(augMa[j], "")
-							// res.ResType = Error
-							// return res
 						}
 					}
 					if allZero {
-						// fmt.Printf("There is a free var")
 						res.ResType = EmptyCol
 						freeVar = append(freeVar, i)
 						res.ColNo = append(res.ColNo, i)
@@ -221,18 +117,15 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 			}
 		}
 
-		// xor alle ræker efter r, hvor der står 1
+		// XOR alle ræker efter r, hvor der står 1
 		sliceCopy := make([]int, len(augMa[i]))
 		copy(sliceCopy, augMa[i])
-		//fmt.Printf("Row %d, should be 1 in index %d: \n %d \n", s, i, sliceCopy)
 
 		noCol := len(augMa[0])
 		for p := s + 1; p < noEquations; p++ {
-			// fmt.Printf("j is %d \n", p)
 			if augMa[p][i] == 1 {
 				augAfterxor := make([]int, len(augMa[p]))
 				for j := 0; j < noCol; j++ {
-					// fmt.Printf("j is %d, ", j)
 					augAfterxor[j] = augMa[p][j] ^ sliceCopy[j]
 				}
 				augMa[p] = augAfterxor
@@ -243,7 +136,6 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 				if augMa[index][i] == 1 {
 					augAfterxor := make([]int, len(augMa[index]))
 					for j := 0; j < noCol; j++ {
-						// fmt.Printf("j is %d, ", j)
 						augAfterxor[j] = augMa[index][j] ^ sliceCopy[j]
 					}
 					augMa[index] = augAfterxor
@@ -259,17 +151,11 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 	for q := noUnknownVars; q < noEquations; q++ {
 		if augMa[q][bitIndex] == 1 {
 			if augMa[q][resIndex] != 1 {
-				// fmt.Printf("augma[%d][%d] = 1 but augma[%d][res] = %d \n", q, bitIndex, q, 0)
 				res.ResType = Error
 				res.TempRes = augMa
 				return res
 			}
 		} else if augMa[q][resIndex] == 1 {
-			// fmt.Printf("augma[%d][res] == 1, \n", q)
-			// Prints(augMa[q], "stupid")
-			// for i := noUnknownVars; i < noEquations; i++ {
-			// 	Prints(augMa[i], strconv.Itoa(i))
-			// }
 			res.ResType = Error
 			return res
 		}
@@ -278,13 +164,11 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 		for _, index := range freeVar {
 			if augMa[index][bitIndex] == 1 {
 				if augMa[index][resIndex] != 1 {
-					// fmt.Printf("augma[%d][%d] = 1 but augma[%d][res] = %d in freevar\n", index, bitIndex, index, 0)
 					res.ResType = Error
 					res.TempRes = augMa
 					return res
 				}
 			} else if augMa[index][resIndex] == 1 {
-				// fmt.Printf("augma[%d][res] == 1 in freevar \n", index)
 				res.ResType = Error
 				return res
 			}
@@ -296,13 +180,17 @@ func gaussEliminationPart2(augMa [][]int) GaussRes {
 	return res
 }
 
-func backSubstitution(gaussRes GaussRes) GaussRes {
+// BackSubstitution
+// receives a GaussRes as input and performs back substitution.
+// Returns a GaussRes struct. If back substitution was not possible as the system was not valid
+// GaussRes.ResType is set to Error.
+// Otherwise, GaussRess is updated and returned with the found R1, R2 and R3 values.
+func BackSubstitution(gaussRes GaussRes) GaussRes {
 	augMatrix := gaussRes.TempRes
 	lengthy := len(augMatrix[0])
 	noUnknownVars := lengthy - 2 // n is number of unknowns
 	lastCol := lengthy - 1
 	bitCol := lengthy - 2
-	//res := make([]int, noUnknownVars)
 	gaussRes = HandleMulti(gaussRes)
 	noMulti := len(gaussRes.Multi)
 
@@ -314,11 +202,11 @@ func backSubstitution(gaussRes GaussRes) GaussRes {
 		res[noUnknownVars-1] = augMatrix[noUnknownVars-1][lastCol] ^ augMatrix[noUnknownVars-1][bitCol]
 
 		for i := noUnknownVars - 2; i >= 0; i-- { // looks at every row not all zero
-			if contains(gaussRes.ColNo, i) {
+			if Contains(gaussRes.ColNo, i) {
 				continue //if we are in an free collum then we skip iteration
 				//i.e. we need to have a res with both 0 and 1 for this variable
 			}
-			if contains(gaussRes.DepCol, i) {
+			if Contains(gaussRes.DepCol, i) {
 				continue //if we are in an Dependent collum then we skip iteration
 				//i.e. we need to have a res with both 0 and 1 for this variable
 			}
@@ -339,12 +227,14 @@ func backSubstitution(gaussRes GaussRes) GaussRes {
 	return gaussRes
 }
 
+// HandleMulti
+// handles if there were empty columns or mutually dependent variables found when during GaussElimination.
+// Returns the multiple possible solutions for R4.
 func HandleMulti(gauss GaussRes) GaussRes {
 	gaussRes := gauss
 	gaussRes.Multi = make([][]int, 0)
 	noMulti := len(gaussRes.Multi)
 
-	//fmt.Printf("ResType: %v \n", gaussRes.ResType)
 	if gaussRes.ResType == Both || gaussRes.ResType == EmptyCol {
 		gaussRes = HandleEmptyCol(gaussRes)
 		noMulti = len(gaussRes.Multi)
@@ -357,7 +247,7 @@ func HandleMulti(gauss GaussRes) GaussRes {
 	}
 
 	if noMulti < 1 {
-		res := make([]int, (len(gaussRes.TempRes[0]) - 2))
+		res := make([]int, len(gaussRes.TempRes[0])-2)
 		gaussRes.Multi = append(gaussRes.Multi, res)
 		noMulti = len(gaussRes.Multi)
 	}
@@ -366,21 +256,21 @@ func HandleMulti(gauss GaussRes) GaussRes {
 	return gaussRes
 }
 
+// HandleEmptyCol
+// handles if there were empty columns found during GaussElimination.
 func HandleEmptyCol(gauss GaussRes) GaussRes {
 	gaussRes := gauss
 	noEmptyCol := len(gauss.ColNo)
 	bitSlice := MakeBitSlice(noEmptyCol)
 	newMulti := make([][]int, 0)
 	for i := 0; i < len(bitSlice); i++ {
-		res := make([]int, (len(gaussRes.TempRes[0]) - 2))
+		res := make([]int, len(gaussRes.TempRes[0])-2)
 		for j := 0; j < noEmptyCol; j++ {
 			index := gauss.ColNo[j]
 			res[index] = bitSlice[i][j]
 		}
-		//fmt.Printf("hmmm %d, %d, \n", res, i)
 		newMulti = append(newMulti, res)
 	}
-	//fmt.Printf("Size of NewMulti: %d \n", len(newMulti))
 
 	newGauss := GaussRes{
 		ResType: gaussRes.ResType,
@@ -392,6 +282,8 @@ func HandleEmptyCol(gauss GaussRes) GaussRes {
 	return newGauss
 }
 
+// HandleDepVar
+// handles if there were mutually dependent variables found during GaussElimination.
 func HandleDepVar(gauss GaussRes) GaussRes {
 	gaussRes := gauss
 	noDepVar := len(gaussRes.DepCol)
@@ -427,11 +319,10 @@ func HandleDepVar(gauss GaussRes) GaussRes {
 	return newGauss
 }
 
+// Contains
+// Takes a list of integer returns bool
 // Taken from https://stackoverflow.com/questions/10485743/contains-method-for-a-slice
-/* contains
-Takes a list of integer returns bool
-*/
-func contains(s []int, e int) bool {
+func Contains(s []int, e int) bool {
 	for _, a := range s {
 		if a == e {
 			return true
@@ -440,7 +331,8 @@ func contains(s []int, e int) bool {
 	return false
 }
 
-//MakeBitSlice takes an integer and outputs a slice of slices with all possible combinations
+// MakeBitSlice
+// takes an integer and outputs a slice of slices with all possible combinations
 func MakeBitSlice(number int) [][]int {
 	bitSlice := make([][]int, 0)
 	noOfDiffComb := int(math.Pow(2, float64(number)))

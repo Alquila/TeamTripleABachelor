@@ -35,9 +35,9 @@ func DoTheKnownPlainTextHack() ([]int, []int, []int) {
 	b := append(b1, b2...)
 	b = append(b, b3...)
 
-	x := solveByGaussEliminationTryTwo(A, b)
+	x := SolveByGaussElimination(A, b)
 
-	r1_solved, r2_solved, r3_solved := MakeGaussResultToRegisters(x.Solved)
+	r1_solved, r2_solved, r3_solved := MakeGaussResultToRegisters(x.Multi[0])
 
 	return r1_solved, r2_solved, r3_solved
 }
@@ -87,7 +87,7 @@ func PutConstantBackInRes(arr []int, constantIndex int) []int {
 
 // SimulateClockingR4WithFrameDifference
 // creates a new r4 register and initialises it with the difference between the current and original frame number.
-// Returns the RegSlice of the register which contains 1's in the place where the bits have been flipped with the new frame.
+// Returns the RegSlice of the register which Contains 1's in the place where the bits have been flipped with the new frame.
 func SimulateClockingR4WithFrameDifference(original_frame_number int, current_frame int) []int {
 	fake_r4 := MakeR4()
 	diff := FindDifferenceOfFrameNumbers(original_frame_number, current_frame)
@@ -122,6 +122,7 @@ func DescribeNewFrameWithOldVariables(original_framenum int, current_framenum in
 
 	// init the predicted new symReg
 	length := len(original_reg.RegSlice)
+	fmt.Println(length)
 
 	/*
 		Res is used to simulate what indices gets affected by the difference in frame number.
@@ -370,7 +371,7 @@ func KnownPlaintextAttack() {
 		key = append(key, key3...)
 
 		// this returns a gauss struct
-		gauss := solveByGaussEliminationTryTwo(key, realKey)
+		gauss := SolveByGaussElimination(key, realKey)
 
 		if gauss.ResType == Error {
 			continue
@@ -493,7 +494,7 @@ func RetrieveSessionKey(registers []int) []int {
 	skey := make([]int, 0)
 
 	symkey := DescribeRegistersFromKey() //
-	gauss := solveByGaussEliminationTryTwo(symkey, registers)
+	gauss := SolveByGaussElimination(symkey, registers)
 	println(gauss.ResType)
 	if gauss.ResType == Multi {
 		skey = gauss.Multi[0]
