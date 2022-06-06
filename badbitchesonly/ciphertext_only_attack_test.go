@@ -7,6 +7,7 @@ import (
 	"reflect"
 	_ "reflect"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -210,6 +211,8 @@ func TestMatrixToSlice(t *testing.T) {
 }
 
 func TestCiphertextOnlyAttack(t *testing.T) {
+	start := time.Now()
+
 	r4_found := make([][]int, 0)
 	r4_guess := make([]int, 17)
 
@@ -238,8 +241,8 @@ func TestCiphertextOnlyAttack(t *testing.T) {
 
 	guesses := int(math.Pow(2, 16))
 	println(guesses)
-	for i := lower; i < upper; i++ {
-		//for i := 0; i < guesses; i++ {
+	//for i := lower; i < upper; i++ {
+	for i := 0; i < guesses; i++ {
 		if i%100 == 0 {
 			fmt.Printf("iteration %d \n", i)
 		}
@@ -297,6 +300,8 @@ func TestCiphertextOnlyAttack(t *testing.T) {
 	fmt.Printf("This is bin_key: %v\n", bin_key[:2])
 	fmt.Printf("This is key_for_test: %v\n", key_for_test[:2])
 
+	executionTime := time.Since(start)
+	fmt.Printf("Ciphertext-only Attack took: %s", executionTime)
 }
 
 func TestCalculateXFramCiphertext(t *testing.T) {

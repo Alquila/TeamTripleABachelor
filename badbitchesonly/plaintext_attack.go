@@ -279,8 +279,8 @@ func KnownPlaintextAttack() {
 
 	guesses := int(math.Pow(2, 16))
 	println(guesses)
-	for i := lower; i < upper; i++ {
-		// for i := 0; i < guesses; i++ {
+	//for i := lower; i < upper; i++ {
+	for i := 0; i < guesses; i++ {
 		if i%100 == 0 {
 			fmt.Printf("iteration %d \n", i)
 		}

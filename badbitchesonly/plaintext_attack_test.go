@@ -11,44 +11,13 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	// "github.com/tidwall/assert"
 	// "time"
 	// //"golang.org/x/tools/go/analysis/passes/nilfunc"
 )
-
-// func TestPlaintext(t *testing.T) {
-// 	plaintext := MakePlaintext()
-// 	fmt.Printf("%d", plaintext)
-// }
-
-// func TestEncryptPlaintext(t *testing.T) {
-// 	plaintext := MakePlaintext()
-// 	fmt.Printf("This is the plaintext: %d \n", plaintext)
-// 	cipher := EncryptSimplePlaintext(plaintext)
-// 	fmt.Printf("%d \n", cipher)
-// }
-
-// func TestSymPlaintext(t *testing.T) {
-// 	plaintext := MakeSymPlaintext()
-// 	fmt.Printf("This is the plaintext: %d \n", plaintext)
-// }
-
-// func TestSymEncryptPlaintext(t *testing.T) {
-// 	plaintext := MakeSymPlaintext()
-// 	fmt.Printf("This is the plaintext: %d \n", plaintext)
-// 	cipher := EncryptSimpleSymPlaintext()
-// }
-
-func NotAllowedBigBangTest(t *testing.T) {
-	//plaintext := MakePlaintext()
-
-}
-
-// func TestDoTheSimpleHack(t *testing.T) {
-// 	doTheSimpleHack()
-// }
 
 func TestPrint2(t *testing.T) {
 	print("hello worlds")
@@ -605,7 +574,10 @@ func TestVerifyKeyStream(t *testing.T) {
 }
 
 func TestKnownPlaintextAttack(t *testing.T) {
+	start := time.Now()
 	KnownPlaintextAttack()
+	executionTime := time.Since(start)
+	fmt.Printf("Known Plaintext Attack took: %s", executionTime)
 }
 
 func TestFrames(t *testing.T) {
