@@ -44,7 +44,7 @@ The Known Plaintext Attack run:
 * To run the normal version with 2^16 guesses do the following:
   * go to ``plaintext_attack.go`` and check that line 283 is not commented out, but line 282 is.
   * The run in the terminal: go test -timeout 0 -run TestKnownPlaintextAttack
-  * Expect that the code might run up to 3 and a half hours. 
+  * Expect that the code might run up to 3 hours. 
 
 To run the Ciphertext-only Attack run:
 * To run the short version of the Ciphertext-only Attack you need to do the following:
@@ -54,7 +54,9 @@ To run the Ciphertext-only Attack run:
 * To run the normal version with 2^16 guesses do the following:
     * go to ``ciphertext_only_attack_test.go`` and check that line 242 is not commented out, but line 241 is.
     * The run in the terminal: go test -timeout 0 -run TestCiphertextOnlyAttack
-    * Expect that the code might run up to 7 and a half hours.
+    * Expect that the code might run up 4 hours.
+
+If you want to run both attacks simply run the file: ``run_attacks_test.go``
 
 NOTE: All tests were run on a MacBook Pro with a 2,3 GHz 8-Core Intel Core i9 CPU, and 16 GB 2667 MHz DDR4 RAM, 
 and lastly, an internal Intel UHD Graphics 630 1536 MB GPU. 

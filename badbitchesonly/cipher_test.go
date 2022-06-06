@@ -181,7 +181,7 @@ func TestSetIndicesToOne(t *testing.T) {
 
 func TestRegistersAreSameAfterInitWithSameFrameNumber(t *testing.T) {
 	MakeRegisters()
-	current_frame_number = 22
+	currentFrameNumber = 22
 	MakeSessionKey()
 	InitializeRegisters()
 	SetIndicesToOne()
@@ -391,7 +391,7 @@ func TestFinalXor(t *testing.T) {
 
 func TestKeyStreamSimple(t *testing.T) {
 	MakeSessionKey()
-	current_frame_number = -1
+	currentFrameNumber = -1
 	x := MakeKeyStream()
 	Printf("%+v \n", x)
 	Printf("mean %f \n", mean(x))

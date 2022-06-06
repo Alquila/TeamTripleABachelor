@@ -15,8 +15,8 @@ var r4 Register
 var r4_after_init Register
 
 // Lives in cipher.go - Has to be manually updated
-var current_frame_number int
-var session_key []int
+var currentFrameNumber int
+var sessionKey []int
 
 type Register struct {
 	Length   int   // Length of the Register
@@ -159,7 +159,7 @@ func MakeSessionKey() {
 	for i := 0; i < 64; i++ {
 		key[i] = rand.Intn(2)
 	}
-	session_key = key
+	sessionKey = key
 }
 
 // InitializeRegisters
@@ -178,14 +178,14 @@ func InitializeRegisters() {
 		Clock(r3)
 		Clock(r4)
 
-		r1.RegSlice[0] = r1.RegSlice[0] ^ session_key[i]
-		r2.RegSlice[0] = r2.RegSlice[0] ^ session_key[i]
-		r3.RegSlice[0] = r3.RegSlice[0] ^ session_key[i]
-		r4.RegSlice[0] = r4.RegSlice[0] ^ session_key[i]
+		r1.RegSlice[0] = r1.RegSlice[0] ^ sessionKey[i]
+		r2.RegSlice[0] = r2.RegSlice[0] ^ sessionKey[i]
+		r3.RegSlice[0] = r3.RegSlice[0] ^ sessionKey[i]
+		r4.RegSlice[0] = r4.RegSlice[0] ^ sessionKey[i]
 	}
 
 	// makes frame_number from int -> bits in slice
-	frame_bits := MakeFrameNumberToBits(current_frame_number)
+	frame_bits := MakeFrameNumberToBits(currentFrameNumber)
 
 	// Clock all registers 22 times and XOR with frame number
 	for i := 0; i < 22; i++ {

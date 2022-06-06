@@ -1,6 +1,6 @@
 package main
 
-var original_frame_number int
+var originalFrameNumber int
 
 /* global variable declaration */
 var sr1 SymRegister
@@ -120,9 +120,9 @@ func SymInitializeRegisters() {
 	// Reset registers, all indexes are set to 0
 	SymSetRegisters()
 
-	sr1.RegSlice = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr1)
-	sr2.RegSlice = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr2)
-	sr3.RegSlice = DescribeNewFrameWithOldVariables(original_frame_number, current_frame_number, sr3)
+	sr1.RegSlice = DescribeNewFrameWithOldVariables(originalFrameNumber, currentFrameNumber, sr1)
+	sr2.RegSlice = DescribeNewFrameWithOldVariables(originalFrameNumber, currentFrameNumber, sr2)
+	sr3.RegSlice = DescribeNewFrameWithOldVariables(originalFrameNumber, currentFrameNumber, sr3)
 
 	//Set bits to 1
 	BitEntry(sr1)

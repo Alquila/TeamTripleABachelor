@@ -101,9 +101,9 @@ func TestCiphertextOnlyAttackGauss(t *testing.T) {
 	/**	Does the same as TestMAKETEST from dumb_assversary */
 
 	// set frame number
-	current_frame_number, original_frame_number = 42, 42
-	// session_key is now all 0's
-	session_key = make([]int, 64)
+	currentFrameNumber, originalFrameNumber = 42, 42
+	// sessionKey is now all 0's
+	sessionKey = make([]int, 64)
 	// MakeSessionKey()
 	keyStream := make([]int, 0)      // append to this, assert that the length is rigth
 	symKeyStream := make([][]int, 0) // same here <3
@@ -115,7 +115,7 @@ func TestCiphertextOnlyAttackGauss(t *testing.T) {
 		newSymKeyStream := ClockForKey(sr4)
 		keyStream = append(keyStream, newKeyStream...)
 		symKeyStream = append(symKeyStream, newSymKeyStream...)
-		current_frame_number++
+		currentFrameNumber++
 	}
 
 	fmt.Printf("dims of msg:    %d x 1\n", len(full_msg))
@@ -216,11 +216,11 @@ func TestCiphertextOnlyAttack(t *testing.T) {
 	r4_found := make([][]int, 0)
 	r4_guess := make([]int, 17)
 
-	session_key = make([]int, 64) // FIXME: session_keyis all zeros now
-	// MakeSessionKey()
-	original_frame_number, current_frame_number = 42, 42
+	//sessionKey = make([]int, 64)
+	MakeSessionKey()
+	originalFrameNumber, currentFrameNumber = 42, 42
 	// should have eight frames
-	r4_bin, bin_key, key_for_test := MakeRealKeyStreamSixFrames(original_frame_number)
+	r4_bin, bin_key, key_for_test := MakeRealKeyStreamSixFrames(originalFrameNumber)
 
 	real_iteration := CalculateRealIteration(r4_bin)
 	lower := real_iteration - 100
@@ -243,7 +243,7 @@ func TestCiphertextOnlyAttack(t *testing.T) {
 	println(guesses)
 	//for i := lower; i < upper; i++ {
 	for i := 0; i < guesses; i++ {
-		if i%100 == 0 {
+		if i%1000 == 0 {
 			fmt.Printf("iteration %d \n", i)
 		}
 		if i == real_iteration {
@@ -252,8 +252,8 @@ func TestCiphertextOnlyAttack(t *testing.T) {
 		if i == real_iteration+1 {
 			fmt.Printf("iteration %d\n", real_iteration+1)
 		}
-		original_frame_number = 42 //reset the framenumber for the symbolic version
-		current_frame_number = 42
+		originalFrameNumber = 42 //reset the framenumber for the symbolic version
+		currentFrameNumber = 42
 
 		r4_guess = MakeR4Guess(i)
 		r4_guess = PutConstantBackInRes(r4_guess, 10)
@@ -261,12 +261,12 @@ func TestCiphertextOnlyAttack(t *testing.T) {
 		symKeyStream := make([][]int, 0)
 
 		for i := 0; i < 6; i++ { //Make six frame long sym-keystream for the guess
-			frame_influenced_bits := SimulateClockingR4WithFrameDifference(original_frame_number, current_frame_number)
+			frame_influenced_bits := SimulateClockingR4WithFrameDifference(originalFrameNumber, currentFrameNumber)
 			r4.RegSlice = XorSlice(frame_influenced_bits, r4_guess)
 			r4.RegSlice[10] = 1
 			key1 := MakeSymKeyStream() //this clocks sr4 which has r4_guess as its array
 			symKeyStream = append(symKeyStream, key1...)
-			current_frame_number++
+			currentFrameNumber++
 		}
 
 		/* Multiply KG with the SymbolicKeyStream to make KGK */
@@ -277,7 +277,7 @@ func TestCiphertextOnlyAttack(t *testing.T) {
 		full_KGk = append(full_KGk, KGk3...)
 
 		x := SolveByGaussElimination(full_KGk, full_KGC)
-		println(x.ResType)
+		//println(x.ResType)
 
 		if x.ResType == Multi {
 			//do stuff
@@ -294,20 +294,23 @@ func TestCiphertextOnlyAttack(t *testing.T) {
 
 	}
 
-	fmt.Printf("This is r4_found: %v\n", r4_found)
-	// fmt.Printf("This is r4_guess: %v\n", r4_guess)
+	fmt.Printf("This is r4_found: %v\n", r4_found[0])
 	fmt.Printf("This is r4_bin: %v\n", r4_bin)
-	fmt.Printf("This is bin_key: %v\n", bin_key[:2])
-	fmt.Printf("This is key_for_test: %v\n", key_for_test[:2])
+	fmt.Println("Have we found the right r4?")
+	if reflect.DeepEqual(r4_bin, r4_found[0]) {
+		fmt.Println("Fuck yes we found it gutterne")
+	} else {
+		fmt.Println("RIP we dit not manage to find the correct R4")
+	}
 
 	executionTime := time.Since(start)
 	fmt.Printf("Ciphertext-only Attack took: %s", executionTime)
 }
 
 func TestCalculateXFramCiphertext(t *testing.T) {
-	session_key = make([]int, 64)
-	original_frame_number = 42
-	current_frame_number = 42
+	sessionKey = make([]int, 64)
+	originalFrameNumber = 42
+	currentFrameNumber = 42
 	_, key, _ := MakeRealKeyStreamSixFrames(42)
 
 	c := CalculateXFrameCiphertext(key, 6)

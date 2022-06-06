@@ -272,8 +272,8 @@ func TestMAKETEST(t *testing.T) {
 	/* init r1 r2 r3 r4 */
 	MakeRegisters()
 	/* set frame number */
-	current_frame_number = 42
-	original_frame_number = 42
+	currentFrameNumber = 42
+	originalFrameNumber = 42
 
 	// key := make([]int, 64)
 	MakeSessionKey()
@@ -329,7 +329,7 @@ func TestMAKETEST(t *testing.T) {
 	}
 
 	//Do it all again
-	current_frame_number++
+	currentFrameNumber++
 	InitializeRegisters()
 	SetIndicesToOne()
 
@@ -360,7 +360,7 @@ func TestMAKETEST(t *testing.T) {
 	fmt.Printf("keystreamsym %d \n", len(keyStreamSym2[0]))
 
 	//Do it all again
-	current_frame_number++
+	currentFrameNumber++
 	InitializeRegisters()
 	SetIndicesToOne()
 
@@ -592,9 +592,9 @@ func TestFrames(t *testing.T) {
 	// diff between fake and real sec [0 0 1 1 1 0 1 0 1 0 0 0 0 0 1 1 0]
 	Prints(acc, "diff")
 
-	original_frame_number = 42
-	current_frame_number = 43
-	diff := FindDifferenceOfFrameNumbers(original_frame_number, current_frame_number)
+	originalFrameNumber = 42
+	currentFrameNumber = 43
+	diff := FindDifferenceOfFrameNumbers(originalFrameNumber, currentFrameNumber)
 	Prints(diff, "diff")
 	r4Instance := MakeR4()
 	for i := 0; i < 22; i++ {

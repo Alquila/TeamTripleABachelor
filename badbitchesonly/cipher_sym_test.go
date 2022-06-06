@@ -90,9 +90,9 @@ func TestDescribeRegistersFromKey(t *testing.T) {
 }
 
 /*func TestRetrieveSessionKey(t *testing.T) {
-	session_key = stringToIntArray("0 0 0 0 0 1 1 0 1 1 0 1 0 1 0 1 0 1 0 1 0 1 1 1 1 0 0 0 0 1 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 1 0 0")
+	sessionKey = stringToIntArray("0 0 0 0 0 1 1 0 1 1 0 1 0 1 0 1 0 1 0 1 0 1 1 1 1 0 0 0 0 1 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 1 0 0")
 	real_ses := make([]int, 64)
-	copy(real_ses, session_key)
+	copy(real_ses, sessionKey)
 	Prints(real_ses, "rree")
 
 	MakeRegisters()
@@ -116,8 +116,8 @@ func TestDescribeRegistersFromKey(t *testing.T) {
 }*/
 
 func TestSymRegistersSameAfterInitWithSameFrameNumber(t *testing.T) {
-	current_frame_number = 22
-	original_frame_number = 22
+	currentFrameNumber = 22
+	originalFrameNumber = 22
 	MakeSessionKey()
 	MakeRegisters()
 	InitializeRegisters()
@@ -161,8 +161,8 @@ func TestSymRegistersSameAfterInitWithSameFrameNumber(t *testing.T) {
 }
 
 func TestFinalXorSomething(t *testing.T) {
-	current_frame_number = 22
-	original_frame_number = 22
+	currentFrameNumber = 22
+	originalFrameNumber = 22
 	MakeSessionKey()
 	MakeRegisters()
 	InitializeRegisters()
@@ -205,9 +205,9 @@ func TestFinalXorSomething(t *testing.T) {
 }
 
 func TestFinalXorLenght(t *testing.T) {
-	current_frame_number = 22
-	original_frame_number = 22
-	session_key = make([]int, 64)
+	currentFrameNumber = 22
+	originalFrameNumber = 22
+	sessionKey = make([]int, 64)
 	MakeRegisters()
 	InitializeRegisters()
 	SymInitializeRegisters()

@@ -152,18 +152,18 @@ func DescribeNewFrameWithOldVariables(original_framenum int, current_framenum in
 // Returns the real r4 that made the keystream.
 // Returns a three frame long key. Returns fourth frame key
 func MakeRealKeyStreamFourFrames(frame int) ([]int, []int, []int) {
-	original_frame_number = frame
-	current_frame_number = frame
+	originalFrameNumber = frame
+	currentFrameNumber = frame
 	key1 := MakeKeyStream()
 	r4_real := make([]int, 17)
 	copy(r4_real, r4_after_init.RegSlice)
 
-	current_frame_number++
+	currentFrameNumber++
 	key2 := MakeKeyStream()
-	current_frame_number++
+	currentFrameNumber++
 	key3 := MakeKeyStream()
 
-	current_frame_number++
+	currentFrameNumber++
 	key4 := MakeKeyStream()
 
 	key := append(key1, key2...)
@@ -175,8 +175,8 @@ func MakeRealKeyStreamFourFrames(frame int) ([]int, []int, []int) {
 // makes a six frame long key stream and returns it along the initial r4 value.
 // Returns two extra frame for test. Returns r4_real, key, extra_key
 func MakeRealKeyStreamSixFrames(frame int) ([]int, []int, []int) {
-	original_frame_number = frame
-	current_frame_number = frame
+	originalFrameNumber = frame
+	currentFrameNumber = frame
 	key := make([]int, 0)
 	key1 := MakeKeyStream()
 	r4Real := make([]int, 17)
@@ -184,14 +184,14 @@ func MakeRealKeyStreamSixFrames(frame int) ([]int, []int, []int) {
 	key = append(key, key1...)
 
 	for i := 0; i < 5; i++ {
-		current_frame_number++
+		currentFrameNumber++
 		newKeyStream := MakeKeyStream()
 		key = append(key, newKeyStream...)
 	}
 
-	current_frame_number++
+	currentFrameNumber++
 	extraKeyStream := MakeKeyStream()
-	current_frame_number++
+	currentFrameNumber++
 	extraKeyStream2 := MakeKeyStream()
 	extraKeyStream = append(extraKeyStream, extraKeyStream2...)
 
@@ -268,9 +268,9 @@ func KnownPlaintextAttack() {
 	r4Found := make([][]int, 0) // append results to this boi
 	r4Guess := make([]int, 17)
 
-	session_key = make([]int, 64) //all zero session key
-	original_frame_number = 42
-	r4Real, realKey, r4ForTest := MakeRealKeyStreamFourFrames(original_frame_number)
+	sessionKey = make([]int, 64) //all zero session key
+	originalFrameNumber = 42
+	r4Real, realKey, r4ForTest := MakeRealKeyStreamFourFrames(originalFrameNumber)
 
 	realIteration := CalculateRealIteration(r4Real)
 	lower := realIteration - 150
@@ -281,7 +281,7 @@ func KnownPlaintextAttack() {
 	println(guesses)
 	//for i := lower; i < upper; i++ {
 	for i := 0; i < guesses; i++ {
-		if i%100 == 0 {
+		if i%1000 == 0 {
 			fmt.Printf("iteration %d \n", i)
 		}
 		if i == realIteration {
@@ -290,8 +290,8 @@ func KnownPlaintextAttack() {
 		if i == realIteration+1 {
 			fmt.Printf("iteration %d\n", realIteration+1)
 		}
-		original_frame_number = 42 // reset the frame number for the symbolic version
-		current_frame_number = 42
+		originalFrameNumber = 42 // reset the frame number for the symbolic version
+		currentFrameNumber = 42
 
 		r4Guess = MakeR4Guess(i) // for all possible value of r4 we need three frames
 		r4Guess = PutConstantBackInRes(r4Guess, 10)
@@ -301,24 +301,24 @@ func KnownPlaintextAttack() {
 		copy(r4.RegSlice, r4Guess)
 		key1 := MakeSymKeyStream() // this clocks sr4 which has r4Guess as its array
 
-		current_frame_number++
+		currentFrameNumber++
 
 		// update r4Guess with new frame value
 		r4 = MakeR4()
 		copy(r4.RegSlice, r4Guess)
 
-		frameInfluencedBits := SimulateClockingR4WithFrameDifference(original_frame_number, current_frame_number)
+		frameInfluencedBits := SimulateClockingR4WithFrameDifference(originalFrameNumber, currentFrameNumber)
 		r4.RegSlice = XorSlice(frameInfluencedBits, r4Guess)
 
 		r4.RegSlice[10] = 1
 
 		key2 := MakeSymKeyStream() //this will now copy the updated r4_regSlice into sr4
 
-		current_frame_number++
+		currentFrameNumber++
 		r4 = MakeR4()
 		fakeR4 := MakeR4()
 		copy(r4.RegSlice, r4Guess)
-		diff := FindDifferenceOfFrameNumbers(original_frame_number, current_frame_number)
+		diff := FindDifferenceOfFrameNumbers(originalFrameNumber, currentFrameNumber)
 
 		//fakeR4.RegSlice clockes således at det er [...1..] de steder hvor diff påvirker indgangene
 		for i := 0; i < 22; i++ {
@@ -329,7 +329,7 @@ func KnownPlaintextAttack() {
 		r4.RegSlice = XorSlice(fakeR4.RegSlice, r4.RegSlice)
 		r4.RegSlice[10] = 1
 		key3 := MakeSymKeyStream()
-		current_frame_number++
+		currentFrameNumber++
 
 		key := append(key1, key2...)
 		key = append(key, key3...)
@@ -360,7 +360,7 @@ func KnownPlaintextAttack() {
 		for i := 0; i > numberOfValidR4; i++ {
 			r4.RegSlice = r4Found[i]
 			// We make an extra keystream with frame number: base frame + 4
-			current_frame_number = original_frame_number + 4
+			currentFrameNumber = originalFrameNumber + 4
 			ks := MakeKeyStream()
 			if reflect.DeepEqual(ks, r4ForTest) {
 				fmt.Printf("This is the right one: %d\n", r4ForTest)
