@@ -245,6 +245,13 @@ func DescribeRegistersFromKey() [][]int {
 		reg4.RegSlice[0][i] = 1
 	}
 
+	for i := 0; i < 22; i++ {
+		SymClock(sre1)
+		SymClock(sre2)
+		SymClock(sre3)
+		SymClock(reg4)
+	}
+
 	symbolicDescription := make([][]int, 0)
 	symbolicDescription = append(symbolicDescription, sre1.RegSlice...)
 	symbolicDescription = append(symbolicDescription, sre2.RegSlice...)
@@ -252,6 +259,101 @@ func DescribeRegistersFromKey() [][]int {
 	symbolicDescription = append(symbolicDescription, reg4.RegSlice...)
 
 	return symbolicDescription
+}
+
+func DescribeRegistersFromFrame() [][]int {
+	sre1 := SymMakeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14, 15)
+	sre2 := SymMakeRegister(22, []int{21, 20}, []int{9, 13}, 16, 16)
+	sre3 := SymMakeRegister(23, []int{22, 21, 20, 7}, []int{16, 18}, 13, 18)
+
+	for i := 0; i < sre1.Length; i++ {
+		sre1.RegSlice[i] = make([]int, 22)
+	}
+
+	for i := 0; i < sre2.Length; i++ {
+		sre2.RegSlice[i] = make([]int, 22)
+	}
+
+	for i := 0; i < sre3.Length; i++ {
+		sre3.RegSlice[i] = make([]int, 22)
+	}
+
+	reg4 := SymMakeRegister(17, []int{16, 11}, []int{12, 15}, 14, 10)
+	for i := 0; i < 17; i++ {
+		reg4.RegSlice[i] = make([]int, 22)
+	}
+
+	for i := 0; i < 22; i++ {
+		SymClock(sre1)
+		SymClock(sre2)
+		SymClock(sre3)
+		SymClock(reg4)
+		sre1.RegSlice[0][i] = 1
+		sre2.RegSlice[0][i] = 1
+		sre3.RegSlice[0][i] = 1
+		reg4.RegSlice[0][i] = 1
+	}
+	symbolicDescription := make([][]int, 0)
+	symbolicDescription = append(symbolicDescription, sre1.RegSlice...)
+	symbolicDescription = append(symbolicDescription, sre2.RegSlice...)
+	symbolicDescription = append(symbolicDescription, sre3.RegSlice...)
+	symbolicDescription = append(symbolicDescription, reg4.RegSlice...)
+
+	return symbolicDescription
+}
+
+func DescribeRegistersFromKeyAndFrame() [][]int {
+	sre1 := SymMakeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14, 15)
+	sre2 := SymMakeRegister(22, []int{21, 20}, []int{9, 13}, 16, 16)
+	sre3 := SymMakeRegister(23, []int{22, 21, 20, 7}, []int{16, 18}, 13, 18)
+
+	for i := 0; i < sre1.Length; i++ {
+		sre1.RegSlice[i] = make([]int, 64+22)
+	}
+
+	for i := 0; i < sre2.Length; i++ {
+		sre2.RegSlice[i] = make([]int, 64+22)
+	}
+
+	for i := 0; i < sre3.Length; i++ {
+		sre3.RegSlice[i] = make([]int, 64+22)
+	}
+
+	reg4 := SymMakeRegister(17, []int{16, 11}, []int{12, 15}, 14, 10)
+	for i := 0; i < 17; i++ {
+		reg4.RegSlice[i] = make([]int, 64+22)
+	}
+
+	for i := 0; i < 64; i++ {
+		SymClock(sre1)
+		SymClock(sre2)
+		SymClock(sre3)
+		SymClock(reg4)
+		sre1.RegSlice[0][i] = 1
+		sre2.RegSlice[0][i] = 1
+		sre3.RegSlice[0][i] = 1
+		reg4.RegSlice[0][i] = 1
+	}
+
+	for i := 64; i < 64+22; i++ {
+		SymClock(sre1)
+		SymClock(sre2)
+		SymClock(sre3)
+		SymClock(reg4)
+		sre1.RegSlice[0][i] = 1
+		sre2.RegSlice[0][i] = 1
+		sre3.RegSlice[0][i] = 1
+		reg4.RegSlice[0][i] = 1
+	}
+
+	symbolicDescription := make([][]int, 0)
+	symbolicDescription = append(symbolicDescription, sre1.RegSlice...)
+	symbolicDescription = append(symbolicDescription, sre2.RegSlice...)
+	symbolicDescription = append(symbolicDescription, sre3.RegSlice...)
+	symbolicDescription = append(symbolicDescription, reg4.RegSlice...)
+
+	return symbolicDescription
+
 }
 
 // KnownPlaintextAttack

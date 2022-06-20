@@ -69,6 +69,28 @@ func PrettySymPrintFrame(slice [][]int) {
 
 }
 
+func PrettySymPrintKeyFrame(slice [][]int) {
+	for i := 0; i < len(slice); i++ { //19
+		accString := "["
+		for j := 0; j < len(slice[0]); j++ { //19
+			if slice[i][j] == 1 {
+				if j < 64 {
+					str := strconv.Itoa(j)
+					accString += "k" + (str) + " ⨁ "
+				} else {
+					str := strconv.Itoa(j - 64)
+					accString += "f" + (str) + " ⨁ "
+				}
+			}
+		}
+		accString = strings.TrimRight(accString, "⨁ ")
+		accString += "]  \n"
+		print(accString)
+	}
+	Println()
+
+}
+
 func PrettySymPrintSliceBit(rMatrix [][]int, bit_entry int) {
 	rLength := len(rMatrix)
 	for i := 0; i < rLength; i++ {

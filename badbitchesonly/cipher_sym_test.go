@@ -89,6 +89,77 @@ func TestDescribeRegistersFromKey(t *testing.T) {
 	PrintMatrix(sym)
 }
 
+func TestRip(t *testing.T) {
+	rr1 := MakeR1()
+	rr2 := MakeR2()
+	rr3 := MakeR3()
+	rr4 := MakeR4()
+	rr1.RegSlice = stringToIntArray("0 1 0 0 0 1 1 1 1 1 1 0 0 1 0 0 0 0 0")
+	rr1.RegSlice = make([]int, rr1.Length)
+	rr1.RegSlice[18] = 1
+	rr2.RegSlice = stringToIntArray("0 1 1 0 0 1 0 0 0 0 1 1 0 1 1 1 1 1 1 0 0 1")
+	rr3.RegSlice = stringToIntArray("1 0 1 0 1 0 1 0 0 0 0 1 0 1 0 0 1 1 1 1 0 1 1")
+	rr4.RegSlice = stringToIntArray("1 0 0 1 0 1 1 1 0 0 1 1 0 0 0 1 0")
+
+	frame := MakeFrameNumberToBits(6)
+	Prints(rr1.RegSlice, "regs pre:")
+	Prints(frame, "frame:   ")
+	for i := 0; i < 22; i++ {
+		Clock(rr1)
+		Clock(rr2)
+		Clock(rr3)
+		Clock(rr4)
+		rr1.RegSlice[0] = rr1.RegSlice[0] ^ frame[i]
+		rr2.RegSlice[0] = rr2.RegSlice[0] ^ frame[i]
+		rr3.RegSlice[0] = rr3.RegSlice[0] ^ frame[i]
+		rr4.RegSlice[0] = rr4.RegSlice[0] ^ frame[i]
+	}
+	Prints(rr1.RegSlice, "regs:    ")
+
+	sym := DescribeRegistersFromFrame()
+	all_reg := append(rr1.RegSlice, rr2.RegSlice...)
+	all_reg = append(all_reg, rr3.RegSlice...)
+	all_reg = append(all_reg, rr4.RegSlice...)
+
+	rriip6 := []int{frame[2] ^ frame[3] ^ frame[4] ^ frame[7] ^ frame[21],
+		frame[1] ^ frame[2] ^ frame[3] ^ frame[6] ^ frame[20],
+		frame[0] ^ frame[1] ^ frame[2] ^ frame[5] ^ frame[19],
+		frame[0] ^ frame[1] ^ frame[4] ^ frame[18],
+		frame[0] ^ frame[3] ^ frame[17],
+		frame[2] ^ frame[16]}
+	Prints(frameReg(sym, frame)[:19], "rii    ")
+	// rip7 := frameReg(sym,frame)
+
+	// x := SolveByGaussElimination(sym, all_reg)
+	// print(x.ResType)
+
+	// PrettySymPrintFrame(sym)
+	Prints(rriip6, "equation")
+}
+
+func TestRip2(t *testing.T) {
+
+	sym := DescribeRegistersFromKeyAndFrame()
+	PrettySymPrintKeyFrame(sym)
+
+}
+
+func frameReg(sym [][]int, frame []int) []int {
+	res := make([]int, 85) //change 85
+	println(len(sym))
+	println(len(sym[0]))
+	for i := 0; i < len(sym); i++ {
+		result := 0
+		for j := 0; j < len(sym[0]); j++ {
+			if sym[i][j] == 1 {
+				result = result ^ frame[j]
+			}
+		}
+		res[i] = result
+	}
+	return res
+}
+
 /*func TestRetrieveSessionKey(t *testing.T) {
 	sessionKey = stringToIntArray("0 0 0 0 0 1 1 0 1 1 0 1 0 1 0 1 0 1 0 1 0 1 1 1 1 0 0 0 0 1 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 1 0 0")
 	real_ses := make([]int, 64)
@@ -114,6 +185,177 @@ func TestDescribeRegistersFromKey(t *testing.T) {
 	}
 
 }*/
+
+func TestRetrieveSessionKey2(t *testing.T) {
+	sessionKey = stringToIntArray("0 0 0 0 0 1 1 0 1 1 0 1 0 1 0 1 0 1 0 1 0 1 1 1 1 0 0 0 0 1 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 1 0 0")
+	MakeSessionKey()
+	real_ses := make([]int, 64)
+	copy(real_ses, sessionKey)
+	Prints(real_ses, "rree")
+	currentFrameNumber = 6
+
+	MakeRegisters()
+	InitializeRegisters()
+
+	symkey := DescribeRegistersFromKey()
+	symFrame := frameReg(DescribeRegistersFromFrame(), MakeFrameNumberToBits(currentFrameNumber))
+
+	println(len(symkey))
+	println(len(symkey[0]))
+	println(len(symFrame))
+	Prints(symFrame[:12], "fram")
+	A := make([][]int, 81)
+	for i := 0; i < len(symkey); i++ {
+		A[i] = append(symkey[i], symFrame[i])
+	}
+	// PrintMatrix(A[:20])
+	b := make([]int, 0)
+	b = append(r1.RegSlice, r2.RegSlice...)
+	b = append(b, r3.RegSlice...)
+	b = append(b, r4.RegSlice...)
+
+	x := SolveByGaussElimination(A, b)
+	println(x.ResType)
+	Prints(x.Multi[0], "reee")
+
+}
+
+func TestOldWay(t *testing.T) {
+	MakeSessionKey()
+	real_ses := make([]int, 64)
+	copy(real_ses, sessionKey)
+	Prints(real_ses, "rree")
+	currentFrameNumber = 6
+
+	MakeRegisters()
+	r1.RegSlice = make([]int, r1.Length)
+	r2.RegSlice = make([]int, r2.Length)
+	r3.RegSlice = make([]int, r3.Length)
+	r4.RegSlice = make([]int, r4.Length)
+
+	// Clock all registers 64 times and XOR with the session key
+	for i := 0; i < 64; i++ {
+		Clock(r1)
+		Clock(r2)
+		Clock(r3)
+		Clock(r4)
+
+		r1.RegSlice[0] = r1.RegSlice[0] ^ sessionKey[i]
+		r2.RegSlice[0] = r2.RegSlice[0] ^ sessionKey[i]
+		r3.RegSlice[0] = r3.RegSlice[0] ^ sessionKey[i]
+		r4.RegSlice[0] = r4.RegSlice[0] ^ sessionKey[i]
+	}
+	preFrame := make([]int, 0)
+	preFrame = append(r1.RegSlice, r2.RegSlice...)
+	preFrame = append(preFrame, r3.RegSlice...)
+	preFrame = append(preFrame, r4.RegSlice...)
+	// makes frame_number from int -> bits in slice
+	frame_bits := MakeFrameNumberToBits(currentFrameNumber)
+
+	// Clock all registers 22 times and XOR with frame number
+	for i := 0; i < 22; i++ {
+		Clock(r1)
+		Clock(r2)
+		Clock(r3)
+		Clock(r4)
+
+		r1.RegSlice[0] = r1.RegSlice[0] ^ frame_bits[i]
+		r2.RegSlice[0] = r2.RegSlice[0] ^ frame_bits[i]
+		r3.RegSlice[0] = r3.RegSlice[0] ^ frame_bits[i]
+		r4.RegSlice[0] = r4.RegSlice[0] ^ frame_bits[i]
+	}
+
+	symFrame := frameReg(DescribeRegistersFromFrame(), MakeFrameNumberToBits(currentFrameNumber))
+
+	ee := helpSym()
+	println(len(ee))
+	println(len(ee[0]))
+	A := make([][]int, 81)
+	for i := 0; i < len(A); i++ {
+		A[i] = append(ee[i], symFrame[i])
+	}
+	// PrintMatrix(A[:20])
+	println(len(A))
+	println(len(A[0]))
+	b := make([]int, 0)
+	b = append(r1.RegSlice, r2.RegSlice...)
+	b = append(b, r3.RegSlice...)
+	b = append(b, r4.RegSlice...)
+
+	// PrintMatrix(ee[:20])
+
+	x := SolveByGaussElimination(A, b)
+	println(x.ResType)
+	Prints(x.Multi[0], "reee")
+	Prints(preFrame, "pref")
+
+}
+
+func helpSym() [][]int {
+	sre1 := SymMakeRegister(19, []int{18, 17, 16, 13}, []int{12, 15}, 14, 15)
+	sre2 := SymMakeRegister(22, []int{21, 20}, []int{9, 13}, 16, 16)
+	sre3 := SymMakeRegister(23, []int{22, 21, 20, 7}, []int{16, 18}, 13, 18)
+
+	for i := 0; i < sre1.Length; i++ {
+		sre1.RegSlice[i] = make([]int, sre1.Length)
+		sre1.RegSlice[i][i] = 1
+	}
+
+	for i := 0; i < sre2.Length; i++ {
+		sre2.RegSlice[i] = make([]int, sre2.Length)
+		sre2.RegSlice[i][i] = 1
+	}
+
+	for i := 0; i < sre3.Length; i++ {
+		sre3.RegSlice[i] = make([]int, sre3.Length)
+		sre3.RegSlice[i][i] = 1
+	}
+
+	reg4 := SymMakeRegister(17, []int{16, 11}, []int{12, 15}, 14, 10)
+	for i := 0; i < 17; i++ {
+		reg4.RegSlice[i] = make([]int, reg4.Length)
+		reg4.RegSlice[i][i] = 1
+	}
+
+	for i := 0; i < 22; i++ {
+		SymClock(sre1)
+		SymClock(sre2)
+		SymClock(sre3)
+		SymClock(reg4)
+	}
+
+	for i := 0; i < sre1.Length; i++ {
+		rr := make([]int, 81)
+		copy(rr, sre1.RegSlice[i])
+		sre1.RegSlice[i] = rr
+	}
+	for i := 0; i < sre2.Length; i++ {
+		rr := make([]int, 81)
+		copy(rr[sre1.Length:], sre2.RegSlice[i])
+		sre2.RegSlice[i] = rr
+	}
+
+	for i := 0; i < sre3.Length; i++ {
+		rr := make([]int, 81)
+		copy(rr[sre1.Length+sre2.Length:], sre3.RegSlice[i])
+		sre3.RegSlice[i] = rr
+	}
+
+	for i := 0; i < 17; i++ {
+		rr := make([]int, 81)
+		copy(rr[sre1.Length+sre2.Length+sre3.Length:], reg4.RegSlice[i])
+		reg4.RegSlice[i] = rr
+	}
+
+	symbolicDescription := make([][]int, 0)
+	symbolicDescription = append(symbolicDescription, sre1.RegSlice...)
+	symbolicDescription = append(symbolicDescription, sre2.RegSlice...)
+	symbolicDescription = append(symbolicDescription, sre3.RegSlice...)
+	symbolicDescription = append(symbolicDescription, reg4.RegSlice...)
+
+	return symbolicDescription
+
+}
 
 func TestSymRegistersSameAfterInitWithSameFrameNumber(t *testing.T) {
 	currentFrameNumber = 22
