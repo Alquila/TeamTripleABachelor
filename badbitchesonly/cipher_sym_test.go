@@ -266,17 +266,25 @@ func TestOldWay(t *testing.T) {
 	}
 
 	symFrame := frameReg(DescribeRegistersFromFrame(), MakeFrameNumberToBits(currentFrameNumber))
+	ree := make([]int, 77)
+	ree = remove(symFrame, 75)
+	// copy(ree, symFrame[:15])                                                          //x_0 - x_14
+	// x_15tox_16 := 16+3+16
+	// x_17tox_17 := x_15tox_16 +
+	// ree = append(ree, symFrame[16:x_15tox_16]...)                                        //x_16 - x_18, x_0 - x_15
+	// ree = append(ree, symFrame[16+16+3+1:16+16+3+1+5+18]...)                          //x_17 - x_21, x_0-x_17
+	// ree = append(ree, symFrame[16+16+3+1+5+18+1:16+16+3+1+5+18+1+4+10]...)            //x_19 - x_22, x_0-x_9
+	// ree = append(ree, symFrame[16+16+3+1+5+18+1+4+10+1:16+16+3+1+5+18+1+4+10+1+6]...) //x_11-x_x_16
+	fmt.Printf("ree: %d \n", len(ree))
 
 	ee := helpSym()
-	println(len(ee))
-	println(len(ee[0]))
+	fmt.Printf("x_sym: %d x %d\n", (len(ee)), (len(ee[0])))
 	A := make([][]int, 81)
 	for i := 0; i < len(A); i++ {
 		A[i] = append(ee[i], symFrame[i])
 	}
 	// PrintMatrix(A[:20])
-	println(len(A))
-	println(len(A[0]))
+	fmt.Printf("A: %d x %d \n", (len(A)), (len(A[0])))
 	b := make([]int, 0)
 	b = append(r1.RegSlice, r2.RegSlice...)
 	b = append(b, r3.RegSlice...)
@@ -288,7 +296,13 @@ func TestOldWay(t *testing.T) {
 	println(x.ResType)
 	Prints(x.Multi[0], "reee")
 	Prints(preFrame, "pref")
+	Prints(preFrame[:15], "15")
+	Prints(preFrame[16:16+3], "16")
 
+}
+
+func remove(slice []int, s int) []int {
+	return append(slice[:s], slice[s+1:]...)
 }
 
 func helpSym() [][]int {
